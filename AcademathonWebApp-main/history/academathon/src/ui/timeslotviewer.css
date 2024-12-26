@@ -1,0 +1,50 @@
+.timeslot-container {
+    font-family: Arial, sans-serif;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    width: 80%;
+    margin: 0 auto;
+  }
+  
+  .timeslot-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .timeslot-body {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .day-timeslots {
+    flex: 1;
+    margin-right: 20px;
+  }
+  
+  .day-timeslots h3 {
+    margin-bottom: 10px;
+  }
+  
+  .timeslot-list {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  
+  .timeslot-item {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .timeslot-item:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .timeslot-item.selected {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .timeslot-item.selected:hover {
+    background-color: #0056b3;
+  }

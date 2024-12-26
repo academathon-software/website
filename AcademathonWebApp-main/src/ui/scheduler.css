@@ -1,0 +1,164 @@
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.scheduler-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.scheduler-header {
+  background-color: #0f6f00;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+}
+
+.scheduler-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  margin-top: 20px;
+}
+
+.day-selector,
+.time-slot-input,
+.duration-input,
+.button-container {
+  margin-bottom: 20px;  
+}
+
+
+.day-selector,
+.time-slot-input,
+.duration-input,
+.button-container:focus {
+  outline: none;
+}
+
+
+.day-selector label,
+.time-slot-input label,
+.duration-input label {
+  margin-right: 10px;
+}
+
+.day-selector select,
+.time-slot-input input,
+.duration-input input {
+  padding: 8px;
+  font-size: 16px;
+}
+
+.button-container button {
+  margin-left: 10px;
+}
+
+.schedule {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin:auto;
+}
+
+.day-schedule {
+  margin: 0 20px;
+  margin-top:10px;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  background-color: #f4fff2;
+}
+
+.day-schedule h2{
+  color:black;
+  font-weight: normal;
+}
+.time-slot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 10px;
+}
+
+.remove-button {
+  padding: 5px 5px;
+  margin-left: 10px;
+  font-size: 14px;
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.remove-button:hover {
+  background-color: #c82333;
+}
+
+.add-button-container {
+  margin-top: 10px;
+  margin-bottom: 30px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+
+.custom-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transition for border color and box shadow */
+}
+
+.custom-input:focus {
+  outline: none;
+  border-color: #0F6F00; /* Color change on focus */
+  box-shadow: 0 0 5px rgba(102, 175, 233, 0.6); /* Optional: Adding a box-shadow on focus */
+}
+
+
+.label-spacing {
+  margin-bottom: 1px;
+}
+
+
+p {
+  font-size: 12px;
+}
+
+
+.custom-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  padding: 20px;
+  width: 40%; /* Adjust width as needed */
+  max-width: 80%; /* Maximum width */
+  max-height: 80vh; /* Maximum height */
+}
+
+.custom-overlay {
+  background-color: rgba(0, 0, 0, 1); /* Adjust opacity as needed */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+

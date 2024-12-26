@@ -1,0 +1,42 @@
+.container{
+    display: flex;
+    justify-content: center;
+    padding-top: 5vh;
+}
+
+.profile-container {
+    width: 30vw;
+    height: 15vh;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.profile-picture {
+    width: 10vh;
+    height: auto;
+    border-radius: 50%;
+    margin-bottom: 20px; /* Spaces the image from the text */
+    border: 3px solid black;
+}
+
+.profile-info {
+    text-align: center; /* Centers the text beneath the image */
+}
+
+.profile-info h2 {
+    color: #000000;
+    font-size: 28px; /* Slightly larger for emphasis */
+}
+
+.profile-name {
+    margin-bottom: 5px; /* Minimizes gap to keep related text together */
+    color: #000000;
+}
+
+.profile-bio {
+    font-size: 18px;
+    color: #000000;
+    margin-bottom: 20px; /* Provides breathing space before the next section */
+}

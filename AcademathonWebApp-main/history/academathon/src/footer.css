@@ -1,0 +1,51 @@
+.footer {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .footer {
+    position: relative;
+    /*height: 5px;*/
+    bottom:0;
+    left: 0;
+    right: 0;
+  }
+  
+  .signup form {
+    display: flex;
+  }
+  
+  .signup input[type="email"],
+  .signup button {
+    padding: 5px;
+    margin-right: 10px;
+  }
+  
+  .signup button {
+    background-color: #fff;
+    color: #333;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .social-links ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .social-links li {
+    margin-bottom: 5px;
+  }
+  
+  .social-links a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .social-links a:hover {
+    text-decoration: underline;
+  }

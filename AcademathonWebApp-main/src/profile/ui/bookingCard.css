@@ -1,0 +1,39 @@
+.booking-card {
+    width: 250px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .booking-card h3{
+    color:black;
+  }
+
+  .booking-card button{
+    margin: 5px;
+  }
+  
+  .button-container {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    margin-top: 10px;
+  }
+  
+  .button-container button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    transition: background-color 0.3s;
+  }
+  
+
+.button-container .meeting-confirmed{
+  color:rgb(0, 244, 0);
+}
+.button-container .meeting-denied{
+  color:red;
+}

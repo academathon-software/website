@@ -1,0 +1,80 @@
+.search-container {
+    display: flex;
+    justify-content: center;
+}
+
+.left-column {
+    flex: 0 0 80px; /* Set width of left column */
+    padding: 20px;
+    background-color: #fcfcfc;
+    margin-right: auto;
+}
+
+
+.main-content {
+    text-align: center;
+    display:grid;
+    justify-content: center;
+    width:100%;
+}
+
+.search-fields{
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.search-button{
+    width:100px;
+    height:50px;
+}
+
+.posts{
+    display:flex;
+    flex-direction: column;
+    max-width: 500px;
+    width:100%;
+}
+
+.profile-post-container{
+    text-align: center;
+}
+
+
+/* Style for filter options */
+.left-column h3 {
+    margin-bottom: 10px;
+}
+
+.left-column ul {
+    list-style: none;
+    padding: 0;
+}
+
+.left-column li {
+    margin-bottom: 5px;
+    cursor: pointer;
+    font-size: 11px;
+}
+.text-search{
+    padding-right: 50px;
+    min-width:300px;
+    display:flex;
+    align-items: center;
+}
+.text-search input{
+    width:100%;
+    height:40px;
+
+    border-radius: 3px;
+}
+
+.subject-selection{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+.subject-selection h3{
+    margin-right: 20px;
+}
+/* Add additional styles as needed */
