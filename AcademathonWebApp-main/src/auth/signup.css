@@ -1,20 +1,17 @@
 
 .signup-button{
-    width:150px;
-    height:50px;
-  }
+  width:525px;
+  margin-top: 25px;
+  height:60px;
+  text-align: center;
+}
   
   .signup-container {
-    width: 80%;
-    max-width: 800px;
-    min-width: 200px;
-    height: 80%;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    width: 55%;
+    height: 700px;
+    position: absolute;
+    right: 0;
     background-color: #f9f9f9;
-    margin-top: 50px;
   }
   
   h2 {
@@ -30,11 +27,21 @@
   }
   
   .signup-container form input{
-    width: 100%;
-    padding: 10px;
+    /* width: 100%; */
+    padding: 20px;
     margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 3px;
+    border: 1px solid green;
+    border-radius: 6px;
+  }
+
+  .undertext{
+    width: 450px;
+    text-align: left;
+    font-size: 15px;
+    color: grey;
+    margin-bottom: 40px;
+    font-weight: 100;
+    font-family: Arial, Helvetica, sans-serif
   }
   
   .error{
@@ -43,14 +50,44 @@
   
 
 .custom-input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transition for border color and box shadow */
+  width: 100%; /* The input will take the full width of its container */
+  max-width: 450px; /* Restrict the maximum width */
+  height: 60px; /* Set the height of the input box */
+  padding: 10px; /* Add padding inside the input box */
+  margin-bottom: 15px; /* Space between inputs */
+  border-radius: 1px; /* Rounded corners */
+  font-size: 1rem; /* Font size for the text inside the input */
+  box-sizing: border-box; /* Ensures padding and border don't affect width */
+  border: 20px solid green;
 }
 
 .custom-input:focus {
   outline: none;
   border-color: #0F6F00; /* Color change on focus */
   box-shadow: 0 0 5px rgba(102, 175, 233, 0.6); /* Optional: Adding a box-shadow on focus */
+}
+
+.greenblock {
+  width: 45%;
+  height: 700px;
+  background-color: #008037;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+}
+
+.starttext{
+  width: 525px;
+  text-align: left;
+  margin-bottom: -5px;
+  margin-top: 75px;
+  font-size: 35px;
+}
+
+.text {
+  width: 450px;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 100;
 }

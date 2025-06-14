@@ -102,59 +102,58 @@ function SignUpPage() {
 
 
   return (
-    <div className="signup-container">
-      <h2>Sign Up</h2>
-      <form onSubmit={handleSignUp}>
-
-
-        <input
-          className='custom-input'
-          type="text"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          className='custom-input'
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        <input
-          className='custom-input'
-          type="password"
-          placeholder="Confirm Password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-        />
-
-        <input
-          className='custom-input'
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-
-        <input
-          className='custom-input'
-          type="text"
-          placeholder="Bio"
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
-        />
-
-        <div className="signup-button">
-          <Button text="Sign Up"/>
-        </div>      
-      </form>
-      <div className="error">
-      {error && <p>{error}</p>}
+    <><div className='greenblock'>
+      <div className='title'>
+      academathon
       </div>
+    
+    
+      <div className="signup-container">
+        <form onSubmit={handleSignUp}>
+        <h2 className='starttext'>Let's ~get started</h2>
+        <h3 className='undertext'>Welcome! Begin with setting up your account </h3>
+          <text className='text'>First name</text>
+          <input
+            className='custom-input'
+            type="text"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+         
+          <text className='text'>Email</text>
+          <input
+            className='custom-input'
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          
+          <text className='text'>Password</text>
+          <input
+            className='custom-input'
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
 
-    </div>
+          <text className='text'>Confirm Password</text>
+          <input
+            className='custom-input'
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+
+          <div className="signup-button">
+            <Button text="Sign Up"/>
+          </div>      
+        </form>
+        <div className="error">
+          {error && <p>{error}</p>}
+        </div>
+        <h4 className='underbutton'>Already have an account?<strong> <a href="./src/auth/login.js">Login</a></strong></h4>
+      </div>
+      </div></>
   );
 }
 

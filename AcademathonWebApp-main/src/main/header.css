@@ -8,8 +8,9 @@
 }
 
 .logo img {
-  max-width: 50px;
-  padding: 10px;
+  max-width: 75px;
+  padding: 12px;
+  margin-left: 10px;
 }
 
 .list {
@@ -34,10 +35,11 @@
 
 .link {
   text-decoration: none;
-  color: #606060;
-  font-family: 'Roboto', sans-serif;
+  color: black;
+  font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
   transition: color 0.3s ease;
+
 }
 
 .link:hover {
