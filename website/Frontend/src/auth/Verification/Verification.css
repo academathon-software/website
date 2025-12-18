@@ -1,0 +1,307 @@
+/* Verification Page Styles */
+.verification-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  padding: 2rem;
+}
+
+.verification-container {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  padding: 3rem;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+}
+
+.verification-header {
+  margin-bottom: 2rem;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #008037;
+  margin-bottom: 2rem;
+}
+
+.logo svg {
+  font-size: 2rem;
+}
+
+.verification-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.verification-header p {
+  color: #666;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.email-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 2px solid #e9ecef;
+  font-weight: 600;
+  color: #333;
+  margin: 1rem 0;
+}
+
+.email-display svg {
+  color: #008037;
+}
+
+.verification-form {
+  margin-bottom: 2rem;
+}
+
+.input-group {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.verification-input {
+  width: 100%;
+  height: 60px;
+  padding: 0 1rem;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 0.5rem;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.verification-input:focus {
+  outline: none;
+  border-color: #008037;
+  box-shadow: 0 0 0 3px rgba(0, 128, 55, 0.1);
+}
+
+.verification-input.error {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+.verification-input::placeholder {
+  color: #999;
+  letter-spacing: normal;
+  font-size: 1rem;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #dc3545;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+
+.verify-btn {
+  width: 100%;
+  height: 55px;
+  background: linear-gradient(135deg, #008037 0%, #006b2e 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.verify-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 128, 55, 0.3);
+}
+
+.verify-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.verification-footer {
+  border-top: 1px solid #e9ecef;
+  padding-top: 1.5rem;
+}
+
+.verification-footer p {
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.resend-btn,
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #e9ecef;
+  background: transparent;
+  color: #666;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 0.5rem;
+  text-decoration: none;
+}
+
+.resend-btn:hover:not(:disabled),
+.back-btn:hover {
+  border-color: #008037;
+  color: #008037;
+  background: rgba(0, 128, 55, 0.05);
+}
+
+.resend-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.success-message {
+  text-align: center;
+  padding: 2rem;
+}
+
+.success-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  animation: successPulse 0.6s ease-out;
+}
+
+.success-icon svg {
+  font-size: 2rem;
+  color: white;
+}
+
+.success-message h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.success-message p {
+  color: #666;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes successPulse {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .verification-page {
+    padding: 1rem;
+  }
+  
+  .verification-container {
+    padding: 2rem;
+  }
+  
+  .verification-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .verification-input {
+    height: 55px;
+    font-size: 1.2rem;
+    letter-spacing: 0.3rem;
+  }
+  
+  .resend-btn,
+  .back-btn {
+    display: block;
+    width: 100%;
+    margin: 0.5rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .verification-container {
+    padding: 1.5rem;
+  }
+  
+  .logo {
+    font-size: 1.5rem;
+  }
+  
+  .logo svg {
+    font-size: 1.5rem;
+  }
+  
+  .verification-header h2 {
+    font-size: 1.3rem;
+  }
+  
+  .verification-input {
+    height: 50px;
+    font-size: 1rem;
+    letter-spacing: 0.2rem;
+  }
+}

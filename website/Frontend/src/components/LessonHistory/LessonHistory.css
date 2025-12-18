@@ -1,0 +1,310 @@
+/* Lesson History Page Styles */
+.lesson-history-page {
+  display: flex;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 250px;
+  padding: 2rem;
+  background-color: white;
+  min-height: 100vh;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 0.5rem 0;
+}
+
+.page-header p {
+  font-size: 1.1rem;
+  color: #666;
+  margin: 0;
+}
+
+/* Lesson List */
+.lesson-list {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.lesson-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e9ecef;
+  transition: background-color 0.2s ease;
+}
+
+.lesson-item:last-child {
+  border-bottom: none;
+}
+
+.lesson-item:hover {
+  background-color: #f8f9fa;
+}
+
+.lesson-info {
+  display: flex;
+  gap: 2rem;
+  flex: 1;
+}
+
+.lesson-datetime {
+  font-size: 0.9rem;
+  color: #666;
+  min-width: 180px;
+  font-weight: 500;
+}
+
+.lesson-name {
+  font-size: 1rem;
+  color: #333;
+  font-weight: 600;
+  min-width: 200px;
+}
+
+.tutor-name {
+  font-size: 0.9rem;
+  color: #666;
+  min-width: 180px;
+}
+
+.lesson-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.rating-section {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.star {
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.star.filled {
+  color: #1A803D;
+}
+
+.star.empty {
+  color: #1A803D;
+  opacity: 0.3;
+}
+
+.star:hover {
+  opacity: 1;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.feedback-button,
+.message-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 140px;
+}
+
+.feedback-button {
+  background-color: #f8f9fa;
+  color: #666;
+  border-color: #ddd;
+}
+
+.feedback-button.enabled {
+  background-color: #e9ecef;
+  color: #333;
+  border-color: #adb5bd;
+}
+
+.feedback-button:hover:not(:disabled) {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.feedback-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.message-button {
+  background-color: #f8f9fa;
+  color: #333;
+  border-color: #ddd;
+}
+
+.message-button:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+.pagination-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #ddd;
+  background-color: white;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background-color: #f8f9fa;
+  border-color: #1A803D;
+}
+
+.pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0 0.5rem;
+}
+
+.page-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #ddd;
+  background-color: white;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.page-number:hover {
+  background-color: #f8f9fa;
+  border-color: #1A803D;
+}
+
+.page-number.active {
+  background-color: #1A803D;
+  color: white;
+  border-color: #1A803D;
+}
+
+.page-number.active:hover {
+  background-color: #2ecc71;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+    padding: 1rem;
+    padding-top: 80px;
+  }
+  
+  .page-header h1 {
+    font-size: 2rem;
+  }
+  
+  .lesson-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .lesson-info {
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+  }
+  
+  .lesson-datetime,
+  .lesson-name,
+  .tutor-name {
+    min-width: auto;
+  }
+  
+  .lesson-actions {
+    align-items: flex-start;
+    width: 100%;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+  
+  .feedback-button,
+  .message-button {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .pagination {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .lesson-list {
+    margin: 0 -1rem;
+    border-radius: 0;
+  }
+  
+  .lesson-item {
+    padding: 1rem;
+  }
+  
+  .pagination {
+    gap: 0.25rem;
+  }
+  
+  .pagination-button,
+  .page-number {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+}

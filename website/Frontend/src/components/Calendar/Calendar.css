@@ -1,0 +1,385 @@
+/* Calendar Page - Independent Styling */
+.calendar-page {
+  display: flex;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+/* Main Content */
+.calendar-main-content {
+  flex: 1;
+  margin-left: 250px;
+  background-color: #f8f9fa;
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+.calendar-page-header {
+  margin-bottom: 2rem;
+}
+
+.calendar-page-header h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 0.5rem 0;
+}
+
+.calendar-page-header p {
+  font-size: 1.1rem;
+  color: #666;
+  margin: 0;
+}
+
+/* Calendar Widget */
+.calendar-widget-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.calendar-widget {
+  background-color: #e8f5e8;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 900px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.calendar-month-year {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.calendar-nav-controls {
+  display: flex;
+  gap: 1rem;
+}
+
+.calendar-nav-arrow {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #666;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.calendar-nav-arrow:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.calendar-view-toggle {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.calendar-view-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  background-color: transparent;
+  color: #666;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.calendar-view-btn.active {
+  background-color: #1A803D;
+  color: white;
+}
+
+.calendar-view-btn:hover:not(.active) {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Calendar Grid */
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  margin-bottom: 1px;
+}
+
+.calendar-weekday {
+  background-color: #f0f0f0;
+  padding: 1rem 0.5rem;
+  text-align: center;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.calendar-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background-color: #ddd;
+}
+
+.calendar-day-cell {
+  background-color: white;
+  padding: 1rem 0.5rem;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid #e0e0e0;
+}
+
+.calendar-day-cell.other-month {
+  background-color: #f9f9f9;
+  color: #ccc;
+}
+
+.calendar-day-cell.today {
+  background-color: #fff3cd;
+}
+
+.calendar-day-number {
+  font-weight: bold;
+  color: #333;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.calendar-lesson {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin-bottom: 0.25rem;
+}
+
+.calendar-lesson-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.calendar-lesson-text {
+  font-size: 0.75rem;
+  color: #333;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+/* Week View Styles */
+.calendar-week-grid {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+}
+
+.week-time-column {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #e0e0e0;
+  min-width: 80px;
+  background-color: #f8f9fa;
+}
+
+.week-header-spacer {
+  height: 60px;
+  border-bottom: 2px solid #e0e0e0;
+  box-sizing: border-box;
+}
+
+.week-time-slot {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: #666;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 0 0.5rem;
+  font-weight: 500;
+  box-sizing: border-box;
+}
+
+.week-days-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+}
+
+.week-days-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-bottom: 2px solid #e0e0e0;
+  background-color: #f8f9fa;
+}
+
+.week-day-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  min-width: 100px;
+  height: 60px;
+  border-right: 1px solid #e0e0e0;
+  box-sizing: border-box;
+}
+
+.week-day-header:last-child {
+  border-right: none;
+}
+
+.week-day-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.week-day-number {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  flex: 1;
+}
+
+.week-day-column {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #e0e0e0;
+  min-width: 100px;
+}
+
+.week-day-column:last-child {
+  border-right: none;
+}
+
+.week-time-cell {
+  height: 60px;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 0.25rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.week-lesson {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 4px;
+  border-left: 3px solid;
+  font-size: 0.75rem;
+  min-height: 24px;
+}
+
+.week-lesson-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.week-lesson-text {
+  font-size: 0.7rem;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .calendar-page {
+    flex-direction: column;
+  }
+  
+  .calendar-sidebar {
+    width: 100%;
+    flex-direction: row;
+    padding: 1rem;
+  }
+  
+  .calendar-logo {
+    margin-bottom: 0;
+    margin-right: 2rem;
+  }
+  
+  .calendar-sidebar-nav {
+    flex-direction: row;
+    gap: 0.5rem;
+    padding: 0;
+  }
+  
+  .calendar-nav-item {
+    padding: 0.5rem;
+  }
+  
+  .calendar-nav-item span {
+    display: none;
+  }
+  
+  .calendar-main-content {
+    padding: 1rem;
+  }
+  
+  .calendar-widget {
+    padding: 1rem;
+  }
+  
+  .calendar-day-cell {
+    min-height: 60px;
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .calendar-lesson-text {
+    font-size: 0.7rem;
+  }
+  
+  .calendar-main-content {
+    margin-left: 0;
+    padding: 1rem;
+  }
+  
+  .week-day-header {
+    min-width: 80px;
+    padding: 0.5rem;
+  }
+  
+  .week-day-column {
+    min-width: 80px;
+  }
+  
+  .week-time-slot {
+    font-size: 0.75rem;
+    padding: 0 0.25rem;
+  }
+  
+  .week-lesson-text {
+    font-size: 0.65rem;
+  }
+}

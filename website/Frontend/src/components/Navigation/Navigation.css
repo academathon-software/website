@@ -1,0 +1,115 @@
+.navigation {
+  background-color: #282c34;
+  padding: 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 70px;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+
+.nav-brand {
+  text-decoration: none;
+}
+
+.nav-brand h1 {
+  color: #61dafb;
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.nav-menu {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+}
+
+.nav-menu li a {
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.nav-menu li a:hover {
+  background-color: #61dafb;
+  color: #282c34;
+  transform: translateY(-1px);
+}
+
+.nav-login {
+  background-color: transparent;
+  border: 2px solid #61dafb;
+  color: #61dafb !important;
+}
+
+.nav-login:hover {
+  background-color: #61dafb !important;
+  color: #282c34 !important;
+}
+
+.nav-signup {
+  background-color: #008037;
+  border: 2px solid #008037;
+  color: white !important;
+}
+
+.nav-signup:hover {
+  background-color: #006b2e !important;
+  border-color: #006b2e;
+  color: white !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .nav-container {
+    padding: 0 1rem;
+  }
+  
+  .nav-brand h1 {
+    font-size: 1.5rem;
+  }
+  
+  .nav-menu {
+    gap: 1rem;
+  }
+  
+  .nav-menu li a {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .nav-menu {
+    gap: 0.5rem;
+  }
+  
+  .nav-menu li a {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+  }
+  
+  .nav-brand h1 {
+    font-size: 1.3rem;
+  }
+}
+

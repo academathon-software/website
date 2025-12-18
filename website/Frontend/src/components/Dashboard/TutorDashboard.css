@@ -1,0 +1,676 @@
+/* Tutor Dashboard Styles - New Layout */
+.tutor-dashboard {
+  display: flex;
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #f8f9fa;
+  margin-left: 2rem;
+  margin-right: 2rem;
+}
+
+/* Left Sidebar */
+.sidebar {
+  width: 250px;
+  background-color: #28a745;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo {
+  margin-bottom: 3rem;
+}
+
+.logo-circle {
+  width: 60px;
+  height: 60px;
+  background-color: #28a745;
+  border: 3px solid white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  color: white;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-item.active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-item svg {
+  font-size: 1.2rem;
+}
+
+.nav-item span {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  background-color: white;
+}
+
+/* Welcome Section */
+.welcome-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.profile-pic {
+  width: 60px;
+  height: 60px;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.welcome-text h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.welcome-text p {
+  margin: 0.25rem 0 0 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Courses Section */
+.courses-section {
+  margin-bottom: 3rem;
+}
+
+.courses-section h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #333;
+  display: inline-block;
+}
+
+.view-full-link {
+  margin-left: 1rem;
+  color: #28a745;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.view-full-link:hover {
+  text-decoration: underline;
+}
+
+.courses-grid {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.course-card {
+  flex: 1;
+  padding: 1.5rem;
+  border-radius: 12px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 150px;
+}
+
+.course-icon {
+  font-size: 2rem;
+  opacity: 0.9;
+}
+
+.course-info {
+  flex: 1;
+}
+
+.course-subject {
+  font-size: 0.85rem;
+  opacity: 0.9;
+  margin-bottom: 0.5rem;
+}
+
+.course-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.view-course-btn {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #979292;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.view-course-btn:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.add-course-card {
+  flex: 1;
+  padding: 1.5rem;
+  border-radius: 12px;
+  background-color: #f8f9fa;
+  border: 2px dashed #dee2e6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 150px;
+}
+
+.add-course-icon {
+  font-size: 2rem;
+  color: #6c757d;
+}
+
+.add-course-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.add-course-btn:hover {
+  background-color: #218838;
+}
+
+/* History Section */
+.history-section {
+  margin-bottom: 2rem;
+}
+
+.history-section h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #333;
+  display: inline-block;
+}
+
+.history-list {
+  margin-top: 1rem;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.history-icon {
+  font-size: 1.2rem;
+  color: #6c757d;
+}
+
+.history-info {
+  flex: 1;
+}
+
+.history-grade {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.history-subject {
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.history-date {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+.history-rating {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.history-rating .filled {
+  color: #ffc107;
+}
+
+.history-rating .empty {
+  color: #e9ecef;
+}
+
+/* Right Sidebar */
+.right-sidebar {
+  width: 300px;
+  background-color: white;
+  padding: 2rem;
+  border-left: 1px solid #e9ecef;
+}
+
+/* Calendar Section */
+.calendar-section {
+  margin-bottom: 3rem;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.calendar-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.calendar-nav {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.calendar-nav button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.calendar-nav button:hover {
+  color: #333;
+}
+
+.calendar {
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.calendar-weekdays div {
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #666;
+}
+
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-day {
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-right: 1px solid #e9ecef;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.calendar-day:nth-child(7n) {
+  border-right: none;
+}
+
+.calendar-day:hover {
+  background-color: #f8f9fa;
+}
+
+.calendar-day.today {
+  background-color: #28a745;
+  color: white;
+}
+
+.calendar-day.weekend {
+  color: #28a745;
+  font-weight: 500;
+}
+
+.calendar-day.other-month {
+  color: #ccc;
+}
+
+.calendar-day.has-lesson {
+  position: relative;
+}
+
+.calendar-day.has-lesson::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background-color: #28a745;
+  border-radius: 50%;
+}
+
+.calendar-day.today.has-lesson::after {
+  background-color: white;
+}
+
+/* Upcoming Section */
+.upcoming-section h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.upcoming-date {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.upcoming-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.upcoming-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+.upcoming-time {
+  font-size: 0.85rem;
+  color: #666;
+  min-width: 60px;
+}
+
+.upcoming-date {
+  font-size: 0.85rem;
+  color: #666;
+  min-width: 100px;
+}
+
+.upcoming-separator {
+  width: 2px;
+  height: 30px;
+  background-color: #dc3545;
+  margin: 0 0.5rem;
+}
+
+.upcoming-student {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.upcoming-subject {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .right-sidebar {
+    width: 250px;
+  }
+}
+
+@media (max-width: 968px) {
+  .tutor-dashboard {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    padding: 1rem;
+    justify-content: space-between;
+  }
+  
+  .logo {
+    margin-bottom: 0;
+  }
+  
+  .sidebar-nav {
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+  
+  .nav-item {
+    padding: 0.5rem;
+  }
+  
+  .nav-item span {
+    display: none;
+  }
+  
+  .right-sidebar {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid #e9ecef;
+  }
+  
+  .courses-grid {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem;
+    margin-left: 0;
+    padding-top: 80px;
+  }
+  
+  .right-sidebar {
+    padding: 1rem;
+  }
+  
+  .welcome-section {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .calendar-section,
+  .upcoming-section {
+    margin-bottom: 2rem;
+  }
+}
+
+/* Pending Bookings Section */
+.pending-bookings-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.pending-bookings-section h3 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.pending-bookings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pending-booking-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #ff9800;
+  transition: all 0.2s;
+}
+
+.pending-booking-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.pending-booking-info {
+  flex: 1;
+}
+
+.booking-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.booking-header h4 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.booking-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-item {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #666;
+  min-width: 80px;
+}
+
+.pending-booking-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-accept,
+.btn-decline {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-accept {
+  background: #4caf50;
+  color: white;
+}
+
+.btn-accept:hover {
+  background: #45a049;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+}
+
+.btn-decline {
+  background: #f44336;
+  color: white;
+}
+
+.btn-decline:hover {
+  background: #e53935;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3);
+}
+
+@media (max-width: 768px) {
+  .pending-booking-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .pending-booking-actions {
+    width: 100%;
+  }
+
+  .btn-accept,
+  .btn-decline {
+    flex: 1;
+  }
+}
