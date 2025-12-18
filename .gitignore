@@ -1,0 +1,52 @@
+# Java
+*.class
+*.jar
+*.war
+*.ear
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Spring Boot
+*.log
+*.gz
+*.tmp
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build
+build/
+out/
+
+# Misc
+.cache/
+coverage/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+bin/
+
+# Application properties (if contains sensitive data)
+# Uncomment if you want to ignore application.properties
+# application.properties
+# application-*.properties
+
