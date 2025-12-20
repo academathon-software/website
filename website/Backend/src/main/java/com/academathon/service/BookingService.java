@@ -13,7 +13,9 @@ import com.academathon.repository.BookingRepository;
 import com.academathon.repository.TutorProfileRepository;
 import com.academathon.repository.UserRepository;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,8 +54,16 @@ public class BookingService {
                 .orElseThrow(() -> new RuntimeException("Tutor profile not found"));
         
         // Validate booking time
-        if (request.getStartTime().isBefore(LocalDateTime.now())) {
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("America/New_York"));
+        
+        if (request.getStartTime().isBefore(now)) {
             throw new RuntimeException("Cannot book a lesson in the past");
+        }
+        
+        // Validate 48-hour minimum booking window
+        LocalDateTime minimumBookingTime = now.plusHours(48);
+        if (request.getStartTime().isBefore(minimumBookingTime)) {
+            throw new RuntimeException("Bookings must be made at least 48 hours in advance");
         }
         
         if (request.getEndTime().isBefore(request.getStartTime())) {
@@ -101,6 +111,9 @@ public class BookingService {
         booking.setEndTime(request.getEndTime());
         booking.setStatus(BookingStatus.PENDING); // Changed from CONFIRMED to PENDING
         booking.setSubject(request.getNotes()); // Store the subject from notes field
+        
+        // Set tutor response deadline (24 hours from now)
+        booking.setTutorResponseDeadline(now.plusHours(24));
         
         Booking savedBooking = bookingRepository.save(booking);
         
@@ -462,12 +475,46 @@ public class BookingService {
         }
         
         // Validate new times
-        if (newStartTime.isBefore(LocalDateTime.now())) {
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("America/New_York"));
+        
+        if (newStartTime.isBefore(now)) {
             throw new RuntimeException("Cannot reschedule to a time in the past");
+        }
+        
+        // Validate 48-hour minimum advance booking for the new time
+        LocalDateTime minimumNewTime = now.plusHours(48);
+        if (newStartTime.isBefore(minimumNewTime)) {
+            throw new RuntimeException("The new lesson time must be at least 48 hours in advance");
         }
         
         if (newEndTime.isBefore(newStartTime)) {
             throw new RuntimeException("End time must be after start time");
+        }
+        
+        // Validate 48-hour minimum reschedule window before original lesson
+        LocalDateTime minimumRescheduleTime = booking.getStartTime().minusHours(48);
+        if (now.isAfter(minimumRescheduleTime)) {
+            long hoursUntilLesson = Duration.between(now, booking.getStartTime()).toHours();
+            throw new RuntimeException(
+                "Cannot update or reschedule within 48 hours of lesson start. " +
+                "Current time is " + hoursUntilLesson + " hours before the lesson."
+            );
+        }
+        
+        // Calculate reschedule response deadline based on EARLIEST lesson time
+        // This handles cases where student requests an earlier time
+        LocalDateTime originalStartTime = booking.getStartTime();
+        LocalDateTime earliestTime = originalStartTime.isBefore(newStartTime) 
+            ? originalStartTime 
+            : newStartTime;
+        LocalDateTime rescheduleResponseDeadline = earliestTime.minusHours(12);
+        
+        // Validate that tutor will have at least some time to respond
+        if (now.isAfter(rescheduleResponseDeadline)) {
+            throw new RuntimeException(
+                "Cannot request this reschedule - tutor response deadline has already passed. " +
+                "Please contact the tutor directly."
+            );
         }
         
         // Check if tutor is available at the new time
@@ -508,6 +555,54 @@ public class BookingService {
             throw new RuntimeException("You have another booking at this time");
         }
         
+        // Handle PENDING bookings differently - just update the booking request
+        if (booking.getStatus() == BookingStatus.PENDING) {
+            // Store original times for email notification
+            LocalDateTime oldStartTime = booking.getStartTime();
+            LocalDateTime oldEndTime = booking.getEndTime();
+            
+            // For PENDING bookings, simply update the booking request
+            // No need for reschedule request since tutor hasn't confirmed yet
+            booking.setStartTime(newStartTime);
+            booking.setEndTime(newEndTime);
+            
+            // Recalculate tutor response deadline (24 hours from now)
+            booking.setTutorResponseDeadline(now.plusHours(24));
+            
+            Booking updatedBooking = bookingRepository.save(booking);
+            
+            // Send email to tutor about the updated request
+            try {
+                String tutorEmail = booking.getTutor().getUser().getEmail();
+                String subject = "Booking Request Updated - Academathon";
+                String body = String.format(
+                    "Hello %s,\n\n" +
+                    "The student %s has updated their booking request.\n\n" +
+                    "Previous requested time: %s to %s\n" +
+                    "New requested time: %s to %s\n\n" +
+                    "Subject: %s\n" +
+                    "Duration: %d minutes\n\n" +
+                    "Please log in to your dashboard to accept or decline this booking request.\n\n" +
+                    "Best regards,\n" +
+                    "Academathon Team",
+                    booking.getTutor().getDisplayName(),
+                    booking.getStudent().getUsername(),
+                    oldStartTime,
+                    oldEndTime,
+                    newStartTime,
+                    newEndTime,
+                    booking.getSubject(),
+                    Duration.between(newStartTime, newEndTime).toMinutes()
+                );
+                emailService.sendEmail(tutorEmail, subject, body);
+            } catch (Exception e) {
+                System.err.println("Failed to send updated booking request email: " + e.getMessage());
+            }
+            
+            return new BookingResponseDTO(updatedBooking);
+        }
+        
+        // For SCHEDULED bookings, use the reschedule request flow
         // Store original times if not already stored
         if (booking.getOriginalStartTime() == null) {
             booking.setOriginalStartTime(booking.getStartTime());
@@ -519,9 +614,12 @@ public class BookingService {
         booking.setRequestedEndTime(newEndTime);
         booking.setHasRescheduleRequest(true);
         
-        // Update current times to the requested times (will revert if rejected)
-        booking.setStartTime(newStartTime);
-        booking.setEndTime(newEndTime);
+        // Set reschedule tracking timestamps
+        booking.setRescheduleRequestTime(now);
+        booking.setRescheduleResponseDeadline(rescheduleResponseDeadline);
+        
+        // IMPORTANT: Keep original times - do NOT update startTime/endTime
+        // Original booking stays in place unless tutor accepts
         
         Booking updatedBooking = bookingRepository.save(booking);
         
@@ -575,12 +673,18 @@ public class BookingService {
             throw new RuntimeException("No pending reschedule request for this booking");
         }
         
-        // Clear the reschedule request flag and original times
+        // Accept the reschedule: update to the requested times
+        booking.setStartTime(booking.getRequestedStartTime());
+        booking.setEndTime(booking.getRequestedEndTime());
+        
+        // Clear all reschedule tracking fields
         booking.setHasRescheduleRequest(false);
         booking.setOriginalStartTime(null);
         booking.setOriginalEndTime(null);
         booking.setRequestedStartTime(null);
         booking.setRequestedEndTime(null);
+        booking.setRescheduleRequestTime(null);
+        booking.setRescheduleResponseDeadline(null);
         
         Booking updatedBooking = bookingRepository.save(booking);
         
@@ -631,19 +735,18 @@ public class BookingService {
         }
         
         // Store the rejected requested times for email
-        LocalDateTime rejectedStartTime = booking.getStartTime();
-        LocalDateTime rejectedEndTime = booking.getEndTime();
+        LocalDateTime rejectedStartTime = booking.getRequestedStartTime();
+        LocalDateTime rejectedEndTime = booking.getRequestedEndTime();
         
-        // Revert to original times
-        booking.setStartTime(booking.getOriginalStartTime());
-        booking.setEndTime(booking.getOriginalEndTime());
-        
-        // Clear the reschedule request data
+        // Original booking times are already in place (we never changed them)
+        // Just clear all reschedule tracking fields
         booking.setHasRescheduleRequest(false);
         booking.setOriginalStartTime(null);
         booking.setOriginalEndTime(null);
         booking.setRequestedStartTime(null);
         booking.setRequestedEndTime(null);
+        booking.setRescheduleRequestTime(null);
+        booking.setRescheduleResponseDeadline(null);
         
         Booking updatedBooking = bookingRepository.save(booking);
         

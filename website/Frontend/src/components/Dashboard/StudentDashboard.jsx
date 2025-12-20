@@ -113,6 +113,14 @@ const StudentDashboard = () => {
     }
   };
 
+  const canReschedule = (booking) => {
+    const now = new Date();
+    const lessonStart = new Date(booking.startTime);
+    const minRescheduleTime = new Date(lessonStart.getTime() - 48 * 60 * 60 * 1000);
+    
+    return now < minRescheduleTime;
+  };
+
   const handleOpenReschedule = (booking) => {
     setSelectedBooking(booking);
     
@@ -228,6 +236,26 @@ const StudentDashboard = () => {
         return;
       }
 
+      // Validate 48-hour minimum reschedule window before original lesson
+      const originalStartTime = new Date(selectedBooking.startTime);
+      const now = new Date();
+      const minimumRescheduleTime = new Date(originalStartTime.getTime() - 48 * 60 * 60 * 1000);
+      
+      if (now >= minimumRescheduleTime) {
+        const hoursUntilLesson = Math.floor((originalStartTime.getTime() - now.getTime()) / (1000 * 60 * 60));
+        alert(`Cannot update or reschedule within 48 hours of lesson start. Your lesson is in ${hoursUntilLesson} hours. Please contact your tutor directly.`);
+        setRescheduleLoading(false);
+        return;
+      }
+      
+      // Validate 48-hour minimum advance booking for the new time
+      const minimumNewTime = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+      if (newStartTime < minimumNewTime) {
+        alert('The new lesson time must be at least 48 hours in advance from now.');
+        setRescheduleLoading(false);
+        return;
+      }
+
       // Check tutor availability before rescheduling
       const availabilityResponse = await bookingAPI.checkAvailability(
         selectedBooking.tutorProfileId,
@@ -251,7 +279,13 @@ const StudentDashboard = () => {
       // Refresh dashboard data
       await fetchDashboardData();
       handleCloseReschedule();
-      alert('Reschedule request sent successfully! Waiting for tutor approval.');
+      
+      // Show appropriate success message based on booking status
+      if (selectedBooking.status === 'PENDING') {
+        alert('Booking request updated successfully! The tutor will review your updated request.');
+      } else {
+        alert('Reschedule request sent successfully! Waiting for tutor approval.');
+      }
     } catch (err) {
       console.error('Error rescheduling booking:', err);
       alert('Failed to reschedule: ' + (err.response?.data?.error || err.message));
@@ -416,7 +450,8 @@ const StudentDashboard = () => {
         const bookingDate = new Date(b.startTime);
         return bookingDate.getMonth() === month && 
                bookingDate.getFullYear() === year &&
-               b.status !== 'CANCELLED';
+               b.status !== 'CANCELLED' &&
+               b.status !== 'REJECTED';
       })
       .map(b => new Date(b.startTime).getDate());
     
@@ -565,7 +600,20 @@ const StudentDashboard = () => {
                 </div>
                 {upcomingLessons.map(booking => (
                   <div key={booking.id} className="lesson-row">
-                    <div className="lesson-datetime">{formatDateTime(booking.startTime)}</div>
+                    <div className="lesson-datetime">
+                      {booking.hasRescheduleRequest ? (
+                        <div style={{ fontSize: '13px' }}>
+                          <div style={{ color: '#666', marginBottom: '4px' }}>
+                            <strong>Original:</strong> {formatDateTime(booking.startTime)}
+                          </div>
+                          <div style={{ color: '#4CAF50' }}>
+                            <strong>Requested:</strong> {formatDateTime(booking.requestedStartTime)}
+                          </div>
+                        </div>
+                      ) : (
+                        formatDateTime(booking.startTime)
+                      )}
+                    </div>
                     <div className="lesson-name">{booking.subject || 'Lesson Name'}</div>
                     <div className="tutor-name">{booking.tutorName}</div>
                     <div className="status-indicator">
@@ -587,7 +635,13 @@ const StudentDashboard = () => {
                         </button>
                       )}
                       {(booking.status === 'PENDING' || booking.status === 'SCHEDULED') && (
-                        <button className="action-btn reschedule-btn" onClick={() => handleOpenReschedule(booking)}>Reschedule</button>
+                        canReschedule(booking) ? (
+                          <button className="action-btn reschedule-btn" onClick={() => handleOpenReschedule(booking)}>
+                            {booking.status === 'PENDING' ? 'Update Request' : 'Reschedule'}
+                          </button>
+                        ) : (
+                          <p className="reschedule-blocked">Updates/reschedules must be requested at least 48 hours before the lesson</p>
+                        )
                       )}
                       <button className="action-btn cancel-btn" onClick={() => handleCancelBooking(booking.id)}>Cancel</button>
                     </div>
@@ -694,7 +748,7 @@ const StudentDashboard = () => {
         <div className="modal-overlay" onClick={handleCloseReschedule}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Reschedule Lesson</h3>
+              <h3>{selectedBooking.status === 'PENDING' ? 'Update Booking Request' : 'Reschedule Lesson'}</h3>
               <button className="modal-close" onClick={handleCloseReschedule}>&times;</button>
             </div>
             
@@ -703,6 +757,11 @@ const StudentDashboard = () => {
                 <p><strong>Lesson:</strong> {selectedBooking.subject || 'Lesson'}</p>
                 <p><strong>Tutor:</strong> {selectedBooking.tutorName}</p>
                 <p><strong>Current Time:</strong> {formatDateTime(selectedBooking.startTime)}</p>
+                {selectedBooking.status === 'PENDING' && (
+                  <p style={{ color: '#3498db', fontSize: '14px', marginTop: '10px' }}>
+                    <em>Note: This will update your booking request to the new time. The tutor will review the updated request.</em>
+                  </p>
+                )}
               </div>
 
               <div className="form-group">
@@ -761,7 +820,9 @@ const StudentDashboard = () => {
                 onClick={handleRescheduleSubmit}
                 disabled={rescheduleLoading}
               >
-                {rescheduleLoading ? 'Rescheduling...' : 'Confirm Reschedule'}
+                {rescheduleLoading 
+                  ? (selectedBooking.status === 'PENDING' ? 'Updating...' : 'Rescheduling...') 
+                  : (selectedBooking.status === 'PENDING' ? 'Update Request' : 'Confirm Reschedule')}
               </button>
             </div>
           </div>

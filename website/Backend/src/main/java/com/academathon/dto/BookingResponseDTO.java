@@ -28,6 +28,9 @@ public class BookingResponseDTO {
     private LocalDateTime originalEndTime;
     private LocalDateTime requestedStartTime;
     private LocalDateTime requestedEndTime;
+    private LocalDateTime tutorResponseDeadline;
+    private LocalDateTime rescheduleRequestTime;
+    private LocalDateTime rescheduleResponseDeadline;
 
     public BookingResponseDTO() {
     }
@@ -55,6 +58,9 @@ public class BookingResponseDTO {
         this.originalEndTime = booking.getOriginalEndTime();
         this.requestedStartTime = booking.getRequestedStartTime();
         this.requestedEndTime = booking.getRequestedEndTime();
+        this.tutorResponseDeadline = booking.getTutorResponseDeadline();
+        this.rescheduleRequestTime = booking.getRescheduleRequestTime();
+        this.rescheduleResponseDeadline = booking.getRescheduleResponseDeadline();
     }
 
     // Getters and setters
@@ -232,6 +238,30 @@ public class BookingResponseDTO {
 
     public void setRequestedEndTime(LocalDateTime requestedEndTime) {
         this.requestedEndTime = requestedEndTime;
+    }
+
+    public LocalDateTime getTutorResponseDeadline() {
+        return tutorResponseDeadline;
+    }
+
+    public void setTutorResponseDeadline(LocalDateTime tutorResponseDeadline) {
+        this.tutorResponseDeadline = tutorResponseDeadline;
+    }
+
+    public LocalDateTime getRescheduleRequestTime() {
+        return rescheduleRequestTime;
+    }
+
+    public void setRescheduleRequestTime(LocalDateTime rescheduleRequestTime) {
+        this.rescheduleRequestTime = rescheduleRequestTime;
+    }
+
+    public LocalDateTime getRescheduleResponseDeadline() {
+        return rescheduleResponseDeadline;
+    }
+
+    public void setRescheduleResponseDeadline(LocalDateTime rescheduleResponseDeadline) {
+        this.rescheduleResponseDeadline = rescheduleResponseDeadline;
     }
 }
 

@@ -66,6 +66,31 @@ public class MessageController {
         messageService.markAsRead(conversationId, currentUser);
         return ResponseEntity.ok().build();
     }
+    
+    @PutMapping("/{messageId}")
+    public ResponseEntity<MessageDTO> editMessage(
+            @PathVariable Long messageId,
+            @RequestBody java.util.Map<String, String> payload) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) auth.getPrincipal();
+        
+        String newContent = payload.get("content");
+        if (newContent == null || newContent.trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        MessageDTO updatedMessage = messageService.editMessage(messageId, currentUser, newContent);
+        return ResponseEntity.ok(updatedMessage);
+    }
+    
+    @DeleteMapping("/{messageId}")
+    public ResponseEntity<Void> deleteMessage(@PathVariable Long messageId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) auth.getPrincipal();
+        
+        messageService.deleteMessage(messageId, currentUser);
+        return ResponseEntity.ok().build();
+    }
 }
 
 

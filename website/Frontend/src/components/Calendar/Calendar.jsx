@@ -40,9 +40,9 @@ const Calendar = () => {
         lastDay.toISOString()
       );
       
-      // Filter out cancelled bookings - they shouldn't appear on calendar
+      // Filter out cancelled and rejected bookings - they shouldn't appear on calendar
       const activeBookings = response.data.filter(
-        booking => booking.status !== 'CANCELLED'
+        booking => booking.status !== 'CANCELLED' && booking.status !== 'REJECTED'
       );
       
       // Transform bookings to lesson format

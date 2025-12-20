@@ -268,6 +268,110 @@
   color: #6c757d;
 }
 
+/* Message Footer with Actions */
+.message-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  gap: 8px;
+}
+
+.edited-indicator {
+  font-style: italic;
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+/* Message Action Buttons */
+.message-actions {
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.message-bubble:hover .message-actions {
+  opacity: 1;
+}
+
+.message-action-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.2s ease;
+}
+
+.message-action-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.message-action-btn.delete-btn:hover {
+  background: rgba(220, 53, 69, 0.8);
+}
+
+/* Message Edit Mode */
+.message-edit-mode {
+  width: 100%;
+}
+
+.message-edit-input {
+  width: 100%;
+  min-height: 60px;
+  padding: 8px;
+  border: 2px solid #007bff;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  margin-bottom: 8px;
+}
+
+.message-edit-input:focus {
+  outline: none;
+  border-color: #0056b3;
+}
+
+.message-edit-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.message-edit-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.message-edit-btn.save-btn {
+  background: #28a745;
+  color: white;
+}
+
+.message-edit-btn.save-btn:hover {
+  background: #218838;
+}
+
+.message-edit-btn.cancel-btn {
+  background: #6c757d;
+  color: white;
+}
+
+.message-edit-btn.cancel-btn:hover {
+  background: #5a6268;
+}
+
 /* Message Input Form */
 .message-input-form {
   display: flex;

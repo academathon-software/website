@@ -5,7 +5,7 @@ import StudentSidebar from '../Shared/StudentSidebar';
 import TutorSidebar from '../Shared/TutorSidebar';
 import { useUser } from '../../context/UserContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPaperPlane, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane, faArrowLeft, faEdit, faTrash, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import './Messages.css';
 
 const Messages = () => {
@@ -16,6 +16,9 @@ const Messages = () => {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [editingMessageId, setEditingMessageId] = useState(null);
+  const [editedContent, setEditedContent] = useState('');
+  const [hoveredMessageId, setHoveredMessageId] = useState(null);
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -124,6 +127,49 @@ const Messages = () => {
     }
   };
 
+  const startEditingMessage = (msg) => {
+    setEditingMessageId(msg.id);
+    setEditedContent(msg.content);
+  };
+
+  const cancelEditing = () => {
+    setEditingMessageId(null);
+    setEditedContent('');
+  };
+
+  const saveEditedMessage = async (messageId) => {
+    if (!editedContent.trim()) {
+      alert('Message cannot be empty');
+      return;
+    }
+
+    try {
+      await messageAPI.editMessage(messageId, editedContent);
+      // Refresh messages
+      await loadConversationMessages(selectedConversation.id);
+      setEditingMessageId(null);
+      setEditedContent('');
+    } catch (err) {
+      console.error('Error editing message:', err);
+      alert('Failed to edit message: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const deleteMessage = async (messageId) => {
+    if (!window.confirm('Are you sure you want to delete this message?')) {
+      return;
+    }
+
+    try {
+      await messageAPI.deleteMessage(messageId);
+      // Refresh messages
+      await loadConversationMessages(selectedConversation.id);
+    } catch (err) {
+      console.error('Error deleting message:', err);
+      alert('Failed to delete message: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
   const formatConversationTime = (timestamp) => {
     const date = new Date(timestamp);
     const now = new Date();
@@ -224,16 +270,82 @@ const Messages = () => {
                   {messages.map((msg) => {
                     const currentUserId = parseInt(localStorage.getItem('userId'));
                     const isSentByMe = msg.senderId === currentUserId;
+                    const isEditing = editingMessageId === msg.id;
+                    const isHovered = hoveredMessageId === msg.id;
+                    
                     return (
                       <div
                         key={msg.id}
                         className={`message-bubble ${isSentByMe ? 'sent' : 'received'}`}
+                        onMouseEnter={() => setHoveredMessageId(msg.id)}
+                        onMouseLeave={() => setHoveredMessageId(null)}
                       >
                         {!isSentByMe && (
                           <div className="message-sender">{msg.senderName}</div>
                         )}
-                        <div className="message-content">{msg.content}</div>
-                        <div className="message-time">{formatMessageTime(msg.createdAt)}</div>
+                        
+                        {isEditing ? (
+                          <div className="message-edit-mode">
+                            <textarea
+                              className="message-edit-input"
+                              value={editedContent}
+                              onChange={(e) => setEditedContent(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                  e.preventDefault();
+                                  saveEditedMessage(msg.id);
+                                } else if (e.key === 'Escape') {
+                                  cancelEditing();
+                                }
+                              }}
+                              autoFocus
+                            />
+                            <div className="message-edit-buttons">
+                              <button 
+                                className="message-edit-btn save-btn" 
+                                onClick={() => saveEditedMessage(msg.id)}
+                                title="Save (Enter)"
+                              >
+                                <FontAwesomeIcon icon={faCheck} />
+                              </button>
+                              <button 
+                                className="message-edit-btn cancel-btn" 
+                                onClick={cancelEditing}
+                                title="Cancel (Esc)"
+                              >
+                                <FontAwesomeIcon icon={faTimes} />
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="message-content">{msg.content}</div>
+                            <div className="message-footer">
+                              <div className="message-time">
+                                {formatMessageTime(msg.createdAt)}
+                                {msg.isEdited && <span className="edited-indicator"> (edited)</span>}
+                              </div>
+                              {isSentByMe && isHovered && (
+                                <div className="message-actions">
+                                  <button 
+                                    className="message-action-btn edit-btn" 
+                                    onClick={() => startEditingMessage(msg)}
+                                    title="Edit message"
+                                  >
+                                    <FontAwesomeIcon icon={faEdit} />
+                                  </button>
+                                  <button 
+                                    className="message-action-btn delete-btn" 
+                                    onClick={() => deleteMessage(msg.id)}
+                                    title="Delete message"
+                                  >
+                                    <FontAwesomeIcon icon={faTrash} />
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </>
+                        )}
                       </div>
                     );
                   })}

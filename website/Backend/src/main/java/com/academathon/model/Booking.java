@@ -58,6 +58,15 @@ public class Booking {
     @Column(name = "requested_end_time")
     private LocalDateTime requestedEndTime;
 
+    @Column(name = "tutor_response_deadline")
+    private LocalDateTime tutorResponseDeadline;
+
+    @Column(name = "reschedule_request_time")
+    private LocalDateTime rescheduleRequestTime;
+
+    @Column(name = "reschedule_response_deadline")
+    private LocalDateTime rescheduleResponseDeadline;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now(ZoneId.of("America/New_York"));
 
@@ -210,6 +219,30 @@ public class Booking {
 
     public void setRequestedEndTime(LocalDateTime requestedEndTime) {
         this.requestedEndTime = requestedEndTime;
+    }
+
+    public LocalDateTime getTutorResponseDeadline() {
+        return tutorResponseDeadline;
+    }
+
+    public void setTutorResponseDeadline(LocalDateTime tutorResponseDeadline) {
+        this.tutorResponseDeadline = tutorResponseDeadline;
+    }
+
+    public LocalDateTime getRescheduleRequestTime() {
+        return rescheduleRequestTime;
+    }
+
+    public void setRescheduleRequestTime(LocalDateTime rescheduleRequestTime) {
+        this.rescheduleRequestTime = rescheduleRequestTime;
+    }
+
+    public LocalDateTime getRescheduleResponseDeadline() {
+        return rescheduleResponseDeadline;
+    }
+
+    public void setRescheduleResponseDeadline(LocalDateTime rescheduleResponseDeadline) {
+        this.rescheduleResponseDeadline = rescheduleResponseDeadline;
     }
 
     @PreUpdate

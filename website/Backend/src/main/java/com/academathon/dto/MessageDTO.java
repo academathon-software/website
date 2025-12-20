@@ -10,11 +10,13 @@ public class MessageDTO {
     private String content;
     private Boolean isRead;
     private LocalDateTime createdAt;
+    private Boolean isEdited;
+    private LocalDateTime editedAt;
 
     public MessageDTO() {
     }
 
-    public MessageDTO(Long id, Long conversationId, Long senderId, String senderName, String content, Boolean isRead, LocalDateTime createdAt) {
+    public MessageDTO(Long id, Long conversationId, Long senderId, String senderName, String content, Boolean isRead, LocalDateTime createdAt, Boolean isEdited, LocalDateTime editedAt) {
         this.id = id;
         this.conversationId = conversationId;
         this.senderId = senderId;
@@ -22,6 +24,8 @@ public class MessageDTO {
         this.content = content;
         this.isRead = isRead;
         this.createdAt = createdAt;
+        this.isEdited = isEdited;
+        this.editedAt = editedAt;
     }
 
     public Long getId() {
@@ -78,6 +82,22 @@ public class MessageDTO {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Boolean getIsEdited() {
+        return isEdited;
+    }
+
+    public void setIsEdited(Boolean isEdited) {
+        this.isEdited = isEdited;
+    }
+
+    public LocalDateTime getEditedAt() {
+        return editedAt;
+    }
+
+    public void setEditedAt(LocalDateTime editedAt) {
+        this.editedAt = editedAt;
     }
 }
 

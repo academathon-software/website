@@ -67,4 +67,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findBookingsByUserAndDateRange(@Param("userId") Long userId,
                                                    @Param("startDate") LocalDateTime startDate,
                                                    @Param("endDate") LocalDateTime endDate);
+    
+    // Find bookings by status and reschedule request flag
+    List<Booking> findByStatusAndHasRescheduleRequest(BookingStatus status, Boolean hasRescheduleRequest);
 }

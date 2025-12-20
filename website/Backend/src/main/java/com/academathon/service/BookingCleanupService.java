@@ -107,6 +107,205 @@ public class BookingCleanupService {
         
         emailService.sendEmail(tutorEmail, tutorSubject, tutorBody);
     }
+    
+    /**
+     * Scheduled job that runs every 15 minutes to check for pending bookings
+     * Auto-declines bookings where tutor did not respond within 24 hours
+     * Uses America/New_York (EST/EDT) timezone
+     */
+    @Scheduled(cron = "0 */15 * * * *", zone = "America/New_York") // Run every 15 minutes
+    @Transactional
+    public void autoDeclinePendingBookings() {
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("America/New_York"));
+        
+        // Find PENDING bookings where tutor response deadline has passed
+        List<Booking> pendingBookings = bookingRepository.findByStatus(BookingStatus.PENDING);
+        
+        int declinedCount = 0;
+        
+        for (Booking booking : pendingBookings) {
+            if (booking.getTutorResponseDeadline() != null && 
+                now.isAfter(booking.getTutorResponseDeadline())) {
+                
+                // Auto-decline the booking
+                booking.setStatus(BookingStatus.REJECTED);
+                booking.setRejectionReason("Auto-declined: Tutor did not respond within 24 hours");
+                bookingRepository.save(booking);
+                
+                declinedCount++;
+
+                // Send notification emails
+                try {
+                    sendTutorTimeoutEmail(booking);
+                } catch (Exception e) {
+                    System.err.println("Error sending tutor timeout email for booking " + 
+                                     booking.getId() + ": " + e.getMessage());
+                }
+            }
+        }
+
+        if (declinedCount > 0) {
+            System.out.println("Auto-declined " + declinedCount + 
+                             " pending bookings due to tutor timeout");
+        }
+    }
+
+    /**
+     * Send timeout notification emails to both student and tutor
+     */
+    private void sendTutorTimeoutEmail(Booking booking) {
+        String studentEmail = booking.getStudent().getEmail();
+        String tutorEmail = booking.getTutor().getUser().getEmail();
+        
+        // Email to student
+        String studentSubject = "Booking Request Declined - No Response";
+        String studentBody = String.format(
+            "Hello %s,\n\n" +
+            "Unfortunately, your booking request with %s has been automatically declined " +
+            "because the tutor did not respond within 24 hours.\n\n" +
+            "Booking Details:\n" +
+            "- Subject: %s\n" +
+            "- Requested Date & Time: %s\n\n" +
+            "You can try booking with another tutor or contact this tutor directly " +
+            "to arrange a lesson.\n\n" +
+            "Best regards,\n" +
+            "Academathon Team",
+            booking.getStudent().getUsername(),
+            booking.getTutor().getDisplayName(),
+            booking.getSubject(),
+            booking.getStartTime()
+        );
+        
+        emailService.sendEmail(studentEmail, studentSubject, studentBody);
+        
+        // Email to tutor
+        String tutorSubject = "Booking Request Expired";
+        String tutorBody = String.format(
+            "Hello %s,\n\n" +
+            "A booking request from student %s has expired because it was not " +
+            "responded to within 24 hours.\n\n" +
+            "Booking Details:\n" +
+            "- Subject: %s\n" +
+            "- Requested Date & Time: %s\n\n" +
+            "Please remember to respond to booking requests promptly to avoid " +
+            "disappointing students.\n\n" +
+            "Best regards,\n" +
+            "Academathon Team",
+            booking.getTutor().getDisplayName(),
+            booking.getStudent().getUsername(),
+            booking.getSubject(),
+            booking.getStartTime()
+        );
+        
+        emailService.sendEmail(tutorEmail, tutorSubject, tutorBody);
+    }
+    
+    /**
+     * Scheduled job that runs every 15 minutes to check for reschedule requests
+     * Auto-declines reschedule requests where tutor did not respond by deadline
+     * Keeps the original booking time
+     * Uses America/New_York (EST/EDT) timezone
+     */
+    @Scheduled(cron = "0 */15 * * * *", zone = "America/New_York") // Run every 15 minutes
+    @Transactional
+    public void autoDeclineRescheduleRequests() {
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("America/New_York"));
+        
+        // Find bookings with pending reschedule requests
+        List<Booking> rescheduleBookings = bookingRepository
+            .findByStatusAndHasRescheduleRequest(BookingStatus.SCHEDULED, true);
+        
+        int declinedCount = 0;
+        
+        for (Booking booking : rescheduleBookings) {
+            if (booking.getRescheduleResponseDeadline() != null && 
+                now.isAfter(booking.getRescheduleResponseDeadline())) {
+                
+                // Store requested times for email notification
+                LocalDateTime requestedStart = booking.getRequestedStartTime();
+                LocalDateTime requestedEnd = booking.getRequestedEndTime();
+                
+                // Keep original time - auto-decline reschedule
+                // Original times are already in startTime/endTime, just clear reschedule fields
+                booking.setHasRescheduleRequest(false);
+                booking.setRequestedStartTime(null);
+                booking.setRequestedEndTime(null);
+                booking.setOriginalStartTime(null);
+                booking.setOriginalEndTime(null);
+                booking.setRescheduleRequestTime(null);
+                booking.setRescheduleResponseDeadline(null);
+                bookingRepository.save(booking);
+                
+                declinedCount++;
+
+                // Send notification emails
+                try {
+                    sendRescheduleTimeoutEmail(booking, requestedStart, requestedEnd);
+                } catch (Exception e) {
+                    System.err.println("Error sending reschedule timeout email for booking " + 
+                                     booking.getId() + ": " + e.getMessage());
+                }
+            }
+        }
+
+        if (declinedCount > 0) {
+            System.out.println("Auto-declined " + declinedCount + 
+                             " reschedule requests due to tutor timeout");
+        }
+    }
+
+    /**
+     * Send reschedule timeout notification emails to both student and tutor
+     */
+    private void sendRescheduleTimeoutEmail(Booking booking, LocalDateTime requestedStart, LocalDateTime requestedEnd) {
+        String studentEmail = booking.getStudent().getEmail();
+        String tutorEmail = booking.getTutor().getUser().getEmail();
+        
+        // Email to student
+        String studentSubject = "Reschedule Request Expired - Original Time Kept";
+        String studentBody = String.format(
+            "Hello %s,\n\n" +
+            "Your reschedule request with %s has expired because the tutor " +
+            "did not respond by the deadline.\n\n" +
+            "Your original lesson time has been kept:\n" +
+            "- Subject: %s\n" +
+            "- Date & Time: %s\n\n" +
+            "Requested time (expired): %s\n\n" +
+            "The original lesson remains scheduled. If you still need to reschedule, " +
+            "please contact the tutor directly.\n\n" +
+            "Best regards,\n" +
+            "Academathon Team",
+            booking.getStudent().getUsername(),
+            booking.getTutor().getDisplayName(),
+            booking.getSubject(),
+            booking.getStartTime(),
+            requestedStart
+        );
+        
+        emailService.sendEmail(studentEmail, studentSubject, studentBody);
+        
+        // Email to tutor
+        String tutorSubject = "Reschedule Request Expired";
+        String tutorBody = String.format(
+            "Hello %s,\n\n" +
+            "A reschedule request from student %s has expired because it was not " +
+            "responded to by the deadline.\n\n" +
+            "The original lesson time has been kept:\n" +
+            "- Subject: %s\n" +
+            "- Date & Time: %s\n\n" +
+            "Requested time (expired): %s\n\n" +
+            "Please remember to respond to reschedule requests promptly.\n\n" +
+            "Best regards,\n" +
+            "Academathon Team",
+            booking.getTutor().getDisplayName(),
+            booking.getStudent().getUsername(),
+            booking.getSubject(),
+            booking.getStartTime(),
+            requestedStart
+        );
+        
+        emailService.sendEmail(tutorEmail, tutorSubject, tutorBody);
+    }
 }
 
 

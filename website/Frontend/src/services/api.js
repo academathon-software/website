@@ -248,6 +248,14 @@ export const messageAPI = {
   // Mark conversation as read
   markAsRead: (conversationId) => 
     api.post(`/api/messages/conversations/${conversationId}/read`),
+  
+  // Edit a message
+  editMessage: (messageId, content) => 
+    api.put(`/api/messages/${messageId}`, { content }),
+  
+  // Delete a message
+  deleteMessage: (messageId) => 
+    api.delete(`/api/messages/${messageId}`),
 };
 
 export default api;

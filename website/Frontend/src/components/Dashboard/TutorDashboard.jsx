@@ -277,7 +277,8 @@ const TutorDashboard = () => {
         const bookingDate = new Date(b.startTime);
         return bookingDate.getMonth() === month && 
                bookingDate.getFullYear() === year &&
-               b.status !== 'CANCELLED';
+               b.status !== 'CANCELLED' &&
+               b.status !== 'REJECTED';
       })
       .map(b => new Date(b.startTime).getDate());
     
@@ -428,11 +429,11 @@ const TutorDashboard = () => {
                             <strong style={{ color: '#4CAF50', fontSize: '13px' }}>Requested New Time:</strong>
                             <div className="detail-item">
                               <span className="detail-label">Date:</span>
-                              <span>{formatDate(booking.startTime)}</span>
+                              <span>{formatDate(booking.requestedStartTime)}</span>
                             </div>
                             <div className="detail-item">
                               <span className="detail-label">Time:</span>
-                              <span>{formatDateTime(booking.startTime)}</span>
+                              <span>{formatDateTime(booking.requestedStartTime)}</span>
                             </div>
                           </div>
                         </>

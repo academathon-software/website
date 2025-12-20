@@ -128,6 +128,35 @@ public class MessageService {
         messageRepository.markConversationAsRead(conversation, currentUser);
     }
     
+    public MessageDTO editMessage(Long messageId, User currentUser, String newContent) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new RuntimeException("Message not found"));
+        
+        // Verify user is the sender
+        if (!message.getSender().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Unauthorized: You can only edit your own messages");
+        }
+        
+        message.setContent(newContent);
+        message.setIsEdited(true);
+        message.setEditedAt(java.time.LocalDateTime.now(java.time.ZoneId.of("America/New_York")));
+        message = messageRepository.save(message);
+        
+        return toMessageDTO(message);
+    }
+    
+    public void deleteMessage(Long messageId, User currentUser) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new RuntimeException("Message not found"));
+        
+        // Verify user is the sender
+        if (!message.getSender().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Unauthorized: You can only delete your own messages");
+        }
+        
+        messageRepository.delete(message);
+    }
+    
     private MessageDTO toMessageDTO(Message message) {
         return new MessageDTO(
                 message.getId(),
@@ -136,7 +165,9 @@ public class MessageService {
                 message.getSender().getUsername(),
                 message.getContent(),
                 message.getIsRead(),
-                message.getCreatedAt()
+                message.getCreatedAt(),
+                message.getIsEdited(),
+                message.getEditedAt()
         );
     }
     

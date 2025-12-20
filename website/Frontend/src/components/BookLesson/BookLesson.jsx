@@ -245,6 +245,17 @@ const BookLesson = () => {
         throw new Error('Slot data not found');
       }
 
+      // Validate 48-hour minimum booking window
+      const selectedDateTime = new Date(slotData.startTime);
+      const now = new Date();
+      const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+      
+      if (selectedDateTime < minBookingTime) {
+        setError('Lessons must be booked at least 48 hours in advance');
+        setBookingLoading(false);
+        return;
+      }
+
       // Format for backend - use the exact times from the availability slot
       const bookingData = {
         tutorProfileId: tutor.id,

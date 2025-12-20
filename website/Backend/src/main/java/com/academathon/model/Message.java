@@ -28,6 +28,12 @@ public class Message {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now(ZoneId.of("America/New_York"));
 
+    @Column(name = "is_edited", nullable = false)
+    private Boolean isEdited = false;
+
+    @Column(name = "edited_at")
+    private LocalDateTime editedAt;
+
     public Message() {
     }
 
@@ -75,6 +81,22 @@ public class Message {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public Boolean getIsEdited() {
+        return isEdited;
+    }
+
+    public void setIsEdited(Boolean isEdited) {
+        this.isEdited = isEdited;
+    }
+
+    public LocalDateTime getEditedAt() {
+        return editedAt;
+    }
+
+    public void setEditedAt(LocalDateTime editedAt) {
+        this.editedAt = editedAt;
     }
 }
 
