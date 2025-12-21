@@ -31,6 +31,64 @@
   margin: 0;
 }
 
+/* Filter Section */
+.filter-section {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.filter-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.filter-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.filter-dropdown {
+  padding: 0.6rem 2.5rem 0.6rem 1rem;
+  border: 2px solid #dee2e6;
+  background-color: white;
+  color: #495057;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 12px;
+  min-width: 200px;
+}
+
+.filter-dropdown:hover {
+  border-color: #4CAF50;
+  background-color: #f1f8f4;
+}
+
+.filter-dropdown:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.filter-info {
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-style: italic;
+}
+
 /* Lesson List */
 .lesson-list {
   background-color: white;
@@ -239,6 +297,21 @@
     margin-left: 0;
     padding: 1rem;
     padding-top: 80px;
+  }
+
+  .filter-section {
+    padding: 1rem;
+  }
+
+  .filter-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .filter-dropdown {
+    width: 100%;
+    min-width: unset;
   }
   
   .page-header h1 {

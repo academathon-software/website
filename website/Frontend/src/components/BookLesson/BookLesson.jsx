@@ -53,23 +53,138 @@ const BookLesson = () => {
     { id: 12, name: "Grade 12" }
   ];
 
-  const subjects = [
-    { id: 'math', name: 'Math', icon: faCalculator, color: '#e74c3c' },
-    { id: 'science', name: 'Science', icon: faFlask, color: '#2ecc71' },
-    { id: 'languages', name: 'Languages', icon: faGlobe, color: '#f1c40f' },
-    { id: 'social', name: 'Social Studies', icon: faGlobeAmericas, color: '#9b59b6' },
-    { id: 'technology', name: 'Technology', icon: faCog, color: '#3498db' },
-    { id: 'business', name: 'Business', icon: faBriefcase, color: '#8B4513' }
-  ];
+  // Grade-specific subject and course structure
+  const getSubjectsForGrade = (gradeId) => {
+    const allSubjects = [
+      { id: 'math', name: 'Math', icon: faCalculator, color: '#e74c3c' },
+      { id: 'english', name: 'English / Language Arts', icon: faGlobe, color: '#f1c40f' },
+      { id: 'science', name: 'Science', icon: faFlask, color: '#2ecc71' },
+      { id: 'social', name: 'Social Studies', icon: faGlobeAmericas, color: '#9b59b6' },
+      { id: 'french', name: 'French', icon: faGlobe, color: '#e67e22' },
+      { id: 'technology', name: 'Technology / CS', icon: faCog, color: '#3498db' },
+      { id: 'business', name: 'Business', icon: faBriefcase, color: '#8B4513' }
+    ];
 
-  const courses = {
-    math: ['Algebra', 'Geometry', 'Calculus', 'Statistics'],
-    science: ['Physics', 'Chemistry', 'Biology', 'Earth Science'],
-    languages: ['English', 'Spanish', 'French', 'Literature'],
-    social: ['Social Studies', 'History', 'Geography', 'Law'],
-    technology: ['Computer Science', 'Programming', 'Web Development', 'Data Science'],
-    business: ['Economics', 'Accounting', 'Marketing', 'Finance']
+    // Grades 1-3 (Primary)
+    if (gradeId >= 1 && gradeId <= 3) {
+      return allSubjects.filter(s => ['math', 'english', 'science', 'french'].includes(s.id));
+    }
+    // Grades 4-6 (Junior)
+    if (gradeId >= 4 && gradeId <= 6) {
+      return allSubjects.filter(s => ['math', 'english', 'science', 'social', 'french'].includes(s.id));
+    }
+    // Grades 7-8 (Intermediate)
+    if (gradeId >= 7 && gradeId <= 8) {
+      return allSubjects.filter(s => ['math', 'english', 'science', 'social', 'french', 'technology'].includes(s.id));
+    }
+    // Grade 9
+    if (gradeId === 9) {
+      return allSubjects.filter(s => !['business'].includes(s.id) || s.id === 'business'); // All except explicitly disallowed
+    }
+    // Grades 10-12
+    return allSubjects; // All subjects available
   };
+
+  const getCoursesForGradeAndSubject = (gradeId, subjectId) => {
+    // Grades 1-3 (Primary)
+    if (gradeId >= 1 && gradeId <= 3) {
+      const courses = {
+        math: ['Addition & Subtraction', 'Place Value', 'Patterns', 'Basic Geometry', 'Time & Money'],
+        english: ['Reading', 'Phonics', 'Writing', 'Spelling', 'Basic Grammar'],
+        science: ['Life Systems', 'Materials', 'Weather & Seasons', 'Simple Machines'],
+        french: ['French Basics', 'French Reading', 'French Writing']
+      };
+      return courses[subjectId] || [];
+    }
+
+    // Grades 4-6 (Junior)
+    if (gradeId >= 4 && gradeId <= 6) {
+      const courses = {
+        math: ['Multiplication & Division', 'Fractions', 'Decimals', 'Intro Algebra (Patterns)', 'Geometry', 'Measurement'],
+        english: ['Reading Comprehension', 'Paragraph Writing', 'Grammar', 'Vocabulary'],
+        science: ['Life Systems', 'Electricity', 'Space', 'Biodiversity'],
+        social: ['Heritage & Identity', 'People & Environments', 'History Basics', 'Geography Basics'],
+        french: ['French Intermediate', 'French Conversation', 'French Grammar']
+      };
+      return courses[subjectId] || [];
+    }
+
+    // Grades 7-8 (Intermediate)
+    if (gradeId >= 7 && gradeId <= 8) {
+      const courses = {
+        math: ['Integers', 'Ratios & Rates', 'Equations (Intro)', 'Pythagorean Theorem', 'Graphing Basics', 'Probability'],
+        english: ['English Language Arts', 'Reading & Analysis', 'Essay Writing', 'Grammar & Composition'],
+        science: ['Cells & Systems', 'Fluids', 'Heat & Energy', 'Ecology'],
+        social: ['History', 'Geography', 'World Cultures', 'Canadian Studies'],
+        french: ['French Advanced', 'French Literature', 'French Communication'],
+        technology: ['Coding Fundamentals', 'Robotics Basics', 'Digital Literacy']
+      };
+      return courses[subjectId] || [];
+    }
+
+    // Grade 9
+    if (gradeId === 9) {
+      const courses = {
+        math: ['Foundations of Algebra', 'Linear Relations', 'Analytic Geometry (Intro)'],
+        science: ['General Science', 'Biology Intro', 'Chemistry Intro', 'Physics Intro'],
+        english: ['English 9', 'Reading & Writing', 'Literature Analysis'],
+        social: ['Geography 9', 'World Geography'],
+        french: ['French 9', 'Core French', 'French Immersion'],
+        technology: ['Intro to Coding (Python)', 'Intro to Coding (Java)', 'Digital Literacy', 'Web Basics'],
+        business: ['Intro to Business (optional)', 'Entrepreneurship Basics']
+      };
+      return courses[subjectId] || [];
+    }
+
+    // Grade 10
+    if (gradeId === 10) {
+      const courses = {
+        math: ['Quadratics', 'Trigonometry Basics', 'Systems of Equations', 'Linear Relations'],
+        science: ['Biology', 'Chemistry', 'Physics', 'General Science'],
+        english: ['English 10', 'Literature & Composition', 'Media Studies'],
+        social: ['History 10', 'Canadian History', 'Civics & Career Studies'],
+        french: ['French 10', 'Core French', 'French Immersion'],
+        technology: ['Programming Fundamentals', 'Web Development Basics', 'Computer Science'],
+        business: ['Intro to Business', 'Entrepreneurship', 'Marketing Basics']
+      };
+      return courses[subjectId] || [];
+    }
+
+    // Grade 11
+    if (gradeId === 11) {
+      const courses = {
+        math: ['Functions', 'College Math', 'Workplace Math'],
+        science: ['Biology', 'Chemistry', 'Physics'],
+        english: ['English 11', 'Literature', 'Writing & Rhetoric'],
+        social: ['Social Sciences', 'World History', 'Law & Politics'],
+        french: ['French 11', 'Core French', 'French Immersion'],
+        technology: ['Programming (Intermediate)', 'Data Structures', 'Web Development', 'App Development'],
+        business: ['Marketing', 'Accounting (Intro)', 'Entrepreneurship', 'Business Management']
+      };
+      return courses[subjectId] || [];
+    }
+
+    // Grade 12
+    if (gradeId === 12) {
+      const courses = {
+        math: ['Advanced Functions', 'Calculus & Vectors', 'Data Management', 'Statistics'],
+        science: ['Biology', 'Chemistry', 'Physics'],
+        english: ['English 12', 'Literature', 'University Preparation'],
+        social: ['Social Sciences', 'World Issues', 'Philosophy'],
+        french: ['French 12', 'Core French', 'French Immersion'],
+        technology: ['Software Engineering', 'OOP', 'Algorithms', 'Databases', 'Web Applications'],
+        business: ['Financial Accounting', 'Finance & Investing', 'Marketing & Management', 'Business Leadership']
+      };
+      return courses[subjectId] || [];
+    }
+
+    return [];
+  };
+
+  const subjects = selectedGrade ? getSubjectsForGrade(selectedGrade.id) : [];
+  const courses = (selectedGrade && selectedSubject) 
+    ? getCoursesForGradeAndSubject(selectedGrade.id, selectedSubject.id) 
+    : [];
 
   const fetchTutors = async () => {
     if (!selectedSubject) return;
@@ -134,9 +249,21 @@ const BookLesson = () => {
       const slotsResponses = await Promise.all(slotsPromises);
       
       // Map tutor IDs to their available slots
+      // Filter out slots that are less than 48 hours from now
+      const now = new Date();
+      const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000); // 48 hours from now
+      
       const slotsMap = {};
       tutorsList.forEach((tutor, index) => {
-        slotsMap[tutor.id] = slotsResponses[index].data || [];
+        const allSlots = slotsResponses[index].data || [];
+        
+        // Only include slots that are 48+ hours in the future
+        const filteredSlots = allSlots.filter(slot => {
+          const slotDateTime = new Date(slot.startTime);
+          return slotDateTime >= minBookingTime;
+        });
+        
+        slotsMap[tutor.id] = filteredSlots;
       });
       
       setAvailableSlots(slotsMap);
@@ -213,10 +340,15 @@ const BookLesson = () => {
 
   const handleGradeSelect = (grade) => {
     setSelectedGrade(grade);
+    // Reset subject and course when grade changes
+    setSelectedSubject(null);
+    setSelectedCourse(null);
   };
 
   const handleSubjectSelect = (subject) => {
     setSelectedSubject(subject);
+    // Reset course when subject changes
+    setSelectedCourse(null);
   };
 
   const handleCourseSelect = (course) => {
@@ -224,6 +356,19 @@ const BookLesson = () => {
   };
 
   const handleTimeSlotSelect = (tutorId, timeSlot, day, date, slotData) => {
+    // Validate 48-hour minimum at selection time
+    if (slotData && slotData.startTime) {
+      const slotDateTime = new Date(slotData.startTime);
+      const now = new Date();
+      const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+      
+      if (slotDateTime < minBookingTime) {
+        const hoursAway = (slotDateTime - now) / (1000 * 60 * 60);
+        alert(`This slot is only ${hoursAway.toFixed(1)} hours away. Lessons must be booked at least 48 hours in advance.`);
+        return;
+      }
+    }
+    
     setSelectedTutor(tutorId);
     setSelectedTimeSlot({ timeSlot, day, date, slotData });
   };
@@ -241,17 +386,27 @@ const BookLesson = () => {
 
       // Use the slot data from the availability API
       const slotData = selectedTimeSlot.slotData;
-      if (!slotData) {
-        throw new Error('Slot data not found');
+      if (!slotData || !slotData.startTime) {
+        throw new Error('Invalid slot data - please select a different time slot');
       }
 
       // Validate 48-hour minimum booking window
       const selectedDateTime = new Date(slotData.startTime);
       const now = new Date();
       const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+      const hoursAway = (selectedDateTime - now) / (1000 * 60 * 60);
+      
+      console.log('Booking validation:');
+      console.log('  Current time:', now);
+      console.log('  Selected slot time:', selectedDateTime);
+      console.log('  Hours away:', hoursAway);
+      console.log('  Min booking time (48h):', minBookingTime);
+      console.log('  Is valid?', selectedDateTime >= minBookingTime);
       
       if (selectedDateTime < minBookingTime) {
-        setError('Lessons must be booked at least 48 hours in advance');
+        const errorMsg = `Lessons must be booked at least 48 hours in advance. This slot is only ${hoursAway.toFixed(1)} hours away.`;
+        setError(errorMsg);
+        alert(errorMsg);
         setBookingLoading(false);
         return;
       }
@@ -265,6 +420,9 @@ const BookLesson = () => {
       };
 
       await bookingAPI.createBooking(bookingData);
+      
+      // Close the booking confirmation popup and show success modal
+      setSelectedTimeSlot(null);
       setShowSuccessModal(true);
     } catch (err) {
       console.error('Error creating booking:', err);
@@ -345,8 +503,11 @@ const BookLesson = () => {
         return (
           <div className="booking-card">
             <h3>Choose a course:</h3>
+            {courses.length === 0 && selectedSubject && (
+              <p className="no-courses-message">No courses available for this grade and subject combination.</p>
+            )}
             <div className="course-grid">
-              {courses[selectedSubject?.id]?.map((course, index) => (
+              {courses.map((course, index) => (
                 <button
                   key={index}
                   className={`course-button ${selectedCourse === course ? 'selected' : ''}`}
@@ -377,16 +538,24 @@ const BookLesson = () => {
         // Group slots by date and time
         const groupSlotsByDateTime = () => {
           const grouped = {};
+          const now = new Date();
+          const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000); // 48 hours from now
+          
           currentTutorSlots.forEach(slot => {
             const slotDate = new Date(slot.startTime);
-            const dateKey = slotDate.toISOString().split('T')[0];
-            const timeKey = slotDate.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
             
-            if (!grouped[dateKey]) {
-              grouped[dateKey] = {};
+            // Only include slots that are at least 48 hours in advance
+            if (slotDate >= minBookingTime) {
+              const dateKey = slotDate.toISOString().split('T')[0];
+              const timeKey = slotDate.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
+              
+              if (!grouped[dateKey]) {
+                grouped[dateKey] = {};
+              }
+              grouped[dateKey][timeKey] = slot;
             }
-            grouped[dateKey][timeKey] = slot;
           });
+          
           return grouped;
         };
         
@@ -482,8 +651,19 @@ const BookLesson = () => {
                               return (
                                 <div key={dayIndex} className="day-slots">
                                   {uniqueTimeSlots.map((timeSlot) => {
-                                    const isAvailable = daySlots[timeSlot] !== undefined;
                                     const slotData = daySlots[timeSlot];
+                                    
+                                    // Check if slot exists
+                                    let isAvailable = false;
+                                    
+                                    if (slotData && slotData.startTime) {
+                                      // Check if slot is at least 48 hours in advance
+                                      const slotDateTime = new Date(slotData.startTime);
+                                      const now = new Date();
+                                      const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000); // 48 hours from now
+                                      isAvailable = slotDateTime >= minBookingTime;
+                                    }
+                                    
                                     const isSelected = selectedTutor === currentTutor.id && 
                                                      selectedTimeSlot?.timeSlot === timeSlot && 
                                                      selectedTimeSlot?.day === dayIndex;
@@ -491,8 +671,15 @@ const BookLesson = () => {
                                       <div
                                         key={`${dayIndex}-${timeSlot}`}
                                         className={`time-slot-cell ${isAvailable ? 'available' : 'unavailable'} ${isSelected ? 'selected-slot' : ''}`}
-                                        onClick={() => isAvailable && handleTimeSlotSelect(currentTutor.id, timeSlot, dayIndex, date, slotData)}
-                                        title={isAvailable ? 'Available' : 'Not available'}
+                                        onClick={() => {
+                                          if (!isAvailable) {
+                                            alert('This time slot is not available. Please select a time that is at least 48 hours from now.');
+                                            return;
+                                          }
+                                          handleTimeSlotSelect(currentTutor.id, timeSlot, dayIndex, date, slotData);
+                                        }}
+                                        style={{ cursor: isAvailable ? 'pointer' : 'not-allowed' }}
+                                        title={isAvailable ? 'Available (48+ hours from now)' : 'Not available (must be 48+ hours in advance)'}
                                       />
                                     );
                                   })}

@@ -22,6 +22,7 @@ const LessonHistory = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cancellingBooking, setCancellingBooking] = useState(null);
+  const [timeFilter, setTimeFilter] = useState('30days'); // Default to 30 days
   
   // Fetch bookings when component mounts
   useEffect(() => {
@@ -46,10 +47,34 @@ const LessonHistory = () => {
     }
   };
 
-  const totalPages = Math.ceil(bookings.length / 9);
+  const filterBookingsByTime = (bookings) => {
+    const now = new Date();
+    const timeRanges = {
+      '7days': 7,
+      '2weeks': 14,
+      '30days': 30,
+      '3months': 90,
+      'year+': 365
+    };
+
+    const daysToFilter = timeRanges[timeFilter];
+    const filterDate = new Date(now);
+    filterDate.setDate(filterDate.getDate() - daysToFilter);
+
+    // Filter bookings within the time range and sort by date (newest first)
+    return bookings
+      .filter(booking => {
+        const bookingDate = new Date(booking.startTime);
+        return bookingDate >= filterDate;
+      })
+      .sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+  };
+
+  const filteredBookings = filterBookingsByTime(bookings);
+  const totalPages = Math.ceil(filteredBookings.length / 9);
   const lessonsPerPage = 9;
   const startIndex = (currentPage - 1) * lessonsPerPage;
-  const currentBookings = bookings.slice(startIndex, startIndex + lessonsPerPage);
+  const currentBookings = filteredBookings.slice(startIndex, startIndex + lessonsPerPage);
 
   const handleRatingClick = (lessonId, rating) => {
     setRatings(prev => ({
@@ -188,6 +213,31 @@ const LessonHistory = () => {
           <p>{isTutor ? "View all the lessons you've taught so far!" : "View all the lessons you've taken so far!"}</p>
         </div>
 
+        {/* Time Filter */}
+        <div className="filter-section">
+          <div className="filter-header">
+            <label htmlFor="time-filter" className="filter-label">Filter by time:</label>
+            <select
+              id="time-filter"
+              className="filter-dropdown"
+              value={timeFilter}
+              onChange={(e) => {
+                setTimeFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
+              <option value="7days">Past 7 Days</option>
+              <option value="2weeks">Past 2 Weeks</option>
+              <option value="30days">Past 30 Days</option>
+              <option value="3months">Past 3 Months</option>
+              <option value="year+">Past Year+</option>
+            </select>
+          </div>
+          <div className="filter-info">
+            Showing {filteredBookings.length} {filteredBookings.length === 1 ? 'lesson' : 'lessons'}
+          </div>
+        </div>
+
         {loading && <div className="loading">Loading bookings...</div>}
         {error && !loading && <div className="error">{error}</div>}
 
@@ -197,7 +247,13 @@ const LessonHistory = () => {
           </div>
         )}
 
-        {!loading && !error && bookings.length > 0 && (
+        {!loading && !error && bookings.length > 0 && filteredBookings.length === 0 && (
+          <div className="no-bookings">
+            <p>No lessons found in the selected time period. Try a different time range!</p>
+          </div>
+        )}
+
+        {!loading && !error && filteredBookings.length > 0 && (
         <>
         <div className="lesson-list">
           {currentBookings.map(booking => (

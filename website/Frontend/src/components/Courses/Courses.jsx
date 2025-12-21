@@ -31,7 +31,219 @@ const Courses = () => {
   const [message, setMessage] = useState({ text: '', type: '' });
   const [selectedSubject, setSelectedSubject] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
   
+  // Comprehensive course catalog based on grade levels
+  const allCoursesByCategory = {
+    'Math': {
+      icon: faCalculator,
+      color: '#e74c3c',
+      courses: [
+        // Primary (Grades 1-3)
+        'Addition & Subtraction',
+        'Place Value',
+        'Patterns',
+        'Basic Geometry',
+        'Time & Money',
+        // Junior (Grades 4-6)
+        'Multiplication & Division',
+        'Fractions',
+        'Decimals',
+        'Intro Algebra (Patterns)',
+        'Geometry',
+        'Measurement',
+        // Intermediate (Grades 7-8)
+        'Integers',
+        'Ratios & Rates',
+        'Equations (Intro)',
+        'Pythagorean Theorem',
+        'Graphing Basics',
+        'Probability',
+        // Grade 9
+        'Foundations of Algebra',
+        'Linear Relations',
+        'Analytic Geometry (Intro)',
+        // Grade 10
+        'Quadratics',
+        'Trigonometry Basics',
+        'Systems of Equations',
+        // Grade 11
+        'Functions',
+        'College Math',
+        'Workplace Math',
+        // Grade 12
+        'Advanced Functions',
+        'Calculus & Vectors',
+        'Data Management',
+        'Statistics'
+      ]
+    },
+    'English / Language Arts': {
+      icon: faBook,
+      color: '#f1c40f',
+      courses: [
+        // Primary (Grades 1-3)
+        'Reading',
+        'Phonics',
+        'Writing',
+        'Spelling',
+        'Basic Grammar',
+        // Junior (Grades 4-6)
+        'Reading Comprehension',
+        'Paragraph Writing',
+        'Grammar',
+        'Vocabulary',
+        // Intermediate (Grades 7-8)
+        'English Language Arts',
+        'Reading & Analysis',
+        'Essay Writing',
+        'Grammar & Composition',
+        // Grade 9-12
+        'English 9',
+        'English 10',
+        'English 11',
+        'English 12',
+        'Literature',
+        'Literature & Composition',
+        'Literature Analysis',
+        'Writing & Rhetoric',
+        'Media Studies',
+        'University Preparation'
+      ]
+    },
+    'Science': {
+      icon: faFlask,
+      color: '#2ecc71',
+      courses: [
+        // Primary (Grades 1-3)
+        'Life Systems',
+        'Materials',
+        'Weather & Seasons',
+        'Simple Machines',
+        // Junior (Grades 4-6)
+        'Electricity',
+        'Space',
+        'Biodiversity',
+        // Intermediate (Grades 7-8)
+        'Cells & Systems',
+        'Fluids',
+        'Heat & Energy',
+        'Ecology',
+        // Grade 9
+        'General Science',
+        'Biology Intro',
+        'Chemistry Intro',
+        'Physics Intro',
+        // Grades 10-12
+        'Biology',
+        'Chemistry',
+        'Physics'
+      ]
+    },
+    'Social Studies': {
+      icon: faGlobe,
+      color: '#9b59b6',
+      courses: [
+        // Junior (Grades 4-6)
+        'Heritage & Identity',
+        'People & Environments',
+        'History Basics',
+        'Geography Basics',
+        // Intermediate (Grades 7-8)
+        'History',
+        'Geography',
+        'World Cultures',
+        'Canadian Studies',
+        // Grade 9
+        'Geography 9',
+        'World Geography',
+        // Grade 10
+        'History 10',
+        'Canadian History',
+        'Civics & Career Studies',
+        // Grade 11
+        'Social Sciences',
+        'World History',
+        'Law & Politics',
+        // Grade 12
+        'World Issues',
+        'Philosophy'
+      ]
+    },
+    'French': {
+      icon: faGlobe,
+      color: '#e67e22',
+      courses: [
+        'French Basics',
+        'French Reading',
+        'French Writing',
+        'French Intermediate',
+        'French Conversation',
+        'French Grammar',
+        'French Advanced',
+        'French Literature',
+        'French Communication',
+        'French 9',
+        'French 10',
+        'French 11',
+        'French 12',
+        'Core French',
+        'French Immersion'
+      ]
+    },
+    'Technology / CS': {
+      icon: faGraduationCap,
+      color: '#3498db',
+      courses: [
+        // Intermediate (Grades 7-8)
+        'Coding Fundamentals',
+        'Robotics Basics',
+        'Digital Literacy',
+        // Grade 9
+        'Intro to Coding (Python)',
+        'Intro to Coding (Java)',
+        'Web Basics',
+        // Grade 10
+        'Programming Fundamentals',
+        'Web Development Basics',
+        'Computer Science',
+        // Grade 11
+        'Programming (Intermediate)',
+        'Data Structures',
+        'Web Development',
+        'App Development',
+        // Grade 12
+        'Software Engineering',
+        'OOP',
+        'Algorithms',
+        'Databases',
+        'Web Applications'
+      ]
+    },
+    'Business': {
+      icon: faBook,
+      color: '#8B4513',
+      courses: [
+        // Grade 9
+        'Intro to Business (optional)',
+        'Entrepreneurship Basics',
+        // Grade 10
+        'Intro to Business',
+        'Entrepreneurship',
+        'Marketing Basics',
+        // Grade 11
+        'Marketing',
+        'Accounting (Intro)',
+        'Business Management',
+        // Grade 12
+        'Financial Accounting',
+        'Finance & Investing',
+        'Marketing & Management',
+        'Business Leadership'
+      ]
+    }
+  };
+
   // Set user type when component mounts
   useEffect(() => {
     setUserType('tutor');
@@ -74,11 +286,26 @@ const Courses = () => {
 
   const fetchAllSubjects = async () => {
     try {
-      const response = await subjectAPI.getAllSubjects();
-      setAllSubjects(response.data);
+      // Generate comprehensive course list from our catalog
+      const courses = [];
+      let id = 1;
+      
+      Object.entries(allCoursesByCategory).forEach(([category, data]) => {
+        data.courses.forEach(courseName => {
+          courses.push({
+            id: id++,
+            name: courseName,
+            category: category,
+            icon: data.icon,
+            color: data.color
+          });
+        });
+      });
+      
+      setAllSubjects(courses);
     } catch (error) {
-      console.error('Error fetching all subjects:', error);
-      showMessage('Failed to load available subjects', 'error');
+      console.error('Error loading courses:', error);
+      showMessage('Failed to load available courses', 'error');
     }
   };
 
@@ -185,10 +412,16 @@ const Courses = () => {
         const tutorSubjectNames = [...currentlyTeaching, ...pastCourses].map(s => s.subjectName);
         let availableSubjects = allSubjects.filter(s => !tutorSubjectNames.includes(s.name));
         
+        // Apply category filter
+        if (selectedCategory !== 'all') {
+          availableSubjects = availableSubjects.filter(s => s.category === selectedCategory);
+        }
+        
         // Apply search filter if search query exists
         if (searchQuery.trim()) {
           availableSubjects = availableSubjects.filter(s => 
-            s.name.toLowerCase().includes(searchQuery.toLowerCase())
+            s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            s.category.toLowerCase().includes(searchQuery.toLowerCase())
           );
         }
         
@@ -199,9 +432,17 @@ const Courses = () => {
   };
 
   const getAvailableSubjects = () => {
-    // Get subjects not already in tutor's list
+    // Get courses not already in tutor's list
     const tutorSubjectNames = [...currentlyTeaching, ...pastCourses].map(s => s.subjectName);
-    return allSubjects.filter(s => !tutorSubjectNames.includes(s.name));
+    return allSubjects
+      .filter(s => !tutorSubjectNames.includes(s.name))
+      .sort((a, b) => {
+        // Sort by category first, then by course name
+        if (a.category !== b.category) {
+          return a.category.localeCompare(b.category);
+        }
+        return a.name.localeCompare(b.name);
+      });
   };
 
   return (
@@ -242,7 +483,7 @@ const Courses = () => {
           </button>
         </div>
 
-        {/* Search Bar for Browse Courses */}
+        {/* Search Bar and Category Filter for Browse Courses */}
         {activeTab === 'browse-courses' && (
           <div className="search-container">
             <div className="search-input-wrapper">
@@ -264,6 +505,22 @@ const Courses = () => {
                 </button>
               )}
             </div>
+            <div className="category-filter">
+              <label htmlFor="category-select">Filter by subject:</label>
+              <select
+                id="category-select"
+                className="category-select"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+              >
+                <option value="all">All Subjects</option>
+                {Object.keys(allCoursesByCategory).map(category => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         )}
 
@@ -275,33 +532,34 @@ const Courses = () => {
             {/* Course Cards Grid */}
             <div className="courses-grid">
               {activeTab === 'browse-courses' ? (
-                // Browse tab shows all available subjects not in tutor's list
+                // Browse tab shows all available courses not in tutor's list
                 getCoursesByTab().length > 0 ? (
-                  getCoursesByTab().map((subject, index) => (
+                  getCoursesByTab().map((course) => (
                     <div 
-                      key={subject.id} 
+                      key={course.id} 
                       className="course-card browse-card" 
-                      style={{ backgroundColor: getSubjectColor(index) }}
+                      style={{ backgroundColor: course.color }}
                     >
                       <div className="course-icon">
-                        <FontAwesomeIcon icon={getSubjectIcon(subject.name)} />
+                        <FontAwesomeIcon icon={course.icon} />
                       </div>
                       <div className="course-info">
-                        <div className="course-title">{subject.name}</div>
+                        <div className="course-category">{course.category}</div>
+                        <div className="course-title">{course.name}</div>
                         <button 
                           className="add-to-teaching-btn"
                           onClick={async () => {
                             try {
                               await tutorSubjectAPI.addSubject({
-                                subjectName: subject.name,
+                                subjectName: course.name,
                                 status: 'CURRENTLY_TEACHING'
                               });
-                              showMessage('Subject added!', 'success');
+                              showMessage('Course added!', 'success');
                               await fetchTutorSubjects();
                               await fetchAllSubjects();
                             } catch (error) {
-                              console.error('Error adding subject:', error);
-                              showMessage('Failed to add subject', 'error');
+                              console.error('Error adding course:', error);
+                              showMessage('Failed to add course', 'error');
                             }
                           }}
                         >
@@ -313,9 +571,9 @@ const Courses = () => {
                 ) : (
                   <div className="empty-state">
                     <p>
-                      {searchQuery 
-                        ? `No courses found matching "${searchQuery}"`
-                        : 'All available subjects are already in your list'}
+                      {searchQuery || selectedCategory !== 'all'
+                        ? `No courses found`
+                        : 'All available courses are already in your list'}
                     </p>
                   </div>
                 )
@@ -411,7 +669,7 @@ const Courses = () => {
                       <div className="add-course-icon">
                         <FontAwesomeIcon icon={faFolderPlus} />
                       </div>
-                      <button className="add-course-btn">Add Subject</button>
+                      <button className="add-course-btn">Add Course</button>
                     </div>
                   )}
                 </>
@@ -420,21 +678,28 @@ const Courses = () => {
           </>
         )}
 
-        {/* Add Subject Modal */}
+        {/* Add Course Modal */}
         {showAddModal && (
           <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-              <h2>Add Subject</h2>
+              <h2>Add Course</h2>
               <select 
                 value={selectedSubject} 
                 onChange={(e) => setSelectedSubject(e.target.value)}
                 className="subject-select"
               >
-                <option value="">Select a subject...</option>
-                {getAvailableSubjects().map(subject => (
-                  <option key={subject.id} value={subject.name}>
-                    {subject.name}
-                  </option>
+                <option value="">Select a course...</option>
+                {Object.keys(allCoursesByCategory).map(category => (
+                  <optgroup key={category} label={category}>
+                    {getAvailableSubjects()
+                      .filter(s => s.category === category)
+                      .map(course => (
+                        <option key={course.id} value={course.name}>
+                          {course.name}
+                        </option>
+                      ))
+                    }
+                  </optgroup>
                 ))}
               </select>
               <div className="modal-actions">
@@ -451,7 +716,7 @@ const Courses = () => {
                   className="confirm-btn" 
                   onClick={handleAddCourse}
                 >
-                  Add Subject
+                  Add Course
                 </button>
               </div>
             </div>

@@ -163,20 +163,29 @@ const StudentDashboard = () => {
       );
 
       // Convert the API response to the format expected by the UI
-      const slots = response.data.map(slot => {
-        const startTime = new Date(slot.startTime);
-        const timeStr = `${String(startTime.getHours()).padStart(2, '0')}:${String(startTime.getMinutes()).padStart(2, '0')}`;
-        
-        return {
-          time: timeStr,
-          available: true, // All slots from the API are available
-          displayTime: startTime.toLocaleTimeString('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-          })
-        };
-      });
+      // Filter out slots that are less than 48 hours from now
+      const now = new Date();
+      const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000); // 48 hours from now
+      
+      const slots = response.data
+        .filter(slot => {
+          const startTime = new Date(slot.startTime);
+          return startTime >= minBookingTime; // Only include slots 48+ hours in advance
+        })
+        .map(slot => {
+          const startTime = new Date(slot.startTime);
+          const timeStr = `${String(startTime.getHours()).padStart(2, '0')}:${String(startTime.getMinutes()).padStart(2, '0')}`;
+          
+          return {
+            time: timeStr,
+            available: true, // All slots from the API are available
+            displayTime: startTime.toLocaleTimeString('en-US', {
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true
+            })
+          };
+        });
 
       setAvailableSlots(slots);
     } catch (error) {

@@ -388,7 +388,7 @@
 }
 
 .calendar-day.weekend {
-  color: #28a745;
+  color: #00ff66;
   font-weight: 500;
 }
 
@@ -408,7 +408,7 @@
   transform: translateX(-50%);
   width: 4px;
   height: 4px;
-  background-color: #28a745;
+  background-color: #00ff3c;
   border-radius: 50%;
 }
 

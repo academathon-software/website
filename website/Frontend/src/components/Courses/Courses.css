@@ -133,6 +133,42 @@
   color: #2c3e50;
 }
 
+/* Category Filter */
+.category-filter {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.category-filter label {
+  font-weight: 500;
+  color: #2c3e50;
+  font-size: 0.95rem;
+}
+
+.category-select {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #2c3e50;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 200px;
+}
+
+.category-select:hover {
+  border-color: #1A803D;
+}
+
+.category-select:focus {
+  outline: none;
+  border-color: #1A803D;
+  box-shadow: 0 0 0 3px rgba(26, 128, 61, 0.1);
+}
+
 /* Courses Grid */
 .courses-grid {
   display: grid;
@@ -185,6 +221,15 @@
   color: rgba(255, 255, 255, 0.9);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+.course-category {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
 }
 
 .course-title {
@@ -447,6 +492,17 @@
 .subject-select:focus {
   outline: none;
   border-color: #1A803D;
+}
+
+.subject-select optgroup {
+  font-weight: 700;
+  color: #1A803D;
+  font-size: 0.95rem;
+}
+
+.subject-select option {
+  padding: 0.5rem;
+  color: #2c3e50;
 }
 
 .modal-actions {
