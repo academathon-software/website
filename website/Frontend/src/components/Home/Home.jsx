@@ -1,5 +1,10 @@
 import React from 'react';
 import './Home.css';
+import waterlooLogo from '../../assets/waterloo.png';
+import mcgillLogo from '../../assets/mcgill.png';
+import mcmasterLogo from '../../assets/mcmaster.png';
+import westernLogo from '../../assets/western.png';
+import torontoLogo from '../../assets/toronto.png';
 
 function Home() {
   return (
@@ -80,6 +85,30 @@ function Home() {
               <div className="feature-icon">📊</div>
               <h3>Progress Tracking</h3>
               <p>Monitor your learning journey with detailed progress reports and performance analytics.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* University Logos Section */}
+      <section className="universities-section">
+        <div className="container">
+          <div className="universities-header">
+            <h2>Qualified Tutors From Top Universities</h2>
+          </div>
+          <div className="logo-slider">
+            <div className="logo-track">
+              <img src={waterlooLogo} alt="University of Waterloo" className="university-logo" />
+              <img src={mcgillLogo} alt="McGill University" className="university-logo" />
+              <img src={mcmasterLogo} alt="McMaster University" className="university-logo" />
+              <img src={westernLogo} alt="Western University" className="university-logo" />
+              <img src={torontoLogo} alt="University of Toronto" className="university-logo" />
+              {/* Duplicate for seamless loop */}
+              <img src={waterlooLogo} alt="University of Waterloo" className="university-logo" />
+              <img src={mcgillLogo} alt="McGill University" className="university-logo" />
+              <img src={mcmasterLogo} alt="McMaster University" className="university-logo" />
+              <img src={westernLogo} alt="Western University" className="university-logo" />
+              <img src={torontoLogo} alt="University of Toronto" className="university-logo" />
             </div>
           </div>
         </div>

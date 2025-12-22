@@ -286,38 +286,62 @@
   font-size: 1rem;
 }
 
-/* Stats Section */
-.stats-section {
+/* Universities Section */
+.universities-section {
   padding: 80px 0;
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
+  overflow: hidden;
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 40px;
+.universities-header {
   text-align: center;
+  margin-bottom: 60px;
 }
 
-.stat-item {
-  padding: 20px;
+.universities-header h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
 }
 
-.stat-number {
-  font-size: 3rem;
-  font-weight: 800;
-  margin-bottom: 8px;
-  background: linear-gradient(45deg, #ffd700, #ffed4e);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.logo-slider {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: 20px 0;
 }
 
-.stat-label {
-  font-size: 1.1rem;
+.logo-track {
+  display: flex;
+  align-items: center;
+  gap: 80px;
+  animation: scroll 30s linear infinite;
+  width: fit-content;
+}
+
+.university-logo {
+  height: 80px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
   opacity: 0.9;
-  font-weight: 500;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.university-logo:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 /* Testimonials Section */
@@ -453,13 +477,16 @@
     padding: 30px 20px;
   }
   
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 30px;
+  .universities-header h2 {
+    font-size: 2rem;
   }
   
-  .stat-number {
-    font-size: 2.5rem;
+  .university-logo {
+    height: 60px;
+  }
+  
+  .logo-track {
+    gap: 60px;
   }
   
   .testimonials-grid {
@@ -511,12 +538,16 @@
     font-size: 2.5rem;
   }
   
-  .stats-grid {
-    grid-template-columns: 1fr;
+  .universities-header h2 {
+    font-size: 1.8rem;
   }
   
-  .stat-number {
-    font-size: 2rem;
+  .university-logo {
+    height: 50px;
+  }
+  
+  .logo-track {
+    gap: 40px;
   }
   
   .cta-content h2 {
@@ -541,8 +572,7 @@
 }
 
 .feature-card,
-.testimonial-card,
-.stat-item {
+.testimonial-card {
   animation: fadeInUp 0.6s ease-out;
 }
 
