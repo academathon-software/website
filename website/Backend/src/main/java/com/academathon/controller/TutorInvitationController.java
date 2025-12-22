@@ -53,12 +53,47 @@ public class TutorInvitationController {
         }
     }
 
-    // Response record for invitation creation
+    @GetMapping
+    public ResponseEntity<?> getAllInvitations() {
+        try {
+            var invitations = invitationService.getAllInvitations();
+            return ResponseEntity.ok(invitations);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body(new ErrorResponse("Failed to retrieve invitations: " + e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteInvitation(@PathVariable Long id) {
+        try {
+            invitationService.deleteInvitation(id);
+            return ResponseEntity.ok().body(new MessageResponse("Invitation deleted successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body(new ErrorResponse("Failed to delete invitation: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/{id}/resend")
+    public ResponseEntity<?> resendInvitation(@PathVariable Long id) {
+        try {
+            invitationService.resendInvitation(id);
+            return ResponseEntity.ok().body(new MessageResponse("Invitation resent successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body(new ErrorResponse("Failed to resend invitation: " + e.getMessage()));
+        }
+    }
+
+    // Response records
     private record InvitationCreatedResponse(
         String token,
         String email,
         String expiresAt
     ) {}
+
+    private record MessageResponse(String message) {}
 }
 
 

@@ -19,6 +19,7 @@ import Courses from './components/Courses/Courses';
 import CourseDetails from './components/Courses/CourseDetails';
 import AvailabilityManager from './components/Availability/AvailabilityManager';
 import Messages from './components/Messages/Messages';
+import TutorInvitations from './components/TutorInvitations/TutorInvitations';
 import About from './About/About';
 import Pricing from './Pricing/Pricing';
 import Team from './Team/Team';
@@ -52,6 +53,7 @@ function App() {
           <Route path="courses/:id" element={<CourseDetails />} />
           <Route path="my-courses/:subjectName" element={<CourseDetails />} />
           <Route path="availability" element={<AvailabilityManager />} />
+          <Route path="tutor-invitations" element={<TutorInvitations />} />
       </Routes>
     </Router>
     </UserProvider>

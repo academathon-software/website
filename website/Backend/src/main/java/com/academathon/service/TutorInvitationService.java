@@ -57,6 +57,34 @@ public class TutorInvitationService {
         invitationRepository.save(invitation);
     }
 
+    public java.util.List<TutorInvitation> getAllInvitations() {
+        return invitationRepository.findAll();
+    }
+
+    public void deleteInvitation(Long id) {
+        if (!invitationRepository.existsById(id)) {
+            throw new RuntimeException("Invitation not found");
+        }
+        invitationRepository.deleteById(id);
+    }
+
+    public void resendInvitation(Long id) throws MessagingException {
+        TutorInvitation invitation = invitationRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Invitation not found"));
+
+        if (invitation.getStatus() == TutorInvitation.InvitationStatus.USED) {
+            throw new RuntimeException("Cannot resend a used invitation");
+        }
+
+        // Update expiration date
+        invitation.setExpiresAt(LocalDateTime.now().plusDays(7));
+        invitation.setStatus(TutorInvitation.InvitationStatus.PENDING);
+        invitationRepository.save(invitation);
+
+        // Resend email
+        sendInvitationEmail(invitation);
+    }
+
     private void sendInvitationEmail(TutorInvitation invitation) throws MessagingException {
         String signupLink = "http://localhost:3000/signup/tutor/" + invitation.getToken();
         
