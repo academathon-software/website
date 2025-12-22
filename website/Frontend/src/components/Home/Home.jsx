@@ -85,30 +85,6 @@ function Home() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="stats-section">
-        <div className="container">
-          <div className="stats-grid">
-            <div className="stat-item">
-              <div className="stat-number">10,000+</div>
-              <div className="stat-label">Happy Students</div>
-            </div>
-            <div className="stat-item">
-              <div className="stat-number">500+</div>
-              <div className="stat-label">Expert Tutors</div>
-            </div>
-            <div className="stat-item">
-              <div className="stat-number">50+</div>
-              <div className="stat-label">Subjects</div>
-            </div>
-            <div className="stat-item">
-              <div className="stat-number">98%</div>
-              <div className="stat-label">Success Rate</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Testimonials Section */}
       <section className="testimonials-section">
         <div className="container">
