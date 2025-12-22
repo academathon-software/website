@@ -165,7 +165,7 @@ function Home() {
             <p>Join thousands of students who are already achieving their academic goals with Academathon.</p>
             <div className="cta-buttons">
               <a href="/signup" className="btn btn-primary btn-large">Start Learning Today</a>
-              <a href="/login" className="btn btn-outline btn-large">Sign In</a>
+              <a href="/login" className="btn btn-primary btn-large">Sign In</a>
             </div>
           </div>
         </div>
