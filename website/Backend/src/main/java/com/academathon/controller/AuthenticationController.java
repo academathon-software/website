@@ -10,6 +10,7 @@ import com.academathon.responses.LoginResponse;
 import com.academathon.responses.ErrorResponse;
 import com.academathon.service.AuthenticationService;
 import com.academathon.service.TutorSignupService;
+import com.academathon.service.PasswordResetService;
 import com.academathon.dto.LoginUserDTO;
 import com.academathon.dto.RegisterUserDTO;
 import com.academathon.dto.VerifyUserDTO;
@@ -27,11 +28,14 @@ public class AuthenticationController {
     private final JWTService jwtService;
     private final AuthenticationService authenticationService;
     private final TutorSignupService tutorSignupService;
+    private final PasswordResetService passwordResetService;
 
-    public AuthenticationController(JWTService jwtService, AuthenticationService authenticationService, TutorSignupService tutorSignupService) {
+    public AuthenticationController(JWTService jwtService, AuthenticationService authenticationService, 
+                                   TutorSignupService tutorSignupService, PasswordResetService passwordResetService) {
         this.jwtService = jwtService;
         this.authenticationService = authenticationService;
         this.tutorSignupService = tutorSignupService;
+        this.passwordResetService = passwordResetService;
     }
 
     @PostMapping("/signup")
@@ -109,6 +113,42 @@ public class AuthenticationController {
             return ResponseEntity.ok(registeredTutor);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody java.util.Map<String, String> request) {
+        try {
+            String email = request.get("email");
+            if (email == null || email.isEmpty()) {
+                return ResponseEntity.badRequest().body(new ErrorResponse("Email is required"));
+            }
+            passwordResetService.createPasswordResetToken(email);
+            return ResponseEntity.ok("If an account exists with this email, a password reset link has been sent.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse("Failed to process password reset request"));
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody java.util.Map<String, String> request) {
+        try {
+            String token = request.get("token");
+            String newPassword = request.get("newPassword");
+            
+            if (token == null || token.isEmpty() || newPassword == null || newPassword.isEmpty()) {
+                return ResponseEntity.badRequest().body(new ErrorResponse("Token and new password are required"));
+            }
+            
+            boolean success = passwordResetService.resetPassword(token, newPassword);
+            
+            if (success) {
+                return ResponseEntity.ok("Password reset successfully");
+            } else {
+                return ResponseEntity.badRequest().body(new ErrorResponse("Invalid or expired reset token"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse("Failed to reset password"));
         }
     }
     

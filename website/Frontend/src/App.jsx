@@ -6,6 +6,8 @@ import Login from './auth/Login/Login';
 import Signup from './auth/Signup/Signup';
 import TutorSignup from './auth/TutorSignup/TutorSignup';
 import Verification from './auth/Verification/Verification';
+import ForgotPassword from './auth/ForgotPassword/ForgotPassword';
+import ResetPassword from './auth/ResetPassword/ResetPassword';
 import Layout from './components/Layout/Layout';
 import StudentDashboard from './components/Dashboard/StudentDashboard';
 import TutorDashboard from './components/Dashboard/TutorDashboard';
@@ -36,6 +38,8 @@ function App() {
           <Route path="signup" element={<Signup />} />
           <Route path="signup/tutor/:token" element={<TutorSignup />} />
           <Route path="verify" element={<Verification />} />
+          <Route path="forgot-password" element={<ForgotPassword />} />
+          <Route path="reset-password" element={<ResetPassword />} />
         </Route>
           <Route path="dashboard" element={<StudentDashboard />} />
           <Route path="tutor-dashboard" element={<TutorDashboard />} />

@@ -91,6 +91,10 @@ function LoginPage() {
               />
             </div>
 
+            <div className="forgot-password-link">
+              <a href="/forgot-password">Forgot your password?</a>
+            </div>
+
             <div className="login-button">
               <button type="submit" className="sign-in-btn">Sign In</button>
             </div>
