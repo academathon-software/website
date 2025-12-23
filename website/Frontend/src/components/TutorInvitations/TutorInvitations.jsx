@@ -10,6 +10,7 @@ import {
   faPlus
 } from '@fortawesome/free-solid-svg-icons';
 import TutorSidebar from '../Shared/TutorSidebar';
+import AdminSidebar from '../Admin/AdminSidebar';
 import { useUser } from '../../context/UserContext';
 import './TutorInvitations.css';
 
@@ -21,11 +22,18 @@ const TutorInvitations = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState({ text: '', type: '' });
   const [submitting, setSubmitting] = useState(false);
+  
+  // Check if user is admin
+  const userRole = localStorage.getItem('userRole');
+  const isAdmin = userRole && userRole.toUpperCase() === 'ADMIN';
 
   useEffect(() => {
-    setUserType('tutor');
+    // Only set userType if not admin
+    if (!isAdmin) {
+      setUserType('tutor');
+    }
     fetchInvitations();
-  }, [setUserType]);
+  }, [setUserType, isAdmin]);
 
   const fetchInvitations = async () => {
     try {
@@ -165,7 +173,7 @@ const TutorInvitations = () => {
 
   return (
     <div className="tutor-invitations-page">
-      <TutorSidebar />
+      {isAdmin ? <AdminSidebar /> : <TutorSidebar />}
       
       <div className="invitations-main-content">
         <div className="invitations-header">

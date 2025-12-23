@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './BookLesson.css';
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faChevronLeft,
@@ -10,13 +11,15 @@ import {
   faGlobeAmericas,
   faCog,
   faBriefcase,
-  faCheck
+  faCheck,
+  faArrowLeft
 } from '@fortawesome/free-solid-svg-icons';
 import StudentSidebar from '../Shared/StudentSidebar';
 import { useUser } from '../../context/UserContext';
 import { tutorAPI, bookingAPI, availabilityAPI } from '../../services/api';
 
 const BookLesson = () => {
+  const navigate = useNavigate();
   const { setUserType } = useUser();
   const [currentStep, setCurrentStep] = useState(1);
   const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date());
@@ -716,7 +719,16 @@ const BookLesson = () => {
       
       <div className="main-content">
         <div className="page-header">
-          <h1>Book Lesson</h1>
+          <div className="header-with-back">
+            <button 
+              className="back-button" 
+              onClick={() => navigate('/dashboard')} 
+              title="Back to Dashboard"
+            >
+              <FontAwesomeIcon icon={faArrowLeft} />
+            </button>
+            <h1>Book Lesson</h1>
+          </div>
           <div className="progress-indicator">
             {[1, 2, 3, 4].map(step => (
               <React.Fragment key={step}>

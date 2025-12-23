@@ -24,6 +24,10 @@ import About from './About/About';
 import Pricing from './Pricing/Pricing';
 import Team from './Team/Team';
 import { UserProvider } from './context/UserContext';
+import AdminDashboard from './components/Admin/AdminDashboard';
+import UserManagement from './components/Admin/UserManagement';
+import Statistics from './components/Admin/Statistics';
+import BookingOversight from './components/Admin/BookingOversight';
 
 function App() {
   return (
@@ -53,7 +57,11 @@ function App() {
           <Route path="courses/:id" element={<CourseDetails />} />
           <Route path="my-courses/:subjectName" element={<CourseDetails />} />
           <Route path="availability" element={<AvailabilityManager />} />
-          <Route path="tutor-invitations" element={<TutorInvitations />} />
+          <Route path="admin-dashboard" element={<AdminDashboard />} />
+          <Route path="admin/users" element={<UserManagement />} />
+          <Route path="admin/statistics" element={<Statistics />} />
+          <Route path="admin/bookings" element={<BookingOversight />} />
+          <Route path="admin/invitations" element={<TutorInvitations />} />
       </Routes>
     </Router>
     </UserProvider>

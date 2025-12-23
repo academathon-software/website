@@ -11,8 +11,7 @@ import {
   faSignOutAlt,
   faBars,
   faTimes,
-  faCalendarCheck,
-  faUserPlus
+  faCalendarCheck
 } from '@fortawesome/free-solid-svg-icons';
 import './TutorSidebar.css';
 
@@ -92,13 +91,6 @@ const TutorSidebar = () => {
           >
             <FontAwesomeIcon icon={faCalendarCheck} />
             <span>Availability</span>
-          </div>
-          <div 
-            className={`sidebar-nav-item ${isActive('/tutor-invitations') ? 'active' : ''}`}
-            onClick={() => handleNavigation('/tutor-invitations')}
-          >
-            <FontAwesomeIcon icon={faUserPlus} />
-            <span>Invite Tutors</span>
           </div>
           <div 
             className={`sidebar-nav-item ${isActive('/lesson-history') ? 'active' : ''}`}

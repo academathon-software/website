@@ -37,7 +37,9 @@ function LoginPage() {
         console.log("SUCCESSFULLY LOGGED IN!");
         
         // Redirect based on user role
-        if (data.role === 'TUTOR') {
+        if (data.role === 'ADMIN') {
+          window.location.href = '/admin-dashboard';
+        } else if (data.role === 'TUTOR') {
           window.location.href = '/tutor-dashboard';
         } else if (data.role === 'STUDENT') {
           window.location.href = '/dashboard';
