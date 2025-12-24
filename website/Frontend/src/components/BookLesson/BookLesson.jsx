@@ -11,8 +11,7 @@ import {
   faGlobeAmericas,
   faCog,
   faBriefcase,
-  faCheck,
-  faArrowLeft
+  faCheck
 } from '@fortawesome/free-solid-svg-icons';
 import StudentSidebar from '../Shared/StudentSidebar';
 import { useUser } from '../../context/UserContext';
@@ -462,13 +461,29 @@ const BookLesson = () => {
                 </button>
               ))}
             </div>
-            <button 
-              className="continue-button"
-              onClick={handleNext}
-              disabled={!selectedGrade}
-            >
-              Continue
-            </button>
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'flex-end', 
+              marginTop: '1.5rem',
+              width: '100%'
+            }}>
+              <button 
+                onClick={handleNext}
+                disabled={!selectedGrade}
+                style={{ 
+                  padding: '0.75rem 1.5rem', 
+                  border: 'none', 
+                  borderRadius: '6px', 
+                  backgroundColor: selectedGrade ? '#1A803D' : '#ccc', 
+                  color: 'white',
+                  cursor: selectedGrade ? 'pointer' : 'not-allowed',
+                  fontSize: '1rem',
+                  fontWeight: '600'
+                }}
+              >
+                Continue
+              </button>
+            </div>
           </div>
         );
 
@@ -489,12 +504,41 @@ const BookLesson = () => {
                 </button>
               ))}
             </div>
-            <div className="button-group">
-              <button className="back-button" onClick={handleBack}>Back</button>
+            <div style={{ 
+              display: 'flex', 
+              gap: '1rem', 
+              justifyContent: 'flex-end', 
+              marginTop: '1.5rem',
+              width: '100%'
+            }}>
               <button 
-                className="continue-button"
+                onClick={handleBack}
+                style={{ 
+                  padding: '0.75rem 1.5rem', 
+                  border: '1px solid #ddd', 
+                  borderRadius: '6px', 
+                  backgroundColor: 'white', 
+                  color: '#333',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  fontWeight: '500'
+                }}
+              >
+                Back
+              </button>
+              <button 
                 onClick={handleNext}
                 disabled={!selectedSubject}
+                style={{ 
+                  padding: '0.75rem 1.5rem', 
+                  border: 'none', 
+                  borderRadius: '6px', 
+                  backgroundColor: selectedSubject ? '#1A803D' : '#ccc', 
+                  color: 'white',
+                  cursor: selectedSubject ? 'pointer' : 'not-allowed',
+                  fontSize: '1rem',
+                  fontWeight: '600'
+                }}
               >
                 Continue
               </button>
@@ -520,12 +564,41 @@ const BookLesson = () => {
                 </button>
               ))}
             </div>
-            <div className="button-group">
-              <button className="back-button" onClick={handleBack}>Back</button>
+            <div style={{ 
+              display: 'flex', 
+              gap: '1rem', 
+              justifyContent: 'flex-end', 
+              marginTop: '1.5rem',
+              width: '100%'
+            }}>
               <button 
-                className="continue-button"
+                onClick={handleBack}
+                style={{ 
+                  padding: '0.75rem 1.5rem', 
+                  border: '1px solid #ddd', 
+                  borderRadius: '6px', 
+                  backgroundColor: 'white', 
+                  color: '#333',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  fontWeight: '500'
+                }}
+              >
+                Back
+              </button>
+              <button 
                 onClick={handleNext}
                 disabled={!selectedCourse}
+                style={{ 
+                  padding: '0.75rem 1.5rem', 
+                  border: 'none', 
+                  borderRadius: '6px', 
+                  backgroundColor: selectedCourse ? '#1A803D' : '#ccc', 
+                  color: 'white',
+                  cursor: selectedCourse ? 'pointer' : 'not-allowed',
+                  fontSize: '1rem',
+                  fontWeight: '600'
+                }}
               >
                 Continue
               </button>
@@ -702,8 +775,28 @@ const BookLesson = () => {
               )}
             </div>
             )}
-            <div className="button-group">
-              <button className="back-button" onClick={handleBack}>Back</button>
+            <div style={{ 
+              display: 'flex', 
+              gap: '1rem', 
+              justifyContent: 'flex-end', 
+              marginTop: '1.5rem',
+              width: '100%'
+            }}>
+              <button 
+                onClick={handleBack}
+                style={{ 
+                  padding: '0.75rem 1.5rem', 
+                  border: '1px solid #ddd', 
+                  borderRadius: '6px', 
+                  backgroundColor: 'white', 
+                  color: '#333',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  fontWeight: '500'
+                }}
+              >
+                Back
+              </button>
             </div>
           </div>
         );
@@ -719,16 +812,7 @@ const BookLesson = () => {
       
       <div className="main-content">
         <div className="page-header">
-          <div className="header-with-back">
-            <button 
-              className="back-button" 
-              onClick={() => navigate('/dashboard')} 
-              title="Back to Dashboard"
-            >
-              <FontAwesomeIcon icon={faArrowLeft} />
-            </button>
-            <h1>Book Lesson</h1>
-          </div>
+          <h1>Book Lesson</h1>
           <div className="progress-indicator">
             {[1, 2, 3, 4].map(step => (
               <React.Fragment key={step}>

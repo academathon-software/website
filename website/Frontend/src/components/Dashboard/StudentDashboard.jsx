@@ -116,7 +116,7 @@ const StudentDashboard = () => {
   const canReschedule = (booking) => {
     const now = new Date();
     const lessonStart = new Date(booking.startTime);
-    const minRescheduleTime = new Date(lessonStart.getTime() - 48 * 60 * 60 * 1000);
+    const minRescheduleTime = new Date(lessonStart.getTime() - 24 * 60 * 60 * 1000);
     
     return now < minRescheduleTime;
   };
@@ -245,14 +245,14 @@ const StudentDashboard = () => {
         return;
       }
 
-      // Validate 48-hour minimum reschedule window before original lesson
+      // Validate 24-hour minimum reschedule window before original lesson
       const originalStartTime = new Date(selectedBooking.startTime);
       const now = new Date();
-      const minimumRescheduleTime = new Date(originalStartTime.getTime() - 48 * 60 * 60 * 1000);
+      const minimumRescheduleTime = new Date(originalStartTime.getTime() - 24 * 60 * 60 * 1000);
       
       if (now >= minimumRescheduleTime) {
         const hoursUntilLesson = Math.floor((originalStartTime.getTime() - now.getTime()) / (1000 * 60 * 60));
-        alert(`Cannot update or reschedule within 48 hours of lesson start. Your lesson is in ${hoursUntilLesson} hours. Please contact your tutor directly.`);
+        alert(`Cannot update or reschedule within 24 hours of lesson start. Your lesson is in ${hoursUntilLesson} hours. Please contact your tutor directly.`);
         setRescheduleLoading(false);
         return;
       }
@@ -649,7 +649,7 @@ const StudentDashboard = () => {
                             {booking.status === 'PENDING' ? 'Update Request' : 'Reschedule'}
                           </button>
                         ) : (
-                          <p className="reschedule-blocked">Updates/reschedules must be requested at least 48 hours before the lesson</p>
+                          <p className="reschedule-blocked">Updates/reschedules must be requested at least 24 hours before the lesson</p>
                         )
                       )}
                       <button className="action-btn cancel-btn" onClick={() => handleCancelBooking(booking.id)}>Cancel</button>

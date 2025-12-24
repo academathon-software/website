@@ -23,6 +23,7 @@ const LessonHistory = () => {
   const [error, setError] = useState(null);
   const [cancellingBooking, setCancellingBooking] = useState(null);
   const [timeFilter, setTimeFilter] = useState('30days'); // Default to 30 days
+  const [statusFilter, setStatusFilter] = useState('all'); // Default to all statuses
   
   // Fetch bookings when component mounts
   useEffect(() => {
@@ -47,30 +48,39 @@ const LessonHistory = () => {
     }
   };
 
-  const filterBookingsByTime = (bookings) => {
+  const filterBookings = (bookings) => {
     const now = new Date();
     const timeRanges = {
       '7days': 7,
       '2weeks': 14,
       '30days': 30,
       '3months': 90,
-      'year+': 365
+      'year+': 365,
+      'all': Infinity
     };
 
     const daysToFilter = timeRanges[timeFilter];
     const filterDate = new Date(now);
-    filterDate.setDate(filterDate.getDate() - daysToFilter);
+    if (daysToFilter !== Infinity) {
+      filterDate.setDate(filterDate.getDate() - daysToFilter);
+    }
 
-    // Filter bookings within the time range and sort by date (newest first)
+    // Filter bookings by time range, status, and sort by date (newest first)
     return bookings
       .filter(booking => {
+        // Time filter
         const bookingDate = new Date(booking.startTime);
-        return bookingDate >= filterDate;
+        const passesTimeFilter = daysToFilter === Infinity || bookingDate >= filterDate;
+        
+        // Status filter
+        const passesStatusFilter = statusFilter === 'all' || booking.status === statusFilter;
+        
+        return passesTimeFilter && passesStatusFilter;
       })
       .sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
   };
 
-  const filteredBookings = filterBookingsByTime(bookings);
+  const filteredBookings = filterBookings(bookings);
   const totalPages = Math.ceil(filteredBookings.length / 9);
   const lessonsPerPage = 9;
   const startIndex = (currentPage - 1) * lessonsPerPage;
@@ -213,28 +223,53 @@ const LessonHistory = () => {
           <p>{isTutor ? "View all the lessons you've taught so far!" : "View all the lessons you've taken so far!"}</p>
         </div>
 
-        {/* Time Filter */}
+        {/* Filters */}
         <div className="filter-section">
-          <div className="filter-header">
-            <label htmlFor="time-filter" className="filter-label">Filter by time:</label>
-            <select
-              id="time-filter"
-              className="filter-dropdown"
-              value={timeFilter}
-              onChange={(e) => {
-                setTimeFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-            >
-              <option value="7days">Past 7 Days</option>
-              <option value="2weeks">Past 2 Weeks</option>
-              <option value="30days">Past 30 Days</option>
-              <option value="3months">Past 3 Months</option>
-              <option value="year+">Past Year+</option>
-            </select>
+          <div className="filter-controls">
+            <div className="filter-group">
+              <label htmlFor="time-filter" className="filter-label">Time:</label>
+              <select
+                id="time-filter"
+                className="filter-dropdown"
+                value={timeFilter}
+                onChange={(e) => {
+                  setTimeFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+              >
+                <option value="7days">Past 7 Days</option>
+                <option value="2weeks">Past 2 Weeks</option>
+                <option value="30days">Past 30 Days</option>
+                <option value="3months">Past 3 Months</option>
+                <option value="year+">Past Year+</option>
+                <option value="all">All Time</option>
+              </select>
+            </div>
+            
+            <div className="filter-group">
+              <label htmlFor="status-filter" className="filter-label">Status:</label>
+              <select
+                id="status-filter"
+                className="filter-dropdown"
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+              >
+                <option value="all">All Statuses</option>
+                <option value="SCHEDULED">Scheduled</option>
+                <option value="PENDING">Pending</option>
+                <option value="CONFIRMED">Confirmed</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="CANCELLED">Cancelled</option>
+                <option value="REJECTED">Rejected</option>
+              </select>
+            </div>
           </div>
           <div className="filter-info">
             Showing {filteredBookings.length} {filteredBookings.length === 1 ? 'lesson' : 'lessons'}
+            {statusFilter !== 'all' && ` (${statusFilter.toLowerCase()})`}
           </div>
         </div>
 

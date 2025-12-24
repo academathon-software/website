@@ -491,12 +491,12 @@ public class BookingService {
             throw new RuntimeException("End time must be after start time");
         }
         
-        // Validate 48-hour minimum reschedule window before original lesson
-        LocalDateTime minimumRescheduleTime = booking.getStartTime().minusHours(48);
+        // Validate 24-hour minimum reschedule window before original lesson
+        LocalDateTime minimumRescheduleTime = booking.getStartTime().minusHours(24);
         if (now.isAfter(minimumRescheduleTime)) {
             long hoursUntilLesson = Duration.between(now, booking.getStartTime()).toHours();
             throw new RuntimeException(
-                "Cannot update or reschedule within 48 hours of lesson start. " +
+                "Cannot update or reschedule within 24 hours of lesson start. " +
                 "Current time is " + hoursUntilLesson + " hours before the lesson."
             );
         }
