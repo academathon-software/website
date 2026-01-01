@@ -56,6 +56,7 @@
 .hero-stats {
   display: flex;
   gap: 2rem;
+  justify-content: center;
 }
 
 .stat {
@@ -93,13 +94,12 @@
 }
 
 .floating-card {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: white;
   border-radius: 2rem;
   padding: 3rem;
   text-align: center;
   animation: float 6s ease-in-out infinite;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
 }
 
 .floating-card svg {
@@ -111,13 +111,13 @@
 .floating-card h3 {
   font-size: 1.5rem;
   margin-bottom: 0.5rem;
-  color: white;
+  color: #333;
 }
 
 .floating-card p {
-  opacity: 0.9;
+  opacity: 0.8;
   margin: 0;
-  color: white;
+  color: #666;
 }
 
 @keyframes float {

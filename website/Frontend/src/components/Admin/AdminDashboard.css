@@ -254,7 +254,7 @@
 @media (max-width: 768px) {
   .admin-content {
     margin-left: 0;
-    padding: 20px;
+    padding: 70px 15px 20px 15px;
   }
 
   .dashboard-header h1 {
@@ -272,15 +272,58 @@
   .stat-value {
     font-size: 1.5rem;
   }
+
+  .page-header {
+    margin-top: 10px;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .filters-section {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .filter-group {
+    width: 100%;
+  }
+
+  .filter-group select,
+  .filter-group input {
+    width: 100%;
+  }
+
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 @media (max-width: 480px) {
+  .admin-content {
+    padding: 70px 10px 15px 10px;
+  }
+
   .quick-actions-grid {
     grid-template-columns: 1fr;
   }
   
   .booking-status-grid {
     grid-template-columns: 1fr;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+
+  .stat-icon {
+    font-size: 2rem;
+  }
+
+  .stat-value {
+    font-size: 1.3rem;
   }
 }
 

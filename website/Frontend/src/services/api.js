@@ -49,6 +49,7 @@ export const authAPI = {
 // User API
 export const userAPI = {
   getCurrentUser: () => api.get('/users/me'),
+  getUserProfile: (userId) => api.get(`/users/${userId}`),
   updateProfile: (data) => api.put('/users/me', data),
   uploadProfilePicture: (file) => {
     const formData = new FormData();

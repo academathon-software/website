@@ -39,6 +39,29 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> getUserById(@PathVariable Long userId) {
+        try {
+            User user = userService.getUserById(userId);
+            // Return a safe subset of user data (not password hash, etc.)
+            Map<String, Object> userProfile = new HashMap<>();
+            userProfile.put("id", user.getId());
+            userProfile.put("userId", user.getId());
+            userProfile.put("name", user.getDisplayUsername());
+            userProfile.put("email", user.getEmail());
+            userProfile.put("role", user.getRole());
+            userProfile.put("profilePictureUrl", user.getProfilePictureUrl());
+            userProfile.put("bio", user.getBio());
+            userProfile.put("contactEmail", user.getContactEmail());
+            userProfile.put("contactPhone", user.getContactPhone());
+            return ResponseEntity.ok(userProfile);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Error fetching user: " + e.getMessage()));
+        }
+    }
+
     @DeleteMapping("/delete/{email}")
     public ResponseEntity<String> deleteUserByEmail(@PathVariable String email) {
         try {

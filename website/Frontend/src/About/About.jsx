@@ -1,5 +1,6 @@
 import React from 'react';
 import './About.css';
+import Footer from '../components/Footer/Footer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faGraduationCap, 
@@ -24,23 +25,18 @@ function About() {
           <div className="hero-text">
             <h1>About Academathon</h1>
             <p className="hero-subtitle">
-              Empowering students worldwide through personalized tutoring and innovative learning experiences
+              Empowering students through personalized tutoring and innovative learning experiences
             </p>
             <div className="hero-stats">
               <div className="stat">
                 <FontAwesomeIcon icon={faUsers} />
-                <span>10,000+</span>
+                <span>50+</span>
                 <p>Students Helped</p>
               </div>
               <div className="stat">
                 <FontAwesomeIcon icon={faChalkboardTeacher} />
-                <span>500+</span>
+                <span>20+</span>
                 <p>Expert Tutors</p>
-              </div>
-              <div className="stat">
-                <FontAwesomeIcon icon={faGlobe} />
-                <span>50+</span>
-                <p>Countries</p>
               </div>
             </div>
           </div>
@@ -65,9 +61,7 @@ function About() {
             <div className="mission-text">
               <h3>Making Education Accessible</h3>
               <p>
-                At Academathon, we believe that quality education should be accessible to every student, 
-                regardless of their location, background, or circumstances. Our platform connects students 
-                with expert tutors who are passionate about teaching and helping others succeed.
+              At Academathon, we’re dedicated to more than just helping students succeed in exams — we’re here to empower them to reach their full potential. Our personalized tutoring approach extends beyond academic support; we focus on building the skills, confidence, and mindset needed to thrive in today’s competitive world. Whether you’re gearing up for university, advancing your career, or aiming to boost your grades, Academathon is committed to guiding and supporting you every step of the way.
               </p>
               <div className="mission-features">
                 <div className="feature">
@@ -166,18 +160,20 @@ function About() {
             <h2>Ready to Start Your Learning Journey?</h2>
             <p>Join thousands of students who are already achieving their academic goals with Academathon.</p>
             <div className="cta-buttons">
-              <button className="btn-primary">
+              <a href="/signup" className="btn-primary">
                 <FontAwesomeIcon icon={faUserGraduate} />
                 Get Started as Student
-              </button>
-              <button className="btn-secondary">
+              </a>
+              <a href="https://docs.google.com/forms/d/e/1FAIpQLSf-QDRnM5yjm9n7D713aiLNlLQyTyLgvD_tIdP7VcG1RNqRrA/viewform" target="_blank" rel="noopener noreferrer" className="btn-secondary">
                 <FontAwesomeIcon icon={faChalkboardTeacher} />
                 Become a Tutor
-              </button>
+              </a>
             </div>
           </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 }

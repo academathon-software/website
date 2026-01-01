@@ -11,7 +11,8 @@ import {
   faLightbulb,
   faDollarSign,
   faCircle,
-  faCheck
+  faCheck,
+  faUser
 } from '@fortawesome/free-solid-svg-icons';
 import StudentSidebar from '../Shared/StudentSidebar';
 import BookingStatusBadge from '../Shared/BookingStatusBadge';
@@ -43,6 +44,9 @@ const StudentDashboard = () => {
   const [checkingAvailability, setCheckingAvailability] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentBookingId, setPaymentBookingId] = useState(null);
+  const [showTutorProfile, setShowTutorProfile] = useState(false);
+  const [selectedTutorProfile, setSelectedTutorProfile] = useState(null);
+  const [loadingTutorProfile, setLoadingTutorProfile] = useState(false);
   
   // Set user type and fetch data when component mounts
   useEffect(() => {
@@ -92,7 +96,12 @@ const StudentDashboard = () => {
 
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
-      setError('Failed to load dashboard data');
+      // Check if it's an authentication error
+      if (err.response?.status === 401 || err.response?.status === 403 || !localStorage.getItem('token')) {
+        setError('SESSION_EXPIRED');
+      } else {
+        setError('Failed to load dashboard data');
+      }
     } finally {
       setLoading(false);
     }
@@ -379,6 +388,33 @@ const StudentDashboard = () => {
     alert('Payment successful! Your lesson is now confirmed.');
   };
 
+  const handleViewTutorProfile = async (booking) => {
+    setShowTutorProfile(true);
+    setLoadingTutorProfile(true);
+    
+    // Set basic info from booking
+    setSelectedTutorProfile({
+      name: booking.tutorName,
+      tutorUserId: booking.tutorUserId,
+      profilePictureUrl: booking.tutorProfilePictureUrl,
+      subjects: []
+    });
+    
+    // Try to fetch more details if available
+    try {
+      const response = await userAPI.getUserProfile(booking.tutorUserId);
+      setSelectedTutorProfile(prev => ({
+        ...prev,
+        ...response.data,
+        name: booking.tutorName // Keep original name
+      }));
+    } catch (err) {
+      console.log('Could not fetch additional tutor details');
+    } finally {
+      setLoadingTutorProfile(false);
+    }
+  };
+
   const handlePaymentCancel = () => {
     setShowPaymentModal(false);
     setPaymentBookingId(null);
@@ -500,26 +536,57 @@ const StudentDashboard = () => {
   }
 
   if (error) {
+    const isSessionExpired = error === 'SESSION_EXPIRED';
+    
     return (
       <div className="student-dashboard">
         <StudentSidebar />
         <div className="main-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
           <div style={{ textAlign: 'center' }}>
-            <h2 style={{ color: 'red' }}>{error}</h2>
-            <button 
-              onClick={fetchDashboardData}
-              style={{
-                marginTop: '20px',
-                padding: '10px 20px',
-                backgroundColor: '#4CAF50',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Retry
-            </button>
+            {isSessionExpired ? (
+              <>
+                <div style={{ fontSize: '48px', marginBottom: '20px' }}>🔒</div>
+                <h2 style={{ color: '#333', marginBottom: '10px' }}>Session Expired</h2>
+                <p style={{ color: '#666', marginBottom: '20px' }}>Your session has expired. Please log back in to continue.</p>
+                <button 
+                  onClick={() => {
+                    localStorage.clear();
+                    navigate('/login');
+                  }}
+                  style={{
+                    marginTop: '10px',
+                    padding: '12px 30px',
+                    backgroundColor: '#1A803D',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '16px',
+                    fontWeight: '600'
+                  }}
+                >
+                  Log Back In
+                </button>
+              </>
+            ) : (
+              <>
+                <h2 style={{ color: 'red' }}>{error}</h2>
+                <button 
+                  onClick={fetchDashboardData}
+                  style={{
+                    marginTop: '20px',
+                    padding: '10px 20px',
+                    backgroundColor: '#4CAF50',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Retry
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -624,7 +691,16 @@ const StudentDashboard = () => {
                       )}
                     </div>
                     <div className="lesson-name">{booking.subject || 'Lesson Name'}</div>
-                    <div className="tutor-name">{booking.tutorName}</div>
+                    <div className="tutor-name">
+                      {booking.tutorName}
+                      <button 
+                        className="view-profile-btn"
+                        onClick={() => handleViewTutorProfile(booking)}
+                        title="View Tutor Profile"
+                      >
+                        <FontAwesomeIcon icon={faUser} />
+                      </button>
+                    </div>
                     <div className="status-indicator">
                       <BookingStatusBadge 
                         status={booking.status} 
@@ -834,6 +910,66 @@ const StudentDashboard = () => {
                   : (selectedBooking.status === 'PENDING' ? 'Update Request' : 'Confirm Reschedule')}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tutor Profile Modal */}
+      {showTutorProfile && selectedTutorProfile && (
+        <div className="tutor-profile-modal-overlay" onClick={() => setShowTutorProfile(false)}>
+          <div className="tutor-profile-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close-btn" onClick={() => setShowTutorProfile(false)}>
+              &times;
+            </button>
+            
+            {loadingTutorProfile ? (
+              <div className="modal-loading">Loading profile...</div>
+            ) : (
+              <>
+                <div className="tutor-profile-header">
+                  {selectedTutorProfile.profilePictureUrl ? (
+                    <img 
+                      src={selectedTutorProfile.profilePictureUrl} 
+                      alt={selectedTutorProfile.name}
+                      className="tutor-profile-avatar-img"
+                    />
+                  ) : (
+                    <div className="tutor-profile-avatar">
+                      {selectedTutorProfile.name?.charAt(0)?.toUpperCase() || 'T'}
+                    </div>
+                  )}
+                  <h2>{selectedTutorProfile.name || 'Tutor'}</h2>
+                </div>
+                
+                <div className="tutor-profile-details">
+                  {selectedTutorProfile.bio && (
+                    <div className="tutor-profile-item bio">
+                      <span className="tutor-profile-label">About</span>
+                      <span className="tutor-profile-value">{selectedTutorProfile.bio}</span>
+                    </div>
+                  )}
+                  
+                  {selectedTutorProfile.contactEmail && (
+                    <div className="tutor-profile-item">
+                      <span className="tutor-profile-label">Email</span>
+                      <span className="tutor-profile-value">{selectedTutorProfile.contactEmail}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="tutor-profile-actions">
+                  <button 
+                    className="message-tutor-btn"
+                    onClick={() => {
+                      setShowTutorProfile(false);
+                      navigate('/messages', { state: { otherUserId: selectedTutorProfile.tutorUserId || selectedTutorProfile.userId } });
+                    }}
+                  >
+                    Send Message
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

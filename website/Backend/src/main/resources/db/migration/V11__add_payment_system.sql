@@ -1,34 +1,29 @@
--- Add new booking statuses and payment tracking
+-- Create payment status enum
+CREATE TYPE payment_status AS ENUM ('PENDING', 'PROCESSING', 'SUCCEEDED', 'FAILED', 'REFUNDED');
 
--- First, modify the bookings table to add new columns
-ALTER TABLE bookings 
-ADD COLUMN payment_intent_id VARCHAR(255),
-ADD COLUMN payment_status ENUM('PENDING', 'PROCESSING', 'SUCCEEDED', 'FAILED', 'REFUNDED') DEFAULT 'PENDING',
-ADD COLUMN amount DECIMAL(10,2),
-ADD COLUMN rejection_reason TEXT;
-
--- Modify the status enum to include new statuses
--- Note: MySQL doesn't support direct ALTER for ENUM, so we need to modify the column
-ALTER TABLE bookings 
-MODIFY COLUMN status ENUM('PENDING', 'CONFIRMED', 'PAID', 'SCHEDULED', 'REJECTED', 'CANCELLED', 'COMPLETED') NOT NULL DEFAULT 'PENDING';
+-- Add new booking columns
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_intent_id VARCHAR(255);
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_status payment_status DEFAULT 'PENDING';
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS amount DECIMAL(10,2);
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS rejection_reason TEXT;
 
 -- Create payments table for tracking payment history
-CREATE TABLE payments (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS payments (
+  id BIGSERIAL PRIMARY KEY,
   booking_id BIGINT NOT NULL,
-  stripe_payment_intent_id VARCHAR(255) NOT NULL,
+  stripe_payment_intent_id VARCHAR(255) NOT NULL UNIQUE,
   amount DECIMAL(10,2) NOT NULL,
   currency VARCHAR(3) NOT NULL DEFAULT 'USD',
-  status ENUM('PENDING', 'PROCESSING', 'SUCCEEDED', 'FAILED', 'REFUNDED') NOT NULL DEFAULT 'PENDING',
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE CASCADE,
-  UNIQUE KEY unique_payment_intent (stripe_payment_intent_id)
+  status payment_status NOT NULL DEFAULT 'PENDING',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE CASCADE
 );
 
--- Create index for efficient querying
-CREATE INDEX idx_bookings_status ON bookings(status);
-CREATE INDEX idx_bookings_start_time ON bookings(start_time);
-CREATE INDEX idx_payments_status ON payments(status);
+-- Create indexes for efficient querying
+CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status);
+CREATE INDEX IF NOT EXISTS idx_bookings_start_time ON bookings(start_time);
+CREATE INDEX IF NOT EXISTS idx_payments_status ON payments(status);
 
-
+-- Create trigger for updated_at
+CREATE TRIGGER update_payments_updated_at BEFORE UPDATE ON payments FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

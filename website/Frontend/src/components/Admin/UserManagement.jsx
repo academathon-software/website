@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AdminSidebar from './AdminSidebar';
 import adminAPI from '../../services/adminApi';
 import './UserManagement.css';
 
 const UserManagement = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -27,7 +29,11 @@ const UserManagement = () => {
       setError(null);
     } catch (err) {
       console.error('Error fetching users:', err);
-      setError('Failed to load users. Please try again.');
+      if (err.response?.status === 401 || err.response?.status === 403 || !localStorage.getItem('token')) {
+        setError('SESSION_EXPIRED');
+      } else {
+        setError('Failed to load users. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -128,6 +134,18 @@ const UserManagement = () => {
         {/* Users Table */}
         {loading ? (
           <div className="loading-spinner">Loading users...</div>
+        ) : error === 'SESSION_EXPIRED' ? (
+          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+            <div style={{ fontSize: '48px', marginBottom: '20px' }}>🔒</div>
+            <h2 style={{ color: '#333', marginBottom: '10px' }}>Session Expired</h2>
+            <p style={{ color: '#666', marginBottom: '20px' }}>Your session has expired. Please log back in to continue.</p>
+            <button 
+              onClick={() => { localStorage.clear(); navigate('/login'); }}
+              style={{ padding: '12px 30px', backgroundColor: '#1A803D', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '16px', fontWeight: '600' }}
+            >
+              Log Back In
+            </button>
+          </div>
         ) : error ? (
           <div className="error-message">{error}</div>
         ) : (

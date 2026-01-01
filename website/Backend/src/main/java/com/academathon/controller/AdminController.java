@@ -192,7 +192,7 @@ public class AdminController {
         return new AdminUserDTO(
             user.getId(),
             user.getEmail(),
-            user.getUsername(),
+            user.getDisplayUsername(),
             user.getRole().name(),
             user.isEnabled(),
             user.getCreatedAt(),

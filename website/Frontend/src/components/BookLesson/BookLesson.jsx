@@ -11,7 +11,9 @@ import {
   faGlobeAmericas,
   faCog,
   faBriefcase,
-  faCheck
+  faCheck,
+  faUser,
+  faStar
 } from '@fortawesome/free-solid-svg-icons';
 import StudentSidebar from '../Shared/StudentSidebar';
 import { useUser } from '../../context/UserContext';
@@ -39,6 +41,8 @@ const BookLesson = () => {
   const [error, setError] = useState(null);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [availableSlots, setAvailableSlots] = useState({});
+  const [showTutorProfile, setShowTutorProfile] = useState(false);
+  const [selectedTutorProfile, setSelectedTutorProfile] = useState(null);
 
   const grades = [
     { id: 1, name: "Grade 1" },
@@ -357,18 +361,43 @@ const BookLesson = () => {
     setSelectedCourse(course);
   };
 
-  const handleTimeSlotSelect = (tutorId, timeSlot, day, date, slotData) => {
+  const handleTimeSlotSelect = async (tutorId, timeSlot, day, date, slotData) => {
+    // Clear any previous errors
+    setError(null);
+    
+    // Validate slot data exists
+    if (!slotData || !slotData.startTime) {
+      setError('This tutor is not available at this time');
+      return;
+    }
+    
     // Validate 48-hour minimum at selection time
-    if (slotData && slotData.startTime) {
-      const slotDateTime = new Date(slotData.startTime);
-      const now = new Date();
-      const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+    const slotDateTime = new Date(slotData.startTime);
+    const now = new Date();
+    const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+    
+    if (slotDateTime < minBookingTime) {
+      const hoursAway = (slotDateTime - now) / (1000 * 60 * 60);
+      alert(`This slot is only ${hoursAway.toFixed(1)} hours away. Lessons must be booked at least 48 hours in advance.`);
+      return;
+    }
+    
+    // Real-time availability check before showing booking popup
+    try {
+      const availabilityResponse = await bookingAPI.checkAvailability(
+        tutorId,
+        slotData.startTime,
+        slotData.endTime
+      );
       
-      if (slotDateTime < minBookingTime) {
-        const hoursAway = (slotDateTime - now) / (1000 * 60 * 60);
-        alert(`This slot is only ${hoursAway.toFixed(1)} hours away. Lessons must be booked at least 48 hours in advance.`);
+      if (!availabilityResponse.data.available) {
+        setError('This tutor is not available at this time. They may have another booking.');
         return;
       }
+    } catch (err) {
+      console.error('Error checking availability:', err);
+      setError('Unable to verify availability. Please try again.');
+      return;
     }
     
     setSelectedTutor(tutorId);
@@ -442,6 +471,12 @@ const BookLesson = () => {
     setSelectedTutor(null);
     setSelectedTimeSlot(null);
     setShowSuccessModal(false);
+  };
+
+  const handleViewTutorProfile = (tutor, e) => {
+    e.stopPropagation(); // Prevent selecting the tutor when clicking profile button
+    setSelectedTutorProfile(tutor);
+    setShowTutorProfile(true);
   };
 
   const renderStepContent = () => {
@@ -673,6 +708,13 @@ const BookLesson = () => {
                   >
                     <div className="tutor-card-name">
                       {tutor.displayName || tutor.name || 'Tutor Name'}
+                      <button 
+                        className="view-tutor-profile-btn"
+                        onClick={(e) => handleViewTutorProfile(tutor, e)}
+                        title="View Profile"
+                      >
+                        <FontAwesomeIcon icon={faUser} />
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -729,15 +771,21 @@ const BookLesson = () => {
                                   {uniqueTimeSlots.map((timeSlot) => {
                                     const slotData = daySlots[timeSlot];
                                     
-                                    // Check if slot exists
+                                    // Check if slot exists and tutor has set availability
                                     let isAvailable = false;
+                                    let unavailableReason = 'Tutor has not set availability for this time';
                                     
                                     if (slotData && slotData.startTime) {
                                       // Check if slot is at least 48 hours in advance
                                       const slotDateTime = new Date(slotData.startTime);
                                       const now = new Date();
                                       const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000); // 48 hours from now
-                                      isAvailable = slotDateTime >= minBookingTime;
+                                      
+                                      if (slotDateTime >= minBookingTime) {
+                                        isAvailable = true;
+                                      } else {
+                                        unavailableReason = 'Must book at least 48 hours in advance';
+                                      }
                                     }
                                     
                                     const isSelected = selectedTutor === currentTutor.id && 
@@ -749,13 +797,13 @@ const BookLesson = () => {
                                         className={`time-slot-cell ${isAvailable ? 'available' : 'unavailable'} ${isSelected ? 'selected-slot' : ''}`}
                                         onClick={() => {
                                           if (!isAvailable) {
-                                            alert('This time slot is not available. Please select a time that is at least 48 hours from now.');
+                                            alert(unavailableReason);
                                             return;
                                           }
                                           handleTimeSlotSelect(currentTutor.id, timeSlot, dayIndex, date, slotData);
                                         }}
                                         style={{ cursor: isAvailable ? 'pointer' : 'not-allowed' }}
-                                        title={isAvailable ? 'Available (48+ hours from now)' : 'Not available (must be 48+ hours in advance)'}
+                                        title={isAvailable ? 'Available - Click to book' : unavailableReason}
                                       />
                                     );
                                   })}
@@ -874,6 +922,86 @@ const BookLesson = () => {
             <button className="book-new-button" onClick={handleBookNewLesson}>
               Book New Lesson
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Tutor Profile Modal */}
+      {showTutorProfile && selectedTutorProfile && (
+        <div className="tutor-profile-modal-overlay" onClick={() => setShowTutorProfile(false)}>
+          <div className="tutor-profile-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close-btn" onClick={() => setShowTutorProfile(false)}>
+              &times;
+            </button>
+            
+            <div className="tutor-profile-header">
+              {(selectedTutorProfile.user?.profilePictureUrl || selectedTutorProfile.profilePictureUrl) ? (
+                <img 
+                  src={selectedTutorProfile.user?.profilePictureUrl || selectedTutorProfile.profilePictureUrl} 
+                  alt={selectedTutorProfile.displayName || selectedTutorProfile.name}
+                  className="tutor-profile-avatar-img"
+                />
+              ) : (
+                <div className="tutor-profile-avatar">
+                  {(selectedTutorProfile.displayName || selectedTutorProfile.name)?.charAt(0)?.toUpperCase() || 'T'}
+                </div>
+              )}
+              <h2>{selectedTutorProfile.displayName || selectedTutorProfile.name || 'Tutor'}</h2>
+              {selectedTutorProfile.rating && (
+                <div className="tutor-rating">
+                  <FontAwesomeIcon icon={faStar} className="star-icon" />
+                  <span>{selectedTutorProfile.rating.toFixed(1)}</span>
+                </div>
+              )}
+            </div>
+            
+            <div className="tutor-profile-details">
+              {selectedTutorProfile.bio && (
+                <div className="tutor-profile-item bio">
+                  <span className="tutor-profile-label">About</span>
+                  <span className="tutor-profile-value">{selectedTutorProfile.bio}</span>
+                </div>
+              )}
+              
+              {selectedTutorProfile.subjects && selectedTutorProfile.subjects.length > 0 && (
+                <div className="tutor-profile-item">
+                  <span className="tutor-profile-label">Subjects</span>
+                  <div className="tutor-subjects-list">
+                    {selectedTutorProfile.subjects.map((subject, index) => (
+                      <span key={index} className="subject-tag">
+                        {subject.name || subject}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {selectedTutorProfile.experience && (
+                <div className="tutor-profile-item">
+                  <span className="tutor-profile-label">Experience</span>
+                  <span className="tutor-profile-value">{selectedTutorProfile.experience}</span>
+                </div>
+              )}
+
+              {selectedTutorProfile.education && (
+                <div className="tutor-profile-item">
+                  <span className="tutor-profile-label">Education</span>
+                  <span className="tutor-profile-value">{selectedTutorProfile.education}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="tutor-profile-actions">
+              <button 
+                className="select-tutor-btn"
+                onClick={() => {
+                  setSelectedTutor(selectedTutorProfile.id);
+                  setShowTutorProfile(false);
+                }}
+              >
+                Select This Tutor
+              </button>
+            </div>
           </div>
         </div>
       )}

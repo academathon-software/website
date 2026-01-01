@@ -53,27 +53,63 @@ function TutorSignup() {
     'Adult Learner'
   ];
 
-  const availableSubjects = [
-    'Mathematics',
-    'Biology',
-    'Chemistry',
-    'Physics',
-    'Computer Science',
-    'English',
-    'History',
-    'Economics',
-    'Psychology',
-    'Philosophy',
-    'French',
-    'Spanish',
-    'Accounting',
-    'Law',
-    'Statistics',
-    'Calculus',
-    'Algebra'
-  ];
+  // Comprehensive subject list organized by category
+  const subjectsByCategory = {
+    'Math': [
+      'Addition & Subtraction', 'Place Value', 'Patterns', 'Basic Geometry', 'Time & Money',
+      'Multiplication & Division', 'Fractions', 'Decimals', 'Intro Algebra', 'Geometry', 'Measurement',
+      'Integers', 'Ratios & Rates', 'Equations', 'Pythagorean Theorem', 'Graphing', 'Probability',
+      'Foundations of Algebra', 'Linear Relations', 'Analytic Geometry',
+      'Quadratics', 'Trigonometry', 'Systems of Equations',
+      'Functions', 'College Math', 'Workplace Math',
+      'Advanced Functions', 'Calculus & Vectors', 'Data Management', 'Statistics'
+    ],
+    'English / Language Arts': [
+      'Reading', 'Phonics', 'Writing', 'Spelling', 'Basic Grammar',
+      'Reading Comprehension', 'Paragraph Writing', 'Grammar', 'Vocabulary',
+      'English Language Arts', 'Essay Writing', 'Grammar & Composition',
+      'English 9', 'English 10', 'English 11', 'English 12',
+      'Literature', 'Literature Analysis', 'Writing & Rhetoric', 'Media Studies'
+    ],
+    'Science': [
+      'Life Systems', 'Materials', 'Weather & Seasons', 'Simple Machines',
+      'Electricity', 'Space', 'Biodiversity',
+      'Cells & Systems', 'Fluids', 'Heat & Energy', 'Ecology',
+      'General Science', 'Biology Intro', 'Chemistry Intro', 'Physics Intro',
+      'Biology', 'Chemistry', 'Physics'
+    ],
+    'Social Studies': [
+      'Heritage & Identity', 'People & Environments', 'History Basics', 'Geography Basics',
+      'History', 'Geography', 'World Cultures', 'Canadian Studies',
+      'World Geography', 'Canadian History', 'Civics & Career Studies',
+      'Social Sciences', 'World History', 'Law & Politics', 'World Issues', 'Philosophy'
+    ],
+    'French': [
+      'French Basics', 'French Reading', 'French Writing', 'French Intermediate',
+      'French Conversation', 'French Grammar', 'French Advanced', 'French Literature',
+      'Core French', 'French Immersion'
+    ],
+    'Technology / Computer Science': [
+      'Coding Fundamentals', 'Robotics', 'Digital Literacy',
+      'Python', 'Java', 'Web Basics',
+      'Programming Fundamentals', 'Web Development', 'Computer Science',
+      'Data Structures', 'App Development',
+      'Software Engineering', 'OOP', 'Algorithms', 'Databases', 'Web Applications'
+    ],
+    'Business': [
+      'Intro to Business', 'Entrepreneurship', 'Marketing Basics',
+      'Marketing', 'Accounting', 'Business Management',
+      'Financial Accounting', 'Finance & Investing', 'Business Leadership'
+    ]
+  };
 
-  const filteredSubjects = availableSubjects.filter(subject =>
+  // Flatten all subjects into a single array
+  const availableSubjects = Object.values(subjectsByCategory).flat();
+
+  // Get unique subjects and sort alphabetically
+  const uniqueSubjects = [...new Set(availableSubjects)].sort();
+
+  const filteredSubjects = uniqueSubjects.filter(subject =>
     subject.toLowerCase().includes(subjectSearch.toLowerCase())
   );
 

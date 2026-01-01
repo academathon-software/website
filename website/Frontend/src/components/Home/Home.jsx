@@ -1,5 +1,6 @@
 import React from 'react';
 import './Home.css';
+import Footer from '../Footer/Footer';
 import waterlooLogo from '../../assets/waterloo.png';
 import mcgillLogo from '../../assets/mcgill.png';
 import mcmasterLogo from '../../assets/mcmaster.png';
@@ -36,12 +37,12 @@ function Home() {
                 <span>Science</span>
               </div>
               <div className="floating-card card-3">
-                <div className="card-icon">🌍</div>
-                <span>History</span>
+                <div className="card-icon">➕</div>
+                <span>Math</span>
               </div>
               <div className="floating-card card-4">
-                <div className="card-icon">💻</div>
-                <span>Programming</span>
+                <div className="card-icon">📚</div>
+                <span>English</span>
               </div>
             </div>
           </div>
@@ -119,42 +120,42 @@ function Home() {
         <div className="container">
           <div className="section-header">
             <h2>What Our Students Say</h2>
-            <p>Real feedback from real students who've achieved their goals</p>
+            <p>Real feedback from real students who've achieved their goals with Academathon.</p>
           </div>
           <div className="testimonials-grid">
             <div className="testimonial-card">
               <div className="testimonial-content">
-                <p>"Academathon helped me improve my math grades from C to A+. The tutors are amazing and really care about your success!"</p>
+                <p>"Academathon transformed my child's confidence and grades in just a few months!"</p>
               </div>
               <div className="testimonial-author">
                 <div className="author-avatar">👩‍🎓</div>
                 <div className="author-info">
-                  <div className="author-name">Sarah Johnson</div>
+                  <div className="author-name">Javi</div>
                   <div className="author-title">High School Student</div>
                 </div>
               </div>
             </div>
             <div className="testimonial-card">
               <div className="testimonial-content">
-                <p>"The programming tutors on this platform are incredible. I landed my dream job thanks to their guidance and support."</p>
+                <p>"Thanks to Academathon, my son  understands math and actually enjoys it now!"</p>
               </div>
               <div className="testimonial-author">
                 <div className="author-avatar">👨‍💻</div>
                 <div className="author-info">
-                  <div className="author-name">Mike Chen</div>
-                  <div className="author-title">Computer Science Graduate</div>
+                  <div className="author-name">David</div>
+                  <div className="author-title">Elementary School Parent</div>
                 </div>
               </div>
             </div>
             <div className="testimonial-card">
               <div className="testimonial-content">
-                <p>"As a working professional, the flexible scheduling was perfect. I could study at my own pace and still get expert help."</p>
+                <p>"The personalized approach at Academathon has made all the difference for my daughter!"</p>
               </div>
               <div className="testimonial-author">
                 <div className="author-avatar">👩‍💼</div>
                 <div className="author-info">
-                  <div className="author-name">Emily Rodriguez</div>
-                  <div className="author-title">Business Professional</div>
+                  <div className="author-name">Aisha</div>
+                  <div className="author-title">Elementary School Parent</div>
                 </div>
               </div>
             </div>
@@ -175,6 +176,8 @@ function Home() {
           </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 }

@@ -379,7 +379,7 @@
 @media (max-width: 768px) {
   .invitations-main-content {
     margin-left: 0;
-    padding: 1.5rem;
+    padding: 70px 1rem 1.5rem 1rem;
   }
 
   .invitations-header {

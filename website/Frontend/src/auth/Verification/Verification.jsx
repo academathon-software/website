@@ -21,8 +21,8 @@ function VerificationPage() {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Get email from location state or use a default
-  const email = location.state?.email || '';
+  // Get email from location state, localStorage (from failed login), or use a default
+  const email = location.state?.email || localStorage.getItem('pendingVerificationEmail') || '';
 
   const handleVerification = async (e) => {
     e.preventDefault();
@@ -49,6 +49,8 @@ function VerificationPage() {
 
       if (response.ok) {
         setSuccess(true);
+        // Clear the pending verification email from localStorage
+        localStorage.removeItem('pendingVerificationEmail');
         setTimeout(() => {
           navigate('/login', { 
             state: { message: 'Account verified successfully! You can now log in.' }

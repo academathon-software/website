@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './Pricing.css';
+import Footer from '../components/Footer/Footer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faCheck, 
@@ -20,18 +21,10 @@ function Pricing() {
       icon: faGraduationCap,
       color: "#10b981",
       features: [
-        "Up to 10 hours of tutoring per month",
-        "Access to all subjects",
-        "1-on-1 video sessions",
-        "Chat support with tutors",
-        "Progress tracking",
-        "Mobile app access",
-        "Basic study materials"
+        
       ],
       limitations: [
-        "Limited to 2 tutors per month",
-        "No priority booking",
-        "Standard support response"
+        
       ],
       popular: false
     },
@@ -42,20 +35,10 @@ function Pricing() {
       icon: faStar,
       color: "#f59e0b",
       features: [
-        "Up to 25 hours of tutoring per month",
-        "Access to all subjects",
-        "1-on-1 video sessions",
-        "Priority booking",
-        "Unlimited chat with tutors",
-        "Advanced progress tracking",
-        "Mobile app access",
-        "Premium study materials",
-        "Exam preparation support",
-        "Up to 5 tutors per month"
+        
       ],
       limitations: [
-        "No group sessions",
-        "Standard support response"
+
       ],
       popular: true
     },
@@ -66,23 +49,10 @@ function Pricing() {
       icon: faUsers,
       color: "#8b5cf6",
       features: [
-        "Up to 50 hours of tutoring per month",
-        "Up to 3 student accounts",
-        "Access to all subjects",
-        "1-on-1 video sessions",
-        "Group study sessions",
-        "Priority booking",
-        "Unlimited chat with tutors",
-        "Advanced progress tracking",
-        "Mobile app access",
-        "Premium study materials",
-        "Exam preparation support",
-        "Unlimited tutors",
-        "Family dashboard",
-        "Parent progress reports"
+        
       ],
       limitations: [
-        "Standard support response"
+        
       ],
       popular: false
     }
@@ -106,10 +76,6 @@ function Pricing() {
       question: "What if I'm not satisfied with a session?",
       answer: "We offer a 100% satisfaction guarantee. If you're not happy with a session, we'll provide a full refund or help you find a better tutor match."
     },
-    {
-      question: "Do you offer group sessions?",
-      answer: "Yes! Our Family plan includes group study sessions, and many tutors offer group classes for specific subjects."
-    },
   ];
 
   return (
@@ -122,9 +88,9 @@ function Pricing() {
             <p className="hero-subtitle">
               Choose the perfect plan for your learning journey. No hidden fees, no surprises.
             </p>
-            <div className="billing-info">
+            {/*<div className="billing-info">
               <p className="billing-description">Pay per hour - no monthly commitments</p>
-            </div>
+            </div>*/}
           </div>
         </div>
       </section>
@@ -162,7 +128,7 @@ function Pricing() {
                   </div>
                 </div>
                 <div className="plan-features">
-                  <h4>What's included:</h4>
+                 {/* <h4>What's included:</h4> */}
                   <ul>
                     {plan.features.map((feature, featureIndex) => (
                       <li key={featureIndex}>
@@ -223,18 +189,20 @@ function Pricing() {
             <h2>Ready to Start Learning?</h2>
             <p>Join thousands of students who are already achieving their goals with Academathon.</p>
             <div className="cta-buttons">
-              <button className="btn-primary">
+              <a href="/signup" className="btn-primary">
                 <FontAwesomeIcon icon={faGraduationCap} />
                 Start as Student
-              </button>
-              <button className="btn-secondary">
+              </a>
+              <a href="https://docs.google.com/forms/d/e/1FAIpQLSf-QDRnM5yjm9n7D713aiLNlLQyTyLgvD_tIdP7VcG1RNqRrA/viewform" target="_blank" rel="noopener noreferrer" className="btn-secondary">
                 <FontAwesomeIcon icon={faChalkboardTeacher} />
                 Become a Tutor
-              </button>
+              </a>
             </div>
           </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 }

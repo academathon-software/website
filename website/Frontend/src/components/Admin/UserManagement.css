@@ -306,14 +306,22 @@
   .filter-group,
   .filter-group.search-group {
     min-width: auto;
+    width: 100%;
   }
 
   .table-container {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .users-table {
-    min-width: 1000px;
+    min-width: 900px;
+  }
+
+  .users-table th,
+  .users-table td {
+    padding: 12px 10px;
+    font-size: 0.85rem;
   }
 }
 
@@ -324,6 +332,50 @@
 
   .modal-content {
     max-height: 95vh;
+    width: 95%;
+    margin: 10px;
+  }
+
+  .users-table {
+    min-width: 800px;
+  }
+
+  .users-table th,
+  .users-table td {
+    padding: 10px 8px;
+    font-size: 0.8rem;
+  }
+
+  .role-badge,
+  .status-badge {
+    padding: 3px 8px;
+    font-size: 0.75rem;
+  }
+
+  .clear-filters-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .users-table {
+    min-width: 700px;
+  }
+
+  .users-table th,
+  .users-table td {
+    padding: 8px 6px;
+    font-size: 0.75rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .action-buttons button {
+    padding: 4px 8px;
+    font-size: 0.9rem;
   }
 }
 

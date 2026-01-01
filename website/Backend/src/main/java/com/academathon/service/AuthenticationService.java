@@ -57,9 +57,21 @@ public class AuthenticationService {
     public User authenticate(LoginUserDTO input){
         User user = userRepository.findByEmail(input.getEmail())
                                                 .orElseThrow(() -> new RuntimeException("User not found"));
-        if (!user.isEnabled()){
-            throw new RuntimeException("Account not verified. Please verify your account");
+        
+        // First verify the password is correct
+        if (!passwordEncoder.matches(input.getPassword(), user.getPasswordHash())) {
+            throw new RuntimeException("Invalid email or password");
         }
+        
+        // If account is not verified, resend verification code
+        if (!user.isEnabled()){
+            user.setVerificationCode(generateVerificationCode());
+            user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
+            sendVerificationEmail(user);
+            userRepository.save(user);
+            throw new RuntimeException("VERIFICATION_REQUIRED:Account not verified. A new verification code has been sent to your email.");
+        }
+        
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(input.getEmail(), input.getPassword())
         );

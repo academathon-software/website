@@ -23,11 +23,13 @@ import TutorInvitations from './components/TutorInvitations/TutorInvitations';
 import About from './About/About';
 import Pricing from './Pricing/Pricing';
 import Team from './Team/Team';
+import Contact from './Contact/Contact';
 import { UserProvider } from './context/UserContext';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import UserManagement from './components/Admin/UserManagement';
 import Statistics from './components/Admin/Statistics';
 import BookingOversight from './components/Admin/BookingOversight';
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 
 function App() {
   return (
@@ -45,23 +47,95 @@ function App() {
           <Route path="verify" element={<Verification />} />
           <Route path="forgot-password" element={<ForgotPassword />} />
           <Route path="reset-password" element={<ResetPassword />} />
+          <Route path="contact" element={<Contact />} />
         </Route>
-          <Route path="dashboard" element={<StudentDashboard />} />
-          <Route path="tutor-dashboard" element={<TutorDashboard />} />
-          <Route path="calendar" element={<Calendar />} />
-          <Route path="book-lesson" element={<BookLesson />} />
-          <Route path="lesson-history" element={<LessonHistory />} />
-          <Route path="messages" element={<Messages />} />
-          <Route path="profile" element={<Profile />} />
-          <Route path="courses" element={<Courses />} />
-          <Route path="courses/:id" element={<CourseDetails />} />
-          <Route path="my-courses/:subjectName" element={<CourseDetails />} />
-          <Route path="availability" element={<AvailabilityManager />} />
-          <Route path="admin-dashboard" element={<AdminDashboard />} />
-          <Route path="admin/users" element={<UserManagement />} />
-          <Route path="admin/statistics" element={<Statistics />} />
-          <Route path="admin/bookings" element={<BookingOversight />} />
-          <Route path="admin/invitations" element={<TutorInvitations />} />
+          {/* Student-only routes */}
+          <Route path="dashboard" element={
+            <ProtectedRoute allowedRoles={['STUDENT']}>
+              <StudentDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="book-lesson" element={
+            <ProtectedRoute allowedRoles={['STUDENT']}>
+              <BookLesson />
+            </ProtectedRoute>
+          } />
+          
+          {/* Tutor-only routes */}
+          <Route path="tutor-dashboard" element={
+            <ProtectedRoute allowedRoles={['TUTOR']}>
+              <TutorDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="courses" element={
+            <ProtectedRoute allowedRoles={['TUTOR']}>
+              <Courses />
+            </ProtectedRoute>
+          } />
+          <Route path="courses/:id" element={
+            <ProtectedRoute allowedRoles={['TUTOR']}>
+              <CourseDetails />
+            </ProtectedRoute>
+          } />
+          <Route path="my-courses/:subjectName" element={
+            <ProtectedRoute allowedRoles={['TUTOR']}>
+              <CourseDetails />
+            </ProtectedRoute>
+          } />
+          <Route path="availability" element={
+            <ProtectedRoute allowedRoles={['TUTOR']}>
+              <AvailabilityManager />
+            </ProtectedRoute>
+          } />
+          
+          {/* Routes for both students and tutors */}
+          <Route path="calendar" element={
+            <ProtectedRoute allowedRoles={['STUDENT', 'TUTOR']}>
+              <Calendar />
+            </ProtectedRoute>
+          } />
+          <Route path="lesson-history" element={
+            <ProtectedRoute allowedRoles={['STUDENT', 'TUTOR']}>
+              <LessonHistory />
+            </ProtectedRoute>
+          } />
+          <Route path="messages" element={
+            <ProtectedRoute allowedRoles={['STUDENT', 'TUTOR']}>
+              <Messages />
+            </ProtectedRoute>
+          } />
+          <Route path="profile" element={
+            <ProtectedRoute allowedRoles={['STUDENT', 'TUTOR', 'ADMIN']}>
+              <Profile />
+            </ProtectedRoute>
+          } />
+          
+          {/* Admin-only routes */}
+          <Route path="admin-dashboard" element={
+            <ProtectedRoute allowedRoles={['ADMIN']}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="admin/users" element={
+            <ProtectedRoute allowedRoles={['ADMIN']}>
+              <UserManagement />
+            </ProtectedRoute>
+          } />
+          <Route path="admin/statistics" element={
+            <ProtectedRoute allowedRoles={['ADMIN']}>
+              <Statistics />
+            </ProtectedRoute>
+          } />
+          <Route path="admin/bookings" element={
+            <ProtectedRoute allowedRoles={['ADMIN']}>
+              <BookingOversight />
+            </ProtectedRoute>
+          } />
+          <Route path="admin/invitations" element={
+            <ProtectedRoute allowedRoles={['ADMIN']}>
+              <TutorInvitations />
+            </ProtectedRoute>
+          } />
       </Routes>
     </Router>
     </UserProvider>

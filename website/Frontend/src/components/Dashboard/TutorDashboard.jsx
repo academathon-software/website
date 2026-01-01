@@ -3,14 +3,11 @@ import './TutorDashboard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faStar,
-  faClock,
-  faPlus,
   faChevronLeft,
   faChevronRight,
   faGraduationCap,
-  faFlask,
-  faFolderPlus,
-  faCheck
+  faCheck,
+  faUser
 } from '@fortawesome/free-solid-svg-icons';
 import TutorSidebar from '../Shared/TutorSidebar';
 import BookingStatusBadge from '../Shared/BookingStatusBadge';
@@ -34,6 +31,10 @@ const TutorDashboard = () => {
   const [showActionModal, setShowActionModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [modalAction, setModalAction] = useState(null);
+  const [completingLesson, setCompletingLesson] = useState(null);
+  const [showStudentProfile, setShowStudentProfile] = useState(false);
+  const [selectedStudentProfile, setSelectedStudentProfile] = useState(null);
+  const [loadingProfile, setLoadingProfile] = useState(false);
   const [stats, setStats] = useState({
     totalStudents: 0,
     totalLessons: 0,
@@ -112,7 +113,12 @@ const TutorDashboard = () => {
 
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
-      setError('Failed to load dashboard data');
+      // Check if it's an authentication error
+      if (err.response?.status === 401 || err.response?.status === 403 || !localStorage.getItem('token')) {
+        setError('SESSION_EXPIRED');
+      } else {
+        setError('Failed to load dashboard data');
+      }
     } finally {
       setLoading(false);
     }
@@ -138,20 +144,6 @@ const TutorDashboard = () => {
       year: 'numeric'
     });
   };
-
-  // Get courses from tutor profile
-  const myCourses = tutorData?.subjects?.map((subject, index) => {
-    const colors = ['#ff6b6b', '#4ecdc4', '#3498db', '#9b59b6'];
-    const icons = [faGraduationCap, faFlask];
-    return {
-      id: subject.id,
-      title: subject.name,
-      subject: subject.name,
-      grade: 'All Grades',
-      icon: icons[index % icons.length],
-      color: colors[index % colors.length]
-    };
-  }) || [];
 
   // Get lesson history from past bookings
   const history = pastBookings
@@ -221,6 +213,47 @@ const TutorDashboard = () => {
     setSelectedBooking(booking);
     setModalAction(action);
     setShowActionModal(true);
+  };
+
+  const handleMarkComplete = async (bookingId) => {
+    if (!window.confirm('Are you sure you want to mark this lesson as completed?')) {
+      return;
+    }
+    
+    try {
+      setCompletingLesson(bookingId);
+      await bookingAPI.completeBooking(bookingId);
+      await fetchDashboardData();
+      alert('Lesson marked as completed!');
+    } catch (err) {
+      console.error('Error completing lesson:', err);
+      alert('Failed to mark lesson as completed: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setCompletingLesson(null);
+    }
+  };
+
+  const handleViewStudentProfile = async (studentUserId, studentName) => {
+    try {
+      setLoadingProfile(true);
+      setShowStudentProfile(true);
+      
+      // Try to fetch detailed student profile
+      const response = await userAPI.getUserProfile(studentUserId);
+      setSelectedStudentProfile({
+        ...response.data,
+        name: studentName
+      });
+    } catch (err) {
+      console.error('Error fetching student profile:', err);
+      // Set basic profile if fetch fails
+      setSelectedStudentProfile({
+        name: studentName,
+        userId: studentUserId
+      });
+    } finally {
+      setLoadingProfile(false);
+    }
   };
 
   // Get upcoming sessions (only SCHEDULED ones)
@@ -317,26 +350,57 @@ const TutorDashboard = () => {
   }
 
   if (error) {
+    const isSessionExpired = error === 'SESSION_EXPIRED';
+    
     return (
       <div className="tutor-dashboard">
         <TutorSidebar />
         <div className="main-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
           <div style={{ textAlign: 'center' }}>
-            <h2 style={{ color: 'red' }}>{error}</h2>
-            <button 
-              onClick={fetchDashboardData}
-              style={{
-                marginTop: '20px',
-                padding: '10px 20px',
-                backgroundColor: '#4CAF50',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Retry
-            </button>
+            {isSessionExpired ? (
+              <>
+                <div style={{ fontSize: '48px', marginBottom: '20px' }}>🔒</div>
+                <h2 style={{ color: '#333', marginBottom: '10px' }}>Session Expired</h2>
+                <p style={{ color: '#666', marginBottom: '20px' }}>Your session has expired. Please log back in to continue.</p>
+                <button 
+                  onClick={() => {
+                    localStorage.clear();
+                    navigate('/login');
+                  }}
+                  style={{
+                    marginTop: '10px',
+                    padding: '12px 30px',
+                    backgroundColor: '#1A803D',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '16px',
+                    fontWeight: '600'
+                  }}
+                >
+                  Log Back In
+                </button>
+              </>
+            ) : (
+              <>
+                <h2 style={{ color: 'red' }}>{error}</h2>
+                <button 
+                  onClick={fetchDashboardData}
+                  style={{
+                    marginTop: '20px',
+                    padding: '10px 20px',
+                    backgroundColor: '#4CAF50',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Retry
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -471,53 +535,87 @@ const TutorDashboard = () => {
           </div>
         )}
 
-        {/* My Courses Section */}
-        <div className="courses-section">
-          <h3>My Courses</h3>
+        {/* Upcoming Lessons Section */}
+        <div className="upcoming-lessons-section">
+          <h3>Upcoming Lessons</h3>
           <button 
             className="view-full-link" 
-            onClick={() => navigate('/courses')}
+            onClick={() => navigate('/lesson-history')}
             style={{ cursor: 'pointer', background: 'none', border: 'none', color: '#4CAF50' }}
           >
             View Full List
           </button>
           
-          <div className="courses-grid">
-            {myCourses.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '40px', color: '#999', gridColumn: '1 / -1' }}>
-                <p>No courses yet. Set up your tutor profile to add subjects you teach.</p>
+          <div className="lessons-table">
+            {upcomingBookings.filter(b => b.status === 'SCHEDULED' || b.status === 'CONFIRMED').length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
+                No upcoming lessons scheduled. Your confirmed lessons will appear here.
               </div>
             ) : (
-              myCourses.map(course => (
-                <div key={course.id} className="course-card" style={{ backgroundColor: course.color }}>
-                  <div className="course-icon">
-                    <FontAwesomeIcon icon={course.icon} />
-                  </div>
-                  <div className="course-info">
-                    <div className="course-subject">{course.subject}</div>
-                    <div className="course-title">{course.title}</div>
-                    <button 
-                      className="view-course-btn"
-                      onClick={() => navigate('/courses')}
-                    >
-                      View Course
-                    </button>
-                  </div>
+              <>
+                <div className="lesson-row lesson-header-row">
+                  <div className="lesson-header-cell">Date/Time</div>
+                  <div className="lesson-header-cell">Lesson Name</div>
+                  <div className="lesson-header-cell">Student Name</div>
+                  <div className="lesson-header-cell"></div>
+                  <div className="lesson-header-cell"></div>
                 </div>
-              ))
+                {upcomingBookings
+                  .filter(b => b.status === 'SCHEDULED' || b.status === 'CONFIRMED')
+                  .map(booking => {
+                    const startTime = new Date(booking.startTime);
+                    const endTime = new Date(booking.endTime);
+                    const now = new Date();
+                    const isPast = endTime < now;
+                    const isOngoing = startTime <= now && endTime >= now;
+                    
+                    return (
+                      <div key={booking.id} className="lesson-row">
+                        <div className="lesson-datetime">
+                          {formatDateTime(booking.startTime)}
+                        </div>
+                        <div className="lesson-name">{booking.subject || 'Tutoring Session'}</div>
+                        <div className="tutor-name">
+                          {booking.studentName}
+                          <button 
+                            className="view-profile-btn"
+                            onClick={() => handleViewStudentProfile(booking.studentUserId, booking.studentName)}
+                            title="View Profile"
+                          >
+                            <FontAwesomeIcon icon={faUser} />
+                          </button>
+                        </div>
+                        <div className="status-indicator">
+                          <BookingStatusBadge 
+                            status={booking.status} 
+                            paymentStatus={booking.paymentStatus}
+                            isTutor={true}
+                          />
+                        </div>
+                        <div className="lesson-actions">
+                          {(isPast || isOngoing) && (
+                            <button 
+                              className="action-btn mark-complete-btn"
+                              onClick={() => handleMarkComplete(booking.id)}
+                              disabled={completingLesson === booking.id}
+                            >
+                              <FontAwesomeIcon icon={faCheck} />
+                              {completingLesson === booking.id ? '...' : ' Complete'}
+                            </button>
+                          )}
+                          <button 
+                            className="action-btn message-btn"
+                            onClick={() => navigate('/messages', { state: { otherUserId: booking.studentUserId, bookingId: booking.id } })}
+                          >
+                            Message
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })
+                }
+              </>
             )}
-            
-            <div className="add-course-card">
-              <div className="add-course-icon">
-                <FontAwesomeIcon icon={faFolderPlus} />
-              </div>
-              <button 
-                className="add-course-btn"
-                onClick={() => navigate('/courses')}
-              >
-                Add Course
-              </button>
-            </div>
           </div>
         </div>
 
@@ -664,6 +762,89 @@ const TutorDashboard = () => {
             setModalAction(null);
           }}
         />
+      )}
+
+      {/* Student Profile Modal */}
+      {showStudentProfile && (
+        <div className="student-profile-modal-overlay" onClick={() => setShowStudentProfile(false)}>
+          <div className="student-profile-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close-btn" onClick={() => setShowStudentProfile(false)}>
+              &times;
+            </button>
+            
+            {loadingProfile ? (
+              <div className="modal-loading">Loading profile...</div>
+            ) : selectedStudentProfile ? (
+              <>
+                <div className="profile-header">
+                  {selectedStudentProfile.profilePictureUrl ? (
+                    <img 
+                      src={selectedStudentProfile.profilePictureUrl} 
+                      alt={selectedStudentProfile.name}
+                      className="profile-avatar-img"
+                    />
+                  ) : (
+                    <div className="profile-avatar">
+                      {selectedStudentProfile.name?.charAt(0)?.toUpperCase() || 'S'}
+                    </div>
+                  )}
+                  <h2>{selectedStudentProfile.name || 'Student'}</h2>
+                </div>
+                
+                <div className="profile-details">
+                  {selectedStudentProfile.email && (
+                    <div className="profile-item">
+                      <span className="profile-label">Email</span>
+                      <span className="profile-value">{selectedStudentProfile.email}</span>
+                    </div>
+                  )}
+                  
+                  {selectedStudentProfile.phone && (
+                    <div className="profile-item">
+                      <span className="profile-label">Phone</span>
+                      <span className="profile-value">{selectedStudentProfile.phone}</span>
+                    </div>
+                  )}
+                  
+                  {selectedStudentProfile.grade && (
+                    <div className="profile-item">
+                      <span className="profile-label">Grade</span>
+                      <span className="profile-value">{selectedStudentProfile.grade}</span>
+                    </div>
+                  )}
+                  
+                  {selectedStudentProfile.school && (
+                    <div className="profile-item">
+                      <span className="profile-label">School</span>
+                      <span className="profile-value">{selectedStudentProfile.school}</span>
+                    </div>
+                  )}
+                  
+                  {selectedStudentProfile.bio && (
+                    <div className="profile-item bio">
+                      <span className="profile-label">About</span>
+                      <span className="profile-value">{selectedStudentProfile.bio}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="profile-actions">
+                  <button 
+                    className="message-btn"
+                    onClick={() => {
+                      setShowStudentProfile(false);
+                      navigate('/messages', { state: { otherUserId: selectedStudentProfile.userId || selectedStudentProfile.id } });
+                    }}
+                  >
+                    Send Message
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="modal-error">Unable to load profile</div>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

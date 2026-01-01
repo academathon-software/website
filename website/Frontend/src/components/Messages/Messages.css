@@ -424,10 +424,12 @@
 @media (max-width: 768px) {
   .messages-container {
     margin-left: 0; /* Remove margin on mobile when sidebar is hidden */
+    padding-top: 60px; /* Space for hamburger menu */
   }
 
   .messages-content {
     position: relative;
+    height: calc(100vh - 60px);
   }
 
   .conversations-list {

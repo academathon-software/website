@@ -148,20 +148,75 @@
 @media (max-width: 1024px) {
   .table-container {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -10px;
+    padding: 0 10px;
   }
 
   .bookings-table {
-    min-width: 1000px;
+    min-width: 800px;
+  }
+
+  .bookings-table th,
+  .bookings-table td {
+    padding: 12px 10px;
+    font-size: 0.85rem;
   }
 }
 
 @media (max-width: 768px) {
   .modal-content {
     max-height: 95vh;
+    width: 95%;
+    margin: 10px;
   }
 
   .detail-section {
     padding: 16px;
+  }
+
+  .filters-section {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .filter-group {
+    width: 100%;
+  }
+
+  .filter-group select {
+    width: 100%;
+  }
+
+  .clear-filters-btn {
+    width: 100%;
+  }
+
+  .bookings-table {
+    min-width: 700px;
+  }
+
+  .bookings-table th,
+  .bookings-table td {
+    padding: 10px 8px;
+    font-size: 0.8rem;
+  }
+
+  .status-badge {
+    padding: 3px 8px;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .bookings-table {
+    min-width: 600px;
+  }
+
+  .bookings-table th,
+  .bookings-table td {
+    padding: 8px 6px;
+    font-size: 0.75rem;
   }
 }
 

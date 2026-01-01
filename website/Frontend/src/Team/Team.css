@@ -4,8 +4,15 @@
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
 
+/* Team Page Container - scoped to avoid conflicts */
+.team-page .team-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
 /* Hero Section */
-.team-hero {
+.team-page .team-hero {
   padding: 6rem 0 4rem;
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
@@ -14,7 +21,7 @@
   overflow: hidden;
 }
 
-.team-hero::before {
+.team-page .team-hero::before {
   content: '';
   position: absolute;
   top: 0;
@@ -25,89 +32,98 @@
   opacity: 0.3;
 }
 
-.team-hero .container {
+.team-page .team-hero .team-container {
   position: relative;
   z-index: 1;
 }
 
-.team-hero h1 {
+.team-page .team-hero-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 3rem 6rem;
+  align-items: start;
+  padding-bottom: 2rem;
+}
+
+.team-page .team-hero-content h1 {
+  grid-column: 1;
+  grid-row: 1;
   font-size: 3.5rem;
   font-weight: 700;
-  margin-bottom: 1rem;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 0;
+  text-align: left;
 }
 
-.hero-subtitle {
-  font-size: 1.25rem;
-  opacity: 0.9;
-  margin-bottom: 3rem;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
+.team-page .team-hero-subtitle {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  font-size: 1.1rem;
+  opacity: 0.95;
+  max-width: 500px;
+  line-height: 1.7;
+  text-align: left;
+  margin: 0;
+  align-self: center;
 }
 
-/* Hero Stats */
-.hero-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 2rem;
-  margin-top: 3rem;
+/* Team Hero Stats */
+.team-page .team-hero-stats {
+  grid-column: 1;
+  grid-row: 2;
+  display: flex;
+  gap: 1.5rem;
 }
 
-.stat-item {
+.team-page .team-stat-item {
   text-align: center;
   padding: 1.5rem;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 15px;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  min-width: 150px;
 }
 
-.stat-icon {
-  width: 60px;
-  height: 60px;
+.team-page .team-stat-icon {
+  width: 50px;
+  height: 50px;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 1rem;
-  font-size: 1.5rem;
+  margin: 0 auto 0.75rem;
+  font-size: 1.25rem;
 }
 
-.stat-number {
-  font-size: 2.5rem;
+.team-page .team-stat-number {
+  font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   color: #ffd700;
 }
 
-.stat-label {
-  font-size: 1rem;
+.team-page .team-stat-label {
+  font-size: 0.9rem;
   opacity: 0.9;
 }
 
-/* Container */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
-}
-
-/* Section Headers */
-.section-header {
+/* Team Section Headers */
+.team-page .team-section-header {
   text-align: center;
   margin-bottom: 4rem;
 }
 
-.section-header h2 {
+.team-page .team-section-header h2 {
   font-size: 2.5rem;
   font-weight: 700;
   color: #1f2937;
   margin-bottom: 1rem;
 }
 
-.section-header p {
+.team-page .team-section-header p {
   font-size: 1.1rem;
   color: #6b7280;
   max-width: 600px;
@@ -115,7 +131,7 @@
 }
 
 /* Leadership Section */
-.leadership-section {
+.team-page .leadership-section {
   padding: 6rem 0;
   background: white;
 }
@@ -144,16 +160,22 @@
 }
 
 .member-avatar {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 2rem;
-  color: white;
-  font-size: 2.5rem;
+  overflow: hidden;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  border: 4px solid #10b981;
+}
+
+.member-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .member-info h3 {
@@ -443,85 +465,109 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .team-hero h1 {
+  .team-page .team-hero-content {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .team-page .team-hero-content h1 {
+    grid-column: 1;
+    grid-row: 1;
     font-size: 2.5rem;
+    text-align: center;
   }
   
-  .hero-subtitle {
-    font-size: 1.1rem;
+  .team-page .team-hero-subtitle {
+    grid-column: 1;
+    grid-row: 2;
+    font-size: 1rem;
+    text-align: center;
+    max-width: 100%;
   }
   
-  .hero-stats {
-    grid-template-columns: repeat(2, 1fr);
+  .team-page .team-hero-stats {
+    grid-column: 1;
+    grid-row: 3;
+    justify-content: center;
     gap: 1rem;
   }
   
-  .team-grid {
+  .team-page .team-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
   
-  .team-card {
+  .team-page .team-card {
     padding: 2rem;
   }
   
-  .advisors-grid {
+  .team-page .advisors-grid {
     grid-template-columns: 1fr;
   }
   
-  .culture-grid {
+  .team-page .culture-grid {
     grid-template-columns: 1fr;
   }
   
-  .join-buttons {
+  .team-page .join-buttons {
     flex-direction: column;
     align-items: center;
   }
   
-  .btn-primary, .btn-secondary {
+  .team-page .btn-primary, 
+  .team-page .btn-secondary {
     width: 100%;
     max-width: 300px;
   }
   
-  .section-header h2 {
+  .team-page .team-section-header h2 {
     font-size: 2rem;
   }
   
-  .join-content h2 {
+  .team-page .join-content h2 {
     font-size: 2rem;
   }
 }
 
 @media (max-width: 480px) {
-  .container {
+  .team-page .team-container {
     padding: 0 1rem;
   }
-  
-  .hero-stats {
-    grid-template-columns: 1fr;
+
+  .team-page .team-hero-content h1 {
+    font-size: 2rem;
   }
   
-  .stat-item {
+  .team-page .team-hero-stats {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .team-page .team-stat-item {
     padding: 1rem;
+    width: 100%;
+    max-width: 200px;
   }
   
-  .team-card {
+  .team-page .team-card {
     padding: 1.5rem;
   }
   
-  .member-avatar {
+  .team-page .member-avatar {
     width: 80px;
     height: 80px;
     font-size: 2rem;
   }
   
-  .advisor-avatar {
+  .team-page .advisor-avatar {
     width: 60px;
     height: 60px;
     font-size: 1.5rem;
   }
   
-  .culture-icon {
+  .team-page .culture-icon {
     width: 60px;
     height: 60px;
     font-size: 1.5rem;

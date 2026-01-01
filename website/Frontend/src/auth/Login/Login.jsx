@@ -48,7 +48,20 @@ function LoginPage() {
           window.location.href = '/dashboard';
         }
       } else {
-        setError('Incorrect email or password');
+        const errorData = await response.json();
+        const errorMessage = errorData.message || 'Incorrect email or password';
+        
+        // Check if verification is required - redirect to verification page
+        if (errorMessage.startsWith('VERIFICATION_REQUIRED:')) {
+          // Store email for verification page
+          localStorage.setItem('pendingVerificationEmail', email);
+          setError('Account not verified. A new verification code has been sent to your email. Redirecting...');
+          setTimeout(() => {
+            window.location.href = '/verify';
+          }, 2000);
+        } else {
+          setError(errorMessage);
+        }
       }
     } catch (error) {
       console.error('Login error:', error);

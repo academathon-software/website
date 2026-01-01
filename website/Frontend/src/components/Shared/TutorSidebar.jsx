@@ -26,6 +26,17 @@ const TutorSidebar = () => {
     setIsMobileMenuOpen(false); // Close mobile menu after navigation
   };
 
+  // Sign out handler - clears all auth data
+  const handleSignOut = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('username');
+    localStorage.removeItem('userType');
+    setIsMobileMenuOpen(false);
+    navigate('/login');
+  };
+
   // Check if a navigation item is active
   const isActive = (path) => {
     return location.pathname === path;
@@ -116,7 +127,7 @@ const TutorSidebar = () => {
           </div>
           <div 
             className="sidebar-nav-item"
-            onClick={() => handleNavigation('/login')}
+            onClick={handleSignOut}
           >
             <FontAwesomeIcon icon={faSignOutAlt} />
             <span>Sign Out</span>

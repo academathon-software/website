@@ -1,10 +1,2 @@
 -- Add subject column to bookings table
-ALTER TABLE bookings ADD COLUMN subject VARCHAR(255);
-
-
-
-
-
-
-
-
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS subject VARCHAR(255);

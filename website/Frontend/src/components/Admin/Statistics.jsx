@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AdminSidebar from './AdminSidebar';
 import adminAPI from '../../services/adminApi';
 import './Statistics.css';
 
 const Statistics = () => {
+  const navigate = useNavigate();
   const [userStats, setUserStats] = useState(null);
   const [bookingStats, setBookingStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,7 +27,11 @@ const Statistics = () => {
       setError(null);
     } catch (err) {
       console.error('Error fetching statistics:', err);
-      setError('Failed to load statistics. Please try again.');
+      if (err.response?.status === 401 || err.response?.status === 403 || !localStorage.getItem('token')) {
+        setError('SESSION_EXPIRED');
+      } else {
+        setError('Failed to load statistics. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -55,11 +61,26 @@ const Statistics = () => {
   }
 
   if (error) {
+    const isSessionExpired = error === 'SESSION_EXPIRED';
     return (
       <div className="admin-dashboard">
         <AdminSidebar />
-        <div className="admin-content">
-          <div className="error-message">{error}</div>
+        <div className="admin-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+          {isSessionExpired ? (
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '48px', marginBottom: '20px' }}>🔒</div>
+              <h2 style={{ color: '#333', marginBottom: '10px' }}>Session Expired</h2>
+              <p style={{ color: '#666', marginBottom: '20px' }}>Your session has expired. Please log back in to continue.</p>
+              <button 
+                onClick={() => { localStorage.clear(); navigate('/login'); }}
+                style={{ padding: '12px 30px', backgroundColor: '#1A803D', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '16px', fontWeight: '600' }}
+              >
+                Log Back In
+              </button>
+            </div>
+          ) : (
+            <div className="error-message">{error}</div>
+          )}
         </div>
       </div>
     );

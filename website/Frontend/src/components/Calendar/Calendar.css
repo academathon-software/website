@@ -316,6 +316,7 @@
 @media (max-width: 768px) {
   .calendar-page {
     flex-direction: column;
+    padding-top: 60px; /* Space for hamburger menu */
   }
   
   .calendar-sidebar {
@@ -363,6 +364,7 @@
   .calendar-main-content {
     margin-left: 0;
     padding: 1rem;
+    padding-top: 1rem;
   }
   
   .week-day-header {
