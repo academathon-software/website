@@ -376,8 +376,7 @@
   }
   
   .about-hero-section {
-    padding: 3rem 1rem 4rem;
-    overflow: visible;
+    padding: 3rem 1rem 2rem;
   }
   
   .about-hero-section .hero-content {
@@ -388,7 +387,7 @@
   
   .hero-text {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
   }
   
   .hero-text h1 {
@@ -406,7 +405,7 @@
     gap: 1rem;
     align-items: center;
     width: 100%;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
   }
   
   .stat {
@@ -425,20 +424,32 @@
   
   .hero-image {
     width: 100%;
-    display: block;
-    text-align: center;
-    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 1rem;
   }
   
   .floating-card {
-    display: inline-block;
-    padding: 1.5rem 2rem;
-    border-radius: 1.5rem;
-    width: 80%;
-    max-width: 280px;
-    margin: 0 auto;
+    padding: 1.25rem 1.5rem;
+    border-radius: 1rem;
+    width: auto;
+    max-width: 200px;
     animation: none !important;
     transform: none !important;
+  }
+  
+  .floating-card svg {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .floating-card h3 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .floating-card p {
+    font-size: 0.8rem;
   }
   
   .floating-card svg {
