@@ -69,6 +69,70 @@ function LoginPage() {
     }
   };
 
+  // #region agent log - Debug mobile login visibility
+  React.useEffect(() => {
+    const logData = (msg, data, hypothesisId) => {
+      fetch('http://127.0.0.1:7242/ingest/407b07ca-5ce6-4fbf-96c0-2e4d8929b53b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Login.jsx:useEffect',message:msg,data:data,timestamp:Date.now(),sessionId:'debug-session',hypothesisId:hypothesisId})}).catch(()=>{});
+    };
+    
+    logData('Login component mounted', { windowWidth: window.innerWidth, windowHeight: window.innerHeight }, 'H5');
+    
+    const loginPage = document.querySelector('.login-page');
+    const greenblock = document.querySelector('.greenblock');
+    const loginContainer = document.querySelector('.login-container');
+    
+    if (loginPage) {
+      const styles = window.getComputedStyle(loginPage);
+      logData('login-page styles', { 
+        display: styles.display, 
+        position: styles.position,
+        height: styles.height,
+        overflow: styles.overflow,
+        visibility: styles.visibility,
+        opacity: styles.opacity,
+        paddingTop: styles.paddingTop,
+        zIndex: styles.zIndex
+      }, 'H1,H2,H3');
+    } else {
+      logData('login-page NOT FOUND', {}, 'H4');
+    }
+    
+    if (greenblock) {
+      const styles = window.getComputedStyle(greenblock);
+      const rect = greenblock.getBoundingClientRect();
+      logData('greenblock styles', { 
+        display: styles.display, 
+        height: styles.height,
+        overflow: styles.overflow,
+        position: styles.position,
+        top: rect.top,
+        left: rect.left,
+        width: rect.width,
+        rectHeight: rect.height
+      }, 'H1,H2');
+    } else {
+      logData('greenblock NOT FOUND', {}, 'H4');
+    }
+    
+    if (loginContainer) {
+      const styles = window.getComputedStyle(loginContainer);
+      const rect = loginContainer.getBoundingClientRect();
+      logData('login-container styles', { 
+        display: styles.display, 
+        visibility: styles.visibility,
+        height: styles.height,
+        top: rect.top,
+        left: rect.left,
+        width: rect.width,
+        rectHeight: rect.height,
+        zIndex: styles.zIndex
+      }, 'H3,H4,H5');
+    } else {
+      logData('login-container NOT FOUND', {}, 'H4');
+    }
+  }, []);
+  // #endregion
+
   return (
     <div className="login-page">
       <div className='greenblock'>

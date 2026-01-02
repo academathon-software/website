@@ -433,7 +433,7 @@ select.custom-input {
     flex-direction: column;
   }
   
-  .greenblock {
+  .signup-page .greenblock {
     display: none !important;
   }
   
