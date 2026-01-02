@@ -6,6 +6,8 @@
   justify-content: center;
   background-color: #f5f5f5;
   font-family: Arial, Helvetica, sans-serif;
+  padding-top: 80px;
+  box-sizing: border-box;
 }
 
 .greenblock {
@@ -195,17 +197,21 @@
 /* Responsive Design */
 @media (max-width: 1024px) {
   .login-page {
-    padding: 0;
-    display: block;
-    background-color: #f9f9f9;
+    padding: 100px 20px 40px !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    background-color: #f9f9f9 !important;
+    min-height: 100vh !important;
   }
   
   .greenblock {
     display: block !important;
     width: 100% !important;
+    max-width: 450px !important;
     height: auto !important;
     min-height: auto !important;
-    background-color: #f9f9f9 !important;
+    background-color: transparent !important;
     border-radius: 0 !important;
     box-shadow: none !important;
     overflow: visible !important;
@@ -218,37 +224,44 @@
   .login-container {
     width: 100% !important;
     height: auto !important;
-    min-height: 100vh !important;
-    padding: 60px 20px 40px !important;
-    background-color: #f9f9f9 !important;
+    min-height: auto !important;
+    padding: 30px 20px !important;
+    background-color: white !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
+    align-items: center !important;
   }
   
   .login-container form {
-    width: 100%;
-    max-width: 400px;
+    width: 100% !important;
+    max-width: 100% !important;
     margin: 0 auto;
   }
   
   .logintext {
-    font-size: 28px;
-    text-align: center;
+    font-size: 28px !important;
+    text-align: center !important;
   }
   
   .undertext {
-    text-align: center;
+    text-align: center !important;
   }
 }
 
 @media (max-width: 480px) {
+  .login-page {
+    padding: 90px 15px 30px !important;
+  }
+  
   .login-container {
-    padding: 40px 15px 30px !important;
+    padding: 25px 15px !important;
   }
   
   .logintext {
-    font-size: 24px;
+    font-size: 24px !important;
   }
   
   .custom-input {
