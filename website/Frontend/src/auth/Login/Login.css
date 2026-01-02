@@ -193,27 +193,29 @@
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
+  .login-page {
+    padding: 0;
+  }
+  
   .greenblock {
-    width: 95%;
+    width: 100%;
     height: auto;
+    min-height: 100vh;
     flex-direction: column;
-    min-height: 600px;
+    border-radius: 0;
+    box-shadow: none;
   }
   
   .title {
-    position: static;
-    transform: none;
-    margin: 30px 0;
-    font-size: 36px;
-    text-align: center;
-    left: auto;
-    top: auto;
+    display: none !important;
   }
   
   .login-container {
     width: 100%;
-    padding: 30px 20px;
+    height: 100vh;
+    padding: 40px 20px;
+    background-color: #f9f9f9;
   }
   
   .logintext {
@@ -227,21 +229,12 @@
 }
 
 @media (max-width: 480px) {
-  .login-page {
-    padding: 10px;
-  }
-  
-  .greenblock {
-    width: 100%;
-    border-radius: 10px;
-  }
-  
-  .title {
-    font-size: 28px;
-  }
-  
   .login-container {
-    padding: 20px 15px;
+    padding: 30px 15px;
+  }
+  
+  .logintext {
+    font-size: 24px;
   }
   
   .custom-input {
