@@ -423,33 +423,7 @@
   }
   
   .hero-image {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    padding-bottom: 1rem;
-  }
-  
-  .floating-card {
-    padding: 1.25rem 1.5rem;
-    border-radius: 1rem;
-    width: auto;
-    max-width: 200px;
-    animation: none !important;
-    transform: none !important;
-  }
-  
-  .floating-card svg {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-  }
-  
-  .floating-card h3 {
-    font-size: 1rem;
-    margin-bottom: 0.25rem;
-  }
-  
-  .floating-card p {
-    font-size: 0.8rem;
+    display: none;
   }
   
   .floating-card svg {
