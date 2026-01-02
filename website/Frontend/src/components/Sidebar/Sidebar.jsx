@@ -3,6 +3,7 @@ import { Link, NavLink } from "react-router-dom"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHome, faSearch, faEnvelope, faClose, faBars, faUser, faUserPlus } from '@fortawesome/free-solid-svg-icons'
 import { useState } from 'react'
+import logoImg from '../../assets/logo.avif'
 
 const Sidebar = () => {
     const [showNav, setShowNav] = useState(false)
@@ -14,7 +15,7 @@ const Sidebar = () => {
     return (
         <div className='nav-bar'>
             <Link className="logo" to="/">
-                <h1>Academathon</h1>
+                <img src={logoImg} alt="Academathon" className="logo-img" />
             </Link>
             <nav className={showNav ? 'mobile-show' : ""}>
                 <NavLink exact="true" activeClassName="active" to="/" onClick={closeNav}>

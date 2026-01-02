@@ -1,21 +1,11 @@
 .App {
-  display: flex;
+  width: 100%;
   min-height: 100vh;
 }
 
 .page {
-    width: 100%; 
-    height: 100%; 
-    position: absolute; 
-    margin-top: 80px; /* Add margin to account for fixed header height */
-    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-  .page {
-    margin-left: 0;
-    margin-top: 100px; /* Adjust margin for mobile header height */
-    padding: 10px;
-  }
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }

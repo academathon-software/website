@@ -6,7 +6,8 @@
 
 /* Hero Section */
 .pricing-hero {
-  padding: 6rem 0 4rem;
+  padding: 8rem 0 4rem;
+  padding-top: calc(80px + 4rem);
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   text-align: center;

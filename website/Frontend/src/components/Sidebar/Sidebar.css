@@ -1,6 +1,6 @@
 .nav-bar { 
-    background: linear-gradient(135deg, #008037 0%, #006b2e 100%);
-    border-bottom: 1px solid rgba(0, 128, 55, 0.3);
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
     width: 100vw; 
     height: 80px; 
     position: fixed; 
@@ -12,7 +12,7 @@
     align-items: center;
     justify-content: center;
     padding: 0 2rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
     
     .logo {
@@ -25,18 +25,6 @@
         
         &:hover {
             transform: scale(1.05);
-        }
-        
-        h1 {
-            color: #fff;
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-top: 50px;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
     }
     
@@ -51,7 +39,7 @@
             align-items: center;
             justify-content: center;
             padding: 0.75rem 1rem;
-            color: rgba(255, 255, 255, 0.8);
+            color: #374151;
             text-decoration: none;
             border-radius: 12px;
             font-weight: 500;
@@ -68,15 +56,14 @@
                 left: -100%;
                 width: 100%;
                 height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+                background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.1), transparent);
                 transition: left 0.5s ease;
             }
             
             &:hover {
-                color: #fff;
-                background: rgba(255, 255, 255, 0.1);
+                color: #10b981;
+                background: rgba(16, 185, 129, 0.1);
                 transform: translateY(-2px);
-                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
                 
                 &::before {
                     left: 100%;
@@ -95,10 +82,10 @@
             }
             
             &.active {
-                color: #fff;
+                color: #10b981;
                 
                 span {
-                    color: #fff;
+                    color: #10b981;
                     font-weight: 700;
                 }
             }
@@ -109,13 +96,13 @@
         position: absolute;
         right: 2rem;
         display: none;
-        color: #fff;
+        color: #374151;
         cursor: pointer;
         transition: all 0.3s ease;
         
         &:hover {
             transform: scale(1.1);
-            color: #667eea;
+            color: #10b981;
         }
     }
 }
@@ -180,7 +167,7 @@
             position: absolute; 
             top: 15px; 
             right: 15px;
-            color: #ffffff; 
+            color: #10b981; 
         }
     }
 }
@@ -214,6 +201,36 @@
 
 /* Scroll effect */
 .nav-bar.scrolled {
-    background: linear-gradient(135deg, #006b2e 0%, #004d21 100%);
-    box-shadow: 0 8px 32px rgba(0, 128, 55, 0.3);
+    background: #ffffff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Independent Navbar Logo Styles */
+.nav-bar .logo {
+    margin: 0 !important;
+    padding: 0 !important;
+    margin-bottom: 0 !important;
+    height: auto !important;
+    width: auto !important;
+}
+
+.nav-bar .logo .logo-img {
+    height: 45px !important;
+    width: auto !important;
+    object-fit: contain !important;
+    display: block !important;
+}
+
+.nav-bar .logo h1 {
+    color: #ffffff !important;
+    font-size: 1.4rem !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    -webkit-text-fill-color: #ffffff !important;
+    background-clip: unset !important;
+    text-shadow: none !important;
+    line-height: 1 !important;
 }
