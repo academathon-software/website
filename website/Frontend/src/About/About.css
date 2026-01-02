@@ -398,12 +398,16 @@
     flex-direction: column;
     gap: 1rem;
     align-items: center;
+    position: relative;
+    z-index: 2;
   }
   
   .stat {
     width: 100%;
     max-width: 200px;
     padding: 1rem;
+    position: relative;
+    z-index: 2;
   }
   
   .stat span {
@@ -415,14 +419,20 @@
   }
   
   .hero-image {
-    margin-top: 1rem;
+    margin-top: 1.5rem;
+    width: 100%;
+    display: flex;
+    justify-content: center;
   }
   
   .floating-card {
     padding: 1.5rem;
     border-radius: 1.5rem;
-    max-width: 250px;
+    max-width: 220px;
     margin: 0 auto;
+    animation: none;
+    position: relative;
+    z-index: 1;
   }
   
   .floating-card svg {

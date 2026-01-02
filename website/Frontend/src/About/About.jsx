@@ -20,7 +20,7 @@ function About() {
   return (
     <div className="about-page">
       {/* Hero Section */}
-      <section className="hero-section">
+      <section className="about-hero-section">
         <div className="hero-content">
           <div className="hero-text">
             <h1>About Academathon</h1>
