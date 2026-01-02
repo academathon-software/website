@@ -16,7 +16,6 @@
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   position: relative;
-  overflow: hidden;
 }
 
 .about-hero-section::before {
@@ -377,19 +376,19 @@
   }
   
   .about-hero-section {
-    padding: 3rem 1rem 2rem;
+    padding: 3rem 1rem 4rem;
+    overflow: visible;
   }
   
   .about-hero-section .hero-content {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 2rem;
+    display: block !important;
     max-width: 100%;
-    padding: 0 1rem;
+    padding: 0;
   }
   
   .hero-text {
     text-align: center;
+    margin-bottom: 2rem;
   }
   
   .hero-text h1 {
@@ -407,11 +406,12 @@
     gap: 1rem;
     align-items: center;
     width: 100%;
+    margin-bottom: 2rem;
   }
   
   .stat {
     width: 80%;
-    max-width: 250px;
+    max-width: 280px;
     padding: 1rem;
   }
   
@@ -425,16 +425,17 @@
   
   .hero-image {
     width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-top: 0.5rem;
+    display: block;
+    text-align: center;
+    margin-top: 1rem;
   }
   
   .floating-card {
+    display: inline-block;
     padding: 1.5rem 2rem;
     border-radius: 1.5rem;
     width: 80%;
-    max-width: 250px;
+    max-width: 280px;
     margin: 0 auto;
     animation: none !important;
     transform: none !important;
