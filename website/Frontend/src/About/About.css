@@ -361,6 +361,10 @@
     text-align: center;
   }
   
+  .hero-image {
+    display: none !important;
+  }
+  
   .mission-content {
     grid-template-columns: 1fr;
     gap: 3rem;
