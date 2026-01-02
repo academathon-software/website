@@ -1,6 +1,7 @@
 /* Homepage Styles */
 .homepage {
   width: 100%;
+  max-width: 100%;
   min-height: 100vh;
   overflow-x: hidden;
   margin: 0;
@@ -443,16 +444,34 @@
     text-align: center;
   }
   
+  .hero-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
   .hero-title {
     font-size: 2.5rem;
   }
   
   .hero-description {
     font-size: 1.1rem;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
   }
   
   .hero-buttons {
     justify-content: center;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .hero-buttons .btn {
+    width: 100%;
+    max-width: 280px;
+    text-align: center;
   }
   
   .hero-graphic {
