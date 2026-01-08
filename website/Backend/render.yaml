@@ -1,0 +1,53 @@
+# Render Blueprint Configuration
+# This file can be used with Render's "Blueprint" feature for easy deployment
+# Or used as a reference for manual setup
+
+services:
+  - type: web
+    name: academathon-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free  # Change to 'starter' or higher for production
+    healthCheckPath: /actuator/health
+    envVars:
+      # Spring Profile
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      
+      # Database (from Supabase)
+      - key: DATABASE_URL
+        sync: false  # Set manually in Render dashboard
+      - key: DATABASE_USERNAME
+        sync: false
+      - key: DATABASE_PASSWORD
+        sync: false
+      
+      # JWT Secret (generate a strong 256-bit key)
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      
+      # Email Configuration
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      
+      # AWS S3 Configuration
+      - key: AWS_S3_BUCKET_NAME
+        sync: false
+      - key: AWS_S3_REGION
+        sync: false
+      - key: AWS_S3_ACCESS_KEY
+        sync: false
+      - key: AWS_S3_SECRET_KEY
+        sync: false
+      
+      # Stripe Configuration
+      - key: STRIPE_API_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      
+      # Port (Render sets this automatically)
+      - key: PORT
+        value: 8080

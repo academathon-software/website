@@ -75,7 +75,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource))
             .authorizeHttpRequests(auth -> auth
                 // expose your auth endpoints; tweak as needed
-                .requestMatchers("/", "/login", "/auth/**", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/", "/login", "/auth/**", "/css/**", "/js/**", "/images/**", "/actuator/**").permitAll()
                 // Allow public access to tutor invitation validation
                 .requestMatchers("/api/tutor-invitations/validate/**").permitAll()
                 // Protect admin endpoints - require ADMIN role
@@ -99,8 +99,18 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
-        // Allow frontend origins
-        cfg.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:3000", "http://127.0.0.1:5173", "http://127.0.0.1:5174"));
+        // Allow frontend origins (localhost for dev, Vercel for production)
+        cfg.setAllowedOrigins(List.of(
+            "http://localhost:3000", 
+            "http://localhost:5173", 
+            "http://localhost:5174", 
+            "http://127.0.0.1:3000", 
+            "http://127.0.0.1:5173", 
+            "http://127.0.0.1:5174",
+            // Production Vercel domains - add your actual domain(s) here
+            "https://academathon.vercel.app",
+            "https://*.vercel.app"
+        ));
         // Allow all HTTP methods
         cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         // Allow all headers
