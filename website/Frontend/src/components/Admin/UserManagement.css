@@ -83,6 +83,24 @@
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  position: relative;
+}
+
+/* Mobile scroll hint */
+.table-scroll-hint {
+  display: none;
+  text-align: center;
+  padding: 8px;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 0.85rem;
+  border-bottom: 1px solid #bbf7d0;
+}
+
+@media (max-width: 768px) {
+  .table-scroll-hint {
+    display: block;
+  }
 }
 
 .users-table {
@@ -312,6 +330,7 @@
   .table-container {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    max-width: 100%;
   }
 
   .users-table {
@@ -322,10 +341,25 @@
   .users-table td {
     padding: 12px 10px;
     font-size: 0.85rem;
+    white-space: nowrap;
   }
 }
 
 @media (max-width: 768px) {
+  .page-header {
+    padding: 0 10px;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .filters-section {
+    padding: 16px;
+    margin: 0 0 16px 0;
+    border-radius: 8px;
+  }
+
   .user-detail-grid {
     grid-template-columns: 1fr;
   }
@@ -336,6 +370,12 @@
     margin: 10px;
   }
 
+  .table-container {
+    margin: 0;
+    border-radius: 8px;
+    overflow-x: scroll;
+  }
+
   .users-table {
     min-width: 800px;
   }
@@ -344,6 +384,7 @@
   .users-table td {
     padding: 10px 8px;
     font-size: 0.8rem;
+    white-space: nowrap;
   }
 
   .role-badge,
@@ -358,6 +399,29 @@
 }
 
 @media (max-width: 480px) {
+  .page-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .page-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .filters-section {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .filter-group label {
+    font-size: 0.8rem;
+  }
+
+  .filter-group select,
+  .filter-group input {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+  }
+
   .users-table {
     min-width: 700px;
   }
@@ -369,7 +433,7 @@
   }
 
   .action-buttons {
-    flex-direction: column;
+    flex-direction: row;
     gap: 4px;
   }
 

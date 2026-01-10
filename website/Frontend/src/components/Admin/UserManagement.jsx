@@ -150,6 +150,7 @@ const UserManagement = () => {
           <div className="error-message">{error}</div>
         ) : (
           <div className="table-container">
+            <div className="table-scroll-hint">👆 Swipe left/right to see all columns</div>
             <table className="users-table">
               <thead>
                 <tr>
