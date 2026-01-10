@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_BASE_URL = 'https://website-zjdn.onrender.com';
 
 // Create axios instance with default config
 const api = axios.create({
