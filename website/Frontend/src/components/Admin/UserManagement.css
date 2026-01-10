@@ -97,9 +97,20 @@
   border-bottom: 1px solid #bbf7d0;
 }
 
+/* Table wrapper for scroll */
+.table-scroll-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+}
+
 @media (max-width: 768px) {
   .table-scroll-hint {
     display: block;
+  }
+
+  .table-scroll-wrapper {
+    overflow-x: scroll;
   }
 }
 
@@ -355,9 +366,20 @@
   }
 
   .filters-section {
-    padding: 16px;
+    padding: 12px;
     margin: 0 0 16px 0;
     border-radius: 8px;
+    gap: 12px;
+  }
+
+  .filter-group {
+    min-width: 100%;
+  }
+
+  .filter-group select,
+  .filter-group input {
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .user-detail-grid {
@@ -373,11 +395,15 @@
   .table-container {
     margin: 0;
     border-radius: 8px;
-    overflow-x: scroll;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    display: block;
+    width: 100%;
   }
 
   .users-table {
     min-width: 800px;
+    display: table;
   }
 
   .users-table th,
@@ -395,6 +421,7 @@
 
   .clear-filters-btn {
     width: 100%;
+    margin-top: 4px;
   }
 }
 
@@ -408,8 +435,13 @@
   }
 
   .filters-section {
-    padding: 12px;
-    gap: 12px;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .filter-group {
+    min-width: 100%;
+    width: 100%;
   }
 
   .filter-group label {
@@ -418,12 +450,24 @@
 
   .filter-group select,
   .filter-group input {
-    padding: 8px 10px;
-    font-size: 0.85rem;
+    padding: 10px 12px;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .clear-filters-btn {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .users-table {
-    min-width: 700px;
+    min-width: 650px;
   }
 
   .users-table th,
