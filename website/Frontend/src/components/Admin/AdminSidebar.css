@@ -5,11 +5,11 @@
   height: 100vh;
   background: linear-gradient(135deg, #1A803D 0%, #2ecc71 100%);
   color: white;
-  transition: width 0.3s ease;
   z-index: 1000;
   display: flex;
   flex-direction: column;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  width: 260px;
 }
 
 .admin-sidebar.expanded {
@@ -17,7 +17,7 @@
 }
 
 .admin-sidebar.collapsed {
-  width: 70px;
+  width: 260px;
 }
 
 .admin-sidebar-header {
@@ -216,16 +216,20 @@
   }
 
   .sidebar-overlay {
+    display: none;
+  }
+
+  .sidebar-overlay.visible {
     display: block;
   }
 
   .admin-sidebar {
-    transform: translateX(-100%);
+    display: none;
     width: 260px !important;
   }
   
   .admin-sidebar.mobile-open {
-    transform: translateX(0);
+    display: flex;
   }
 
   .admin-sidebar .sidebar-toggle {

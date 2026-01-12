@@ -8,7 +8,9 @@
   margin-left: 260px;
   flex: 1;
   padding: 30px;
-  transition: margin-left 0.3s ease;
+  box-sizing: border-box;
+  width: calc(100% - 260px);
+  max-width: calc(100vw - 260px);
 }
 
 .dashboard-header {
