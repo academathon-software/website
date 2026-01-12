@@ -39,7 +39,7 @@ const TutorInvitations = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await fetch('https://website-zjdn.onrender.com/api/tutor-invitations', {
+      const response = await fetch('http://localhost:8080/api/tutor-invitations', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -65,7 +65,7 @@ const TutorInvitations = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://website-zjdn.onrender.com/api/tutor-invitations', {
+      const response = await fetch('http://localhost:8080/api/tutor-invitations', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -94,7 +94,7 @@ const TutorInvitations = () => {
   const handleResendInvitation = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://website-zjdn.onrender.com/api/tutor-invitations/${id}/resend`, {
+      const response = await fetch(`http://localhost:8080/api/tutor-invitations/${id}/resend`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -121,7 +121,7 @@ const TutorInvitations = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://website-zjdn.onrender.com/api/tutor-invitations/${id}`, {
+      const response = await fetch(`http://localhost:8080/api/tutor-invitations/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

@@ -36,7 +36,7 @@ function VerificationPage() {
     setError('');
 
     try {
-      const response = await fetch('https://website-zjdn.onrender.com/auth/verify', {
+      const response = await fetch('http://localhost:8080/auth/verify', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,7 +78,7 @@ function VerificationPage() {
     setError('');
 
     try {
-      const response = await fetch(`https://website-zjdn.onrender.com/auth/resend?email=${encodeURIComponent(email)}`, {
+      const response = await fetch(`http://localhost:8080/auth/resend?email=${encodeURIComponent(email)}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
