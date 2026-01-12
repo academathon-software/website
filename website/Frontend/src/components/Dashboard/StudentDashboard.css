@@ -4,7 +4,7 @@
   min-height: 100vh;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: #f8f9fa;
-  width: 100%;
+  width: 100vw;
   max-width: 100vw;
   overflow-x: hidden;
 }
@@ -18,20 +18,31 @@
   background-color: white;
   min-height: 100vh;
   box-sizing: border-box;
-  overflow-x: auto;
+  width: calc(100vw - 220px - 250px);
+  min-width: 0;
 }
 
 @media (min-width: 1200px) {
   .main-content {
     margin-left: 250px;
     padding: 2rem;
+    width: calc(100vw - 250px - 280px);
   }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1100px) {
   .main-content {
     margin-left: 200px;
     padding: 1.25rem;
+    width: calc(100vw - 200px - 220px);
+  }
+}
+
+@media (max-width: 1000px) {
+  .main-content {
+    margin-left: 180px;
+    padding: 1rem;
+    width: calc(100vw - 180px - 200px);
   }
 }
 
@@ -39,6 +50,7 @@
   .main-content {
     margin-left: 180px;
     padding: 1rem;
+    width: calc(100vw - 180px);
   }
 }
 
