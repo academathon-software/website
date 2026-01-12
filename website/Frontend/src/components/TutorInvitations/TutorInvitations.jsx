@@ -224,6 +224,7 @@ const TutorInvitations = () => {
           </div>
         ) : (
           <div className="invitations-table-container">
+            <div className="table-scroll-wrapper">
             <table className="invitations-table">
               <thead>
                 <tr>
@@ -274,6 +275,7 @@ const TutorInvitations = () => {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         )}
 
