@@ -82,8 +82,8 @@
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
   position: relative;
+  width: 100%;
 }
 
 /* Mobile scroll hint */
@@ -102,13 +102,16 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   width: 100%;
+  display: block;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .table-scroll-hint {
     display: block;
   }
+}
 
+@media (max-width: 768px) {
   .table-scroll-wrapper {
     overflow-x: scroll;
   }
@@ -117,6 +120,26 @@
 .users-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: auto;
+}
+
+/* Scrollbar styling for table */
+.table-scroll-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar-thumb {
+  background: #1A803D;
+  border-radius: 4px;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #166534;
 }
 
 .users-table thead {
@@ -338,14 +361,13 @@
     width: 100%;
   }
 
-  .table-container {
+  .table-scroll-wrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    max-width: 100%;
   }
 
   .users-table {
-    min-width: 900px;
+    min-width: 700px;
   }
 
   .users-table th,
@@ -395,15 +417,10 @@
   .table-container {
     margin: 0;
     border-radius: 8px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    display: block;
-    width: 100%;
   }
 
   .users-table {
-    min-width: 800px;
-    display: table;
+    min-width: 650px;
   }
 
   .users-table th,
@@ -461,13 +478,8 @@
     padding: 12px;
   }
 
-  .table-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
   .users-table {
-    min-width: 650px;
+    min-width: 600px;
   }
 
   .users-table th,

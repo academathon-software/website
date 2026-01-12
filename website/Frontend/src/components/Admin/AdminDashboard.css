@@ -252,9 +252,17 @@
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
+  .admin-dashboard {
+    width: 100%;
+    max-width: 100vw;
+  }
+
   .admin-content {
     margin-left: 0;
     padding: 70px 15px 20px 15px;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
   }
 
   .dashboard-header h1 {
@@ -304,6 +312,9 @@
 @media (max-width: 480px) {
   .admin-content {
     padding: 70px 10px 15px 10px;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
   }
 
   .quick-actions-grid {
