@@ -1,6 +1,5 @@
 /* Student Dashboard Styles - New Layout */
 .student-dashboard {
-  margin-left: 2rem;
   display: flex;
   min-height: 100vh;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -11,10 +10,40 @@
 /* Main Content */
 .main-content {
   flex: 1;
-  margin-left: 250px;
-  padding: 2rem;
+  margin-left: 220px;
+  padding: 1.5rem;
   background-color: white;
   min-height: 100vh;
+  box-sizing: border-box;
+  width: calc(100% - 220px);
+  max-width: calc(100vw - 220px);
+}
+
+@media (min-width: 1200px) {
+  .main-content {
+    margin-left: 250px;
+    padding: 2rem;
+    width: calc(100% - 250px);
+    max-width: calc(100vw - 250px);
+  }
+}
+
+@media (max-width: 1024px) {
+  .main-content {
+    margin-left: 200px;
+    padding: 1.25rem;
+    width: calc(100% - 200px);
+    max-width: calc(100vw - 200px);
+  }
+}
+
+@media (max-width: 900px) {
+  .main-content {
+    margin-left: 180px;
+    padding: 1rem;
+    width: calc(100% - 180px);
+    max-width: calc(100vw - 180px);
+  }
 }
 
 /* Welcome Section */
@@ -509,10 +538,31 @@
 
 /* Right Sidebar */
 .right-sidebar {
-  width: 280px;
+  width: 250px;
   background-color: white;
-  padding: 1.5rem;
+  padding: 1rem;
   border-left: 1px solid #e9ecef;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1200px) {
+  .right-sidebar {
+    width: 280px;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .right-sidebar {
+    width: 220px;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .right-sidebar {
+    display: none;
+  }
 }
 
 /* Calendar Section */

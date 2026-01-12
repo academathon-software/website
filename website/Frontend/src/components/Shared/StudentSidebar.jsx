@@ -55,7 +55,7 @@ const StudentSidebar = () => {
     <>
       {/* Mobile Overlay */}
       {isMobileMenuOpen && (
-        <div className="mobile-overlay" onClick={closeMobileMenu}></div>
+        <div className="mobile-overlay visible" onClick={closeMobileMenu}></div>
       )}
       
       {/* Mobile Hamburger Button */}
