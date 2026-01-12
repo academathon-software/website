@@ -3,7 +3,6 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import './AdminSidebar.css';
 
 const AdminSidebar = () => {
-  const [isExpanded, setIsExpanded] = useState(true);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -68,58 +67,45 @@ const AdminSidebar = () => {
 
       {/* Overlay for mobile */}
       {isMobileOpen && (
-        <div className="sidebar-overlay" onClick={() => setIsMobileOpen(false)} />
+        <div className="sidebar-overlay visible" onClick={() => setIsMobileOpen(false)} />
       )}
 
-      <div className={`admin-sidebar ${isExpanded ? 'expanded' : 'collapsed'} ${isMobileOpen ? 'mobile-open' : ''}`}>
+      <div className={`admin-sidebar ${isMobileOpen ? 'mobile-open' : ''}`}>
         <div className="admin-sidebar-header">
           <div className="admin-logo">
-            {isExpanded ? (
-              <>
-                <span className="admin-logo-icon">🛡️</span>
-                <span className="admin-logo-text">Admin Panel</span>
-              </>
-            ) : (
-              <span className="admin-logo-icon">🛡️</span>
-            )}
+            <span className="admin-logo-icon">🛡️</span>
+            <span className="admin-logo-text">Admin Panel</span>
           </div>
-          <button
-            className="sidebar-toggle"
-            onClick={() => setIsExpanded(!isExpanded)}
-            aria-label="Toggle sidebar"
-          >
-            {isExpanded ? '◀' : '▶'}
-          </button>
         </div>
 
-      <nav className="admin-nav">
-        <ul>
-          {menuItems.map((item) => (
-            <li key={item.path}>
-              <NavLink
-                to={item.path}
-                className={({ isActive }) =>
-                  `admin-nav-link ${isActive ? 'active' : ''}`
-                }
-              >
-                <span className="nav-icon">{item.icon}</span>
-                {isExpanded && <span className="nav-text">{item.name}</span>}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      </nav>
+        <nav className="admin-nav">
+          <ul>
+            {menuItems.map((item) => (
+              <li key={item.path}>
+                <NavLink
+                  to={item.path}
+                  className={({ isActive }) =>
+                    `admin-nav-link ${isActive ? 'active' : ''}`
+                  }
+                  onClick={() => setIsMobileOpen(false)}
+                >
+                  <span className="nav-icon">{item.icon}</span>
+                  <span className="nav-text">{item.name}</span>
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
-      <div className="admin-sidebar-footer">
-        <button className="sign-out-btn" onClick={handleSignOut}>
-          <span className="nav-icon">🚪</span>
-          {isExpanded && <span className="nav-text">Sign Out</span>}
-        </button>
+        <div className="admin-sidebar-footer">
+          <button className="sign-out-btn" onClick={handleSignOut}>
+            <span className="nav-icon">🚪</span>
+            <span className="nav-text">Sign Out</span>
+          </button>
+        </div>
       </div>
-    </div>
     </>
   );
 };
 
 export default AdminSidebar;
-

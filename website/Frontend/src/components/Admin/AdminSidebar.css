@@ -12,13 +12,6 @@
   width: 260px;
 }
 
-.admin-sidebar.expanded {
-  width: 260px;
-}
-
-.admin-sidebar.collapsed {
-  width: 260px;
-}
 
 .admin-sidebar-header {
   padding: 20px;
@@ -48,24 +41,6 @@
   white-space: nowrap;
 }
 
-.sidebar-toggle {
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  color: white;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-}
-
-.sidebar-toggle:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.1);
-}
 
 .admin-nav {
   flex: 1;
@@ -161,16 +136,6 @@
   transform: translateY(-2px);
 }
 
-.admin-sidebar.collapsed .nav-text,
-.admin-sidebar.collapsed .admin-logo-text {
-  display: none;
-}
-
-.admin-sidebar.collapsed .admin-nav-link,
-.admin-sidebar.collapsed .sign-out-btn {
-  justify-content: center;
-  padding: 15px;
-}
 
 /* Mobile hamburger button */
 .mobile-menu-toggle {
@@ -230,10 +195,6 @@
   
   .admin-sidebar.mobile-open {
     display: flex;
-  }
-
-  .admin-sidebar .sidebar-toggle {
-    display: none;
   }
 }
 
