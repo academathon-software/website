@@ -86,17 +86,6 @@
   width: 100%;
 }
 
-/* Mobile scroll hint */
-.table-scroll-hint {
-  display: none;
-  text-align: center;
-  padding: 8px;
-  background: #f0fdf4;
-  color: #166534;
-  font-size: 0.85rem;
-  border-bottom: 1px solid #bbf7d0;
-}
-
 /* Table wrapper for scroll */
 .table-scroll-wrapper {
   overflow-x: auto;
@@ -105,11 +94,6 @@
   display: block;
 }
 
-@media (max-width: 1024px) {
-  .table-scroll-hint {
-    display: block;
-  }
-}
 
 @media (max-width: 768px) {
   .table-scroll-wrapper {
