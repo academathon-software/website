@@ -5,12 +5,38 @@
 }
 
 .admin-content {
-  margin-left: 260px;
+  margin-left: 220px;
   flex: 1;
   padding: 30px;
   box-sizing: border-box;
-  width: calc(100% - 260px);
-  max-width: calc(100vw - 260px);
+  width: calc(100% - 220px);
+  max-width: calc(100vw - 220px);
+}
+
+@media (min-width: 1200px) {
+  .admin-content {
+    margin-left: 260px;
+    width: calc(100% - 260px);
+    max-width: calc(100vw - 260px);
+  }
+}
+
+@media (max-width: 1024px) {
+  .admin-content {
+    margin-left: 200px;
+    width: calc(100% - 200px);
+    max-width: calc(100vw - 200px);
+    padding: 20px;
+  }
+}
+
+@media (max-width: 900px) {
+  .admin-content {
+    margin-left: 180px;
+    width: calc(100% - 180px);
+    max-width: calc(100vw - 180px);
+    padding: 15px;
+  }
 }
 
 .dashboard-header {

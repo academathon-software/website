@@ -6,11 +6,38 @@
 
 .invitations-main-content {
   flex: 1;
-  margin-left: 260px;
-  padding: 2rem 3rem;
+  margin-left: 220px;
+  padding: 2rem;
   box-sizing: border-box;
-  width: calc(100% - 260px);
-  max-width: calc(100vw - 260px);
+  width: calc(100% - 220px);
+  max-width: calc(100vw - 220px);
+}
+
+@media (min-width: 1200px) {
+  .invitations-main-content {
+    margin-left: 260px;
+    padding: 2rem 3rem;
+    width: calc(100% - 260px);
+    max-width: calc(100vw - 260px);
+  }
+}
+
+@media (max-width: 1024px) {
+  .invitations-main-content {
+    margin-left: 200px;
+    width: calc(100% - 200px);
+    max-width: calc(100vw - 200px);
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .invitations-main-content {
+    margin-left: 180px;
+    width: calc(100% - 180px);
+    max-width: calc(100vw - 180px);
+    padding: 1rem;
+  }
 }
 
 .invitations-header {
