@@ -29,21 +29,21 @@
 
 @media screen and (max-width: 1024px) {
   .main-content {
-    margin-left: 200px;
+    margin-left: 190px;
     padding: 1.25rem;
   }
 }
 
 @media screen and (max-width: 900px) {
   .main-content {
-    margin-left: 180px;
+    margin-left: 170px;
     padding: 1rem;
   }
 }
 
 @media screen and (max-width: 800px) {
   .main-content {
-    margin-left: 170px;
+    margin-left: 155px;
     padding: 0.75rem;
   }
 }

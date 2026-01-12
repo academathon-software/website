@@ -24,21 +24,21 @@
 
 @media screen and (max-width: 1024px) {
   .sidebar {
-    width: 200px !important;
+    width: 190px !important;
     padding: 1.25rem 0;
   }
 }
 
 @media screen and (max-width: 900px) {
   .sidebar {
-    width: 180px !important;
+    width: 170px !important;
     padding: 1rem 0;
   }
 }
 
 @media screen and (max-width: 800px) {
   .sidebar {
-    width: 170px !important;
+    width: 155px !important;
     padding: 0.75rem 0;
   }
 }
@@ -131,22 +131,22 @@
 
 @media screen and (max-width: 1024px) {
   .sidebar-nav-item {
-    gap: 0.6rem;
-    padding: 0.65rem 0.85rem;
-  }
-}
-
-@media screen and (max-width: 900px) {
-  .sidebar-nav-item {
     gap: 0.5rem;
     padding: 0.6rem 0.75rem;
   }
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 900px) {
   .sidebar-nav-item {
     gap: 0.4rem;
-    padding: 0.5rem 0.6rem;
+    padding: 0.55rem 0.6rem;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .sidebar-nav-item {
+    gap: 0.35rem;
+    padding: 0.5rem 0.5rem;
   }
 }
 
@@ -163,7 +163,29 @@
 .sidebar-nav-item svg {
   font-size: 1.2rem;
   width: 20px;
+  min-width: 16px;
   transition: transform 0.2s ease;
+}
+
+@media screen and (max-width: 1024px) {
+  .sidebar-nav-item svg {
+    font-size: 1rem;
+    width: 18px;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .sidebar-nav-item svg {
+    font-size: 0.9rem;
+    width: 16px;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .sidebar-nav-item svg {
+    font-size: 0.85rem;
+    width: 14px;
+  }
 }
 
 .sidebar-nav-item:hover svg {
@@ -174,27 +196,24 @@
   font-size: 0.95rem;
   font-weight: 500;
   transition: color 0.2s ease;
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
-  flex: 1;
 }
 
 @media screen and (max-width: 1024px) {
   .sidebar-nav-item span {
-    font-size: 0.85rem;
+    font-size: 0.82rem;
   }
 }
 
 @media screen and (max-width: 900px) {
   .sidebar-nav-item span {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 }
 
 @media screen and (max-width: 800px) {
   .sidebar-nav-item span {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
   }
 }
 
