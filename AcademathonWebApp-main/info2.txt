@@ -1,0 +1,58 @@
+
+
+
+
+
+- 
+
+- eliminate the select time and select duraiton and instead do if start time is at say x, then by default the end time is at x+1h. x is ab:00 or ab:30
+
+
+- wait loop screen when paying
+
+- when student signs up, make it go to search page directly. Also make sure header is updated.
+
+- make pricing update dynamically
+
+
+- once student pays then and only then time slot is taken off (how to implement this)
+
+- once students pay, all other students with the same date booking get an email (somewhat easy)
+
+- minimal platform...
+
+------
+Changes:
+
+
+- tutor gets email when notified
+
+Student selects tutor -> Tutor gets Email of Selection -> Tutor Confirms -> Confirmation Email sent to Student -> Studeny Pays -> Payment Confirmation sent to Tutor -> Receipt Email sent to Student with meeting link
+
+- once link is submitted, student gets email too
+
+
+Student selects tutor -> Tutor gets Email of Selection -> Tutor Declines -> Student gets decline email
+
+
+
+- make email confirmation, before payment is paid
+
+
+- Added x button when adding time slots for tutor schedule
+
+- scheduler UI centered
+
+
+- added grade number to notification card
+- added date to notification card
+
+--------
+Changes to make:
+
+1. Change payment to cloud function, create with it a history record collection for TAX Purposes
+2. Change confirmation to cloud function
+3. Change booking to cloud function
+4. Change declining to cloud function
+5. Add emailing stuff with these functions, makes emailing easier
+6. Change the scheduling timing, make it blocks of 1 hour

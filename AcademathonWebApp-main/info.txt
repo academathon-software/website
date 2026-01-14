@@ -1,0 +1,92 @@
+Fix student booking.
+When confirmed, prompt student to pay.
+Payment Page
+Filter things by grade
+Google meets API?
+
+
+----------
+
+- Finish the posts UI, and link it to firebase.
+
+- The two searches
+
+- Put a calendar & subjects taught for a profile, and a UI near the calendar to show availability and booking ability.
+
+- Create a UI for a booking, (like another page)
+
+- Create a payment page
+
+- Do the edit profile UI
+
+- Do the view profile UI
+
+- Login Page
+
+- Signup Page
+
+- Booking UI
+---------------------
+2024-04-29
+
+Finished the Login Page
+
+Connected to singup page
+----------------------------
+To do:
+
+Add more things to signup page (for tutor, and students) (For students shouldn't really have a public profile...)
+
+
+Connect profile page to profile info
+Add mechanisms to change information
+
+Create a profile page for students (keep it simple for now)
+
+Create booking mechanism
+
+Create Search mechanism
+
+Create header stuff
+-----
+
+Profile
+ViewProfile
+Booking Capability
+Searchin Capability
+
+
+Booking:
+
+I want the calendar to show the full-free-dates, unavailable dates, and half-free dates, and I can press the date and show me available times when I can book.
+
+Tomorrow:
+1. Add to Calendar functionaltiy such that it shows which days are fully booked, and etc, and so that when you press on the day it shows you the available times.
+2. Create View Profile functionality and ability to book where you press on the day and then it shows you available time slots and then you book.
+3. Add Searching capability based on the day and time slot. (Maybe have a page on its own for booking)
+4. Add ability to add subjects with year level and bio description, and etc...
+5. Student Sign and Student Viewing, restrict access to Tutors for now.
+
+5. Add ability to say you have the whole day free, and etc. (Time adjustment flexibility)
+
+-----
+
+Build the search page fully, with filters.
+
+Student sign up
+Student sign in, the student should be able to sign in, and look for tutors,
+Tutor adding subjects
+Profile editing.
+
+*You have to implement the new booking system in order for this to work!
+
+------
+
+Booking should have their own collection. This way you have the history and should be easier to listen to.
+Gotta implement fuzzy search later on
+
+
+----
+
+
+

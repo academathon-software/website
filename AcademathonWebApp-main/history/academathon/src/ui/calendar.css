@@ -1,0 +1,94 @@
+
+.Sample input,
+.Sample button {
+  font: inherit;
+}
+
+.Sample header {
+  background-color: #323639;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  color: white;
+}
+
+.Sample header h1 {
+  font-size: inherit;
+  margin: 0;
+}
+
+.Sample__container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  margin: 10px 0;
+  padding: 10px;
+}
+
+.Sample__container > * > * {
+  margin: 10px;
+}
+
+.Sample__container__content {
+  display: flex;
+  max-width: 100%;
+  flex-basis: 420px;
+  flex-direction: column;
+  flex-grow: 100;
+  align-items: stretch;
+  padding-top: 1em;
+}
+
+.Sample__container__content .react-calendar {
+  margin: 0 auto;
+}
+
+.selected-tile{
+    background-color: #0f6f00 !important; /* Change to your desired color */
+    color: white !important;
+}
+
+.selected-tile:hover{
+    background-color: #1bc700 !important; /* Change to your desired color */
+    color: white !important;
+}
+
+.normal-tile{
+    background-color: red !important;
+    color: black !important;
+}
+
+.normal-month-tile{
+  background-color: white !important;
+  color: black !important;
+}
+
+.normal-month-tile:hover{
+  background-color: #1bc700 !important;
+  color: black !important;
+}
+
+
+
+
+.notfree-tile{
+  background-color: lightgreen !important;
+  color: black !important;
+}
+.notfree-tile:hover{
+  background-color: #1bc700 !important;
+  color: rgb(255, 255, 255) !important;
+}
+
+.white-tile{
+  background-color: white !important;
+  color: black !important;
+}
+.white-tile:hover{
+  background-color: #1bc700 !important;
+  color: rgb(255, 255, 255) !important;
+}
+
+.react-calendar__month-view__weekdays__weekday abbr {
+    text-decoration: none;
+}

@@ -1,0 +1,62 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import "./login.css";
+import Button from '../ui/button';
+import Layout from '../layout';
+import { useState } from 'react';
+import firebase from './firebase';
+
+function LoginPage() {
+  
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
+
+
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      await firebase.auth().signInWithEmailAndPassword(email, password);
+      // Handle successful login
+      console.log("SUCCESSFULY LOGGED IN!");
+    } catch (error) {
+      console.error(error);
+      setError(error.message);
+
+      // Handle login error
+    }
+  };
+
+  return (
+    <div className="login-container">
+      <h2>Login</h2>
+      <form onSubmit={handleLogin}>
+
+
+        <input
+          type="text"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+
+        <div className="login-button">
+          <Button text="Login"/>
+        </div>      
+      </form>
+      <div className="error">
+      {error && <p>{error}</p>}
+      </div>
+    </div>
+  );
+}
+
+export default LoginPage;

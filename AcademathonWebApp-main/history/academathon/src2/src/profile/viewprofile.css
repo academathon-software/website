@@ -1,0 +1,158 @@
+/* .profile-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+}
+
+.profile-picture {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-right: 20px;
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-info h2{
+    color:#000000;
+}
+
+.profile-name {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color:#000000;
+}
+
+.profile-bio {
+    font-size: 16px;
+    color: #000000;
+}
+
+.subject-post-div{
+    max-width: 500px;
+    max-height: 300px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+.subject-posts-list{
+    flex:1;
+    display:grid;
+    justify-content: center;
+}
+
+
+
+.booking{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+ */
+/* 
+.profile-container {
+    max-width: 800px;
+    width: 30vw;
+    height: 15vh;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.profile-picture {
+    width: 10vh;
+    height: auto;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    border: 3px solid black;
+}
+
+.profile-info {
+    text-align: center;
+}
+
+.profile-info h2 {
+    color: #000000;
+    font-size: 28px;
+}
+
+.profile-name {
+    margin-bottom: 5px;
+    color: #000000;
+}
+
+.profile-bio {
+    font-size: 18px;
+    color: #000000;
+    margin-bottom: 20px; 
+} 
+
+*/
+
+.subject-post-div {
+    max-width: 600px;
+    margin: 30px; /* Uniform vertical and horizontal margins */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.subject-posts-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%; /* Ensures alignment within the container */
+}
+
+.calendar-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 50vw; /* Ensures alignment within the container */
+    padding-bottom: 10vh;
+    padding-left: 20vw;
+    padding-right: 20vw;
+}
+
+.selection-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 30vw;
+}
+
+.booking {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    margin-top: 10vh;
+    margin-bottom: 40px;
+}
+
+.button-wrapper {
+    width: 75%; /* Ensures the wrapper takes the full width of its parent */
+    padding: 20px 0; /* Adds vertical padding above and below the button */
+    display: flex;
+    justify-content: center; /* Centers the button horizontally */
+}
+
+.ui.button { /* Existing styles for the button, assuming it uses full width */
+    padding: 5px 10px;
+    font-size: 14px;
+    width: 50%; /* Button takes the full width of its container, the wrapper */
+    text-align: center;
+    margin: 0; /* Remove margin if previously set to auto for centering */
+    display: block;
+}
