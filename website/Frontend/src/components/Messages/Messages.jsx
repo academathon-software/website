@@ -265,7 +265,7 @@ const Messages = () => {
           </div>
 
           {/* Message Thread */}
-          <div className="message-thread">
+          <div className={`message-thread ${selectedConversation ? 'active' : ''}`}>
             {!selectedConversation ? (
               <div className="no-conversation-selected">
                 <p>Select a conversation to start messaging</p>

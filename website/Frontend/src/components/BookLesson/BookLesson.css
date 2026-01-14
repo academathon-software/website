@@ -3,7 +3,7 @@
   display: flex;
   min-height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f8f9fa;
+  background-color: white;
 }
 
 .main-content {
@@ -12,6 +12,24 @@
   padding: 2rem;
   background-color: white;
   min-height: 100vh;
+}
+
+@media screen and (max-width: 1199px) {
+  .main-content {
+    margin-left: 220px;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .main-content {
+    margin-left: 200px;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .main-content {
+    margin-left: 70px;
+  }
 }
 
 .page-header {

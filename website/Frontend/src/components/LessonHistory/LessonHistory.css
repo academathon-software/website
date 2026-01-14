@@ -3,7 +3,7 @@
   display: flex;
   min-height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f8f9fa;
+  background-color: white;
 }
 
 .main-content {
@@ -12,6 +12,24 @@
   padding: 2rem;
   background-color: white;
   min-height: 100vh;
+}
+
+@media screen and (max-width: 1199px) {
+  .main-content {
+    margin-left: 220px;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .main-content {
+    margin-left: 200px;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .main-content {
+    margin-left: 70px;
+  }
 }
 
 .page-header {
@@ -108,7 +126,7 @@
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  overflow-x: auto;
   margin-bottom: 2rem;
 }
 
@@ -119,6 +137,7 @@
   padding: 1.5rem 2rem;
   border-bottom: 1px solid #e9ecef;
   transition: background-color 0.2s ease;
+  min-width: fit-content;
 }
 
 .lesson-item:last-child {
@@ -331,6 +350,53 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1100px) {
+  .lesson-info {
+    gap: 1rem;
+  }
+  
+  .lesson-datetime,
+  .lesson-name,
+  .tutor-name {
+    min-width: 120px;
+    font-size: 0.85rem;
+  }
+  
+  .lesson-item {
+    padding: 1rem 1.5rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .lesson-item {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+  
+  .lesson-info {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  
+  .lesson-datetime,
+  .lesson-name,
+  .tutor-name {
+    min-width: auto;
+    flex: 1 1 auto;
+  }
+  
+  .lesson-actions {
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  
+  .action-buttons {
+    flex-wrap: wrap;
+  }
+}
+
 @media (max-width: 768px) {
   .main-content {
     margin-left: 0;
@@ -374,6 +440,7 @@
     align-items: flex-start;
     gap: 1rem;
     padding: 1rem;
+    min-width: auto;
   }
   
   .lesson-info {

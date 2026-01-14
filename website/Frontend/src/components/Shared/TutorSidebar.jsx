@@ -125,14 +125,17 @@ const TutorSidebar = () => {
             <FontAwesomeIcon icon={faUser} />
             <span>Profile</span>
           </div>
+        </nav>
+        
+        <div className="sidebar-footer">
           <div 
-            className="sidebar-nav-item"
+            className="sidebar-nav-item signout-btn"
             onClick={handleSignOut}
           >
             <FontAwesomeIcon icon={faSignOutAlt} />
             <span>Sign Out</span>
           </div>
-        </nav>
+        </div>
       </div>
     </>
   );
