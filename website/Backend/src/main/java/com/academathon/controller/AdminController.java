@@ -34,7 +34,7 @@ public class AdminController {
     
     @Autowired
     private BookingRepository bookingRepository;
-    
+    //dsad
     @GetMapping("/statistics")
     public ResponseEntity<PlatformStatisticsDTO> getPlatformStatistics() {
         PlatformStatisticsDTO statistics = adminStatisticsService.getPlatformStatistics();
