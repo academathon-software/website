@@ -28,6 +28,19 @@
     max-width: calc(100vw - 200px);
     padding: 20px;
   }
+
+  .stat-card {
+    padding: 20px;
+    padding-top: 38px;
+  }
+
+  .stat-growth {
+    font-size: 0.8rem;
+  }
+
+  .stat-value {
+    font-size: 1.75rem;
+  }
 }
 
 @media (max-width: 900px) {
@@ -36,6 +49,30 @@
     width: calc(100% - 180px);
     max-width: calc(100vw - 180px);
     padding: 15px;
+  }
+
+  .stat-card {
+    padding: 18px;
+    padding-top: 38px;
+    gap: 10px;
+  }
+
+  .stat-icon {
+    font-size: 2rem;
+  }
+
+  .stat-growth {
+    font-size: 0.8rem;
+    padding: 3px 8px;
+  }
+
+  .stat-value {
+    font-size: 1.6rem;
+  }
+
+  .stat-breakdown {
+    gap: 10px;
+    font-size: 0.8rem;
   }
 }
 
@@ -66,13 +103,14 @@
   background: white;
   border-radius: 12px;
   padding: 24px;
+  padding-top: 40px; /* Extra padding for growth badge */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: flex-start;
   gap: 15px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
-  overflow: hidden;
+  overflow: visible; /* Allow growth badge to show */
 }
 
 .stat-card::before {
@@ -130,10 +168,15 @@
 }
 
 .stat-growth {
+  position: absolute;
+  top: 12px;
+  right: 12px;
   font-weight: 600;
-  font-size: 0.9rem;
-  padding: 4px 8px;
+  font-size: 0.85rem;
+  padding: 4px 10px;
   border-radius: 6px;
+  white-space: nowrap;
+  z-index: 1;
 }
 
 .stat-growth.positive {
@@ -355,6 +398,7 @@
 
   .stat-card {
     padding: 16px;
+    padding-top: 36px;
   }
 
   .stat-icon {
@@ -363,6 +407,13 @@
 
   .stat-value {
     font-size: 1.3rem;
+  }
+
+  .stat-growth {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    top: 10px;
+    right: 10px;
   }
 }
 
