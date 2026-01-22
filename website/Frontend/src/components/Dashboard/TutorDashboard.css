@@ -653,9 +653,9 @@
 }
 
 .calendar-weekdays div {
-  padding: 0.75rem 0.5rem;
+  padding: 0.75rem 0.1rem;
   text-align: center;
-  font-size: 0.85rem;
+  font-size: 0.85\rem;
   font-weight: 600;
   color: #666;
 }
