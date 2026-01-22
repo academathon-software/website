@@ -557,6 +557,7 @@
   border-left: 1px solid #e9ecef;
   box-sizing: border-box;
   flex-shrink: 0;
+  overflow: visible;
 }
 
 @media screen and (max-width: 1199px) {
@@ -582,17 +583,17 @@
   }
   
   .calendar-weekdays div {
-    font-size: 0.6rem;
-    padding: 0.3rem 0;
+    font-size: 0.4rem;
+    padding: 0.15rem 0;
   }
   
   .calendar-day {
-    font-size: 0.6rem;
-    padding: 0.25rem 0;
+    font-size: 0.45rem;
+    padding: 0.1rem 0;
   }
   
   .calendar-header h3 {
-    font-size: 0.75rem;
+    font-size: 0.6rem;
   }
 }
 
@@ -608,7 +609,7 @@
   width: 100%;
   box-sizing: border-box;
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .calendar-header {
@@ -656,40 +657,40 @@
   width: 100%;
   box-sizing: border-box;
   background-color: white;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .calendar-weekdays {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  display: flex;
   width: 100%;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
 }
 
 .calendar-weekdays div {
-  padding: 0.4rem 0;
+  flex: 1;
+  min-width: 0;
+  padding: 0.35rem 0;
   text-align: center;
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   font-weight: 600;
   color: #666;
   box-sizing: border-box;
 }
 
 .calendar-days {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   width: 100%;
 }
 
 .calendar-day {
-  padding: 0.35rem 0;
+  flex: 0 0 14.2857%;
+  min-width: 0;
+  padding: 0.3rem 0;
   text-align: center;
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   cursor: pointer;
   transition: background-color 0.2s;
   box-sizing: border-box;
-  border-bottom: 1px solid #f0f0f0;
 }
 
 /* Border styling handled by grid gap */
@@ -979,13 +980,15 @@
   }
   
   .calendar-weekdays div {
-    font-size: 0.65rem;
-    padding: 0.25rem 0;
+    font-size: 0.7rem;
+    padding: 0.3rem 0.2rem;
+    min-height: 25px;
   }
   
   .calendar-day {
-    font-size: 0.65rem;
-    padding: 0.25rem 0;
+    font-size: 0.7rem;
+    padding: 0.3rem 0.2rem;
+    min-height: 25px;
   }
 }
 
