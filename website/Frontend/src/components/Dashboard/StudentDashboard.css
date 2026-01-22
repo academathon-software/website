@@ -666,8 +666,8 @@
 }
 
 .calendar-weekdays div {
-  flex: 0 0 calc(100% / 7);
-  width: calc(100% / 7);
+  flex: 0 0 14.2857%;
+  min-width: 0;
   padding: 0.35rem 0;
   text-align: center;
   font-size: 0.6rem;
@@ -683,8 +683,8 @@
 }
 
 .calendar-day {
-  flex: 0 0 calc(100% / 7);
-  width: calc(100% / 7);
+  flex: 0 0 14.2857%;
+  min-width: 0;
   padding: 0.3rem 0;
   text-align: center;
   font-size: 0.6rem;
