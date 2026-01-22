@@ -660,12 +660,15 @@
   overflow: visible;
 }
 
-.calendar-weekdays {
+.right-sidebar .calendar-weekdays {
   display: flex;
   width: 100%;
+  min-width: unset;
+  background-color: transparent;
+  border-bottom: none;
 }
 
-.calendar-weekdays div {
+.right-sidebar .calendar-weekdays div {
   flex: 0 0 14.2857%;
   min-width: 0;
   padding: 0.35rem 0;
@@ -676,13 +679,14 @@
   box-sizing: border-box;
 }
 
-.calendar-days {
+.right-sidebar .calendar-days {
   display: flex;
   flex-wrap: wrap;
   width: 100%;
+  min-width: unset;
 }
 
-.calendar-day {
+.right-sidebar .calendar-day {
   flex: 0 0 14.2857%;
   min-width: 0;
   padding: 0.3rem 0;
