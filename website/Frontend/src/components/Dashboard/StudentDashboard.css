@@ -670,7 +670,7 @@
 
 .right-sidebar .calendar-weekdays div {
   flex: 0 0 14.2857%;
-  min-width: 0;
+  width: 14.2857%;
   padding: 0.35rem 0;
   text-align: center;
   font-size: 0.6rem;
@@ -688,7 +688,7 @@
 
 .right-sidebar .calendar-day {
   flex: 0 0 14.2857%;
-  min-width: 0;
+  width: 14.2857%;
   padding: 0.3rem 0;
   text-align: center;
   font-size: 0.6rem;
