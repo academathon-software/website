@@ -269,7 +269,7 @@ function SignUpPage() {
             <FontAwesomeIcon icon={faGraduationCap} />
             Academathon
           </div>
-          <h2>Join Thousands of Successful Students</h2>
+          <h2>Join Hundreds of Successful Students</h2>
           <p>Connect with expert tutors and accelerate your learning journey</p>
           <div className='features-list'>
             <div className='feature-item'>
