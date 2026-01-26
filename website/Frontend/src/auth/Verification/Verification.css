@@ -99,6 +99,18 @@
   letter-spacing: 0.5rem;
   transition: all 0.3s ease;
   box-sizing: border-box;
+  background-color: white;
+  color: #333;
+  -webkit-text-fill-color: #333;
+}
+
+/* Safari autofill fix */
+.verification-input:-webkit-autofill,
+.verification-input:-webkit-autofill:hover,
+.verification-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #333;
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 .verification-input:focus {

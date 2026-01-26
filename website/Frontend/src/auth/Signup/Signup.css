@@ -218,6 +218,17 @@
   transition: all 0.3s ease;
   background: white;
   box-sizing: border-box;
+  color: #333;
+  -webkit-text-fill-color: #333;
+}
+
+/* Safari autofill fix */
+.custom-input:-webkit-autofill,
+.custom-input:-webkit-autofill:hover,
+.custom-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #333;
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 .custom-input:focus {
@@ -390,14 +401,23 @@
 .error-general {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 1rem;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
   background: #f8d7da;
   color: #721c24;
   border: 1px solid #f5c6cb;
   border-radius: 8px;
-  margin: 1rem 0;
+  margin: 1rem auto;
   font-weight: 500;
+  overflow: visible;
+  max-width: 500px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.error-general svg {
+  flex-shrink: 0;
+  font-size: 1rem;
 }
 
 .underbutton {
@@ -428,7 +448,7 @@ select.custom-input {
 }
 
 /* Responsive Design */
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
   .signup-page {
     display: block;
   }
@@ -455,6 +475,10 @@ select.custom-input {
   
   .starttext {
     margin-top: 1rem;
+  }
+  
+  .form-step {
+    max-width: 500px;
   }
 }
 

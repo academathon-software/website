@@ -126,6 +126,17 @@
   transition: all 0.2s ease;
   box-sizing: border-box;
   background: white;
+  color: #333;
+  -webkit-text-fill-color: #333;
+}
+
+/* Safari autofill fix */
+.tutor-signup-page .form-group input:-webkit-autofill,
+.tutor-signup-page .form-group input:-webkit-autofill:hover,
+.tutor-signup-page .form-group input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #333;
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 .tutor-signup-page .form-group input:focus {
@@ -285,6 +296,18 @@
   border-radius: 8px;
   font-size: 15px;
   box-sizing: border-box;
+  background: white;
+  color: #333;
+  -webkit-text-fill-color: #333;
+}
+
+/* Safari autofill fix for search */
+.tutor-signup-page .search-box input:-webkit-autofill,
+.tutor-signup-page .search-box input:-webkit-autofill:hover,
+.tutor-signup-page .search-box input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #333;
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 .tutor-signup-page .search-box input:focus {

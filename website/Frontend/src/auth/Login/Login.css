@@ -90,6 +90,17 @@
   box-sizing: border-box;
   transition: border-color 0.3s ease;
   background-color: white;
+  color: #333;
+  -webkit-text-fill-color: #333;
+}
+
+/* Safari autofill fix */
+.login-page .login-input:-webkit-autofill,
+.login-page .login-input:-webkit-autofill:hover,
+.login-page .login-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #333;
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 .login-page .login-input:focus {
@@ -100,6 +111,36 @@
 
 .login-page .login-input::placeholder {
   color: #999;
+}
+
+.login-page .login-password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.login-page .login-password-wrapper .login-input {
+  padding-right: 45px;
+}
+
+.login-page .login-password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  color: #666;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.3s ease;
+}
+
+.login-page .login-password-toggle:hover {
+  color: #008037;
 }
 
 .login-page .login-submit-btn {

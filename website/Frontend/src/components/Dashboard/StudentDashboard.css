@@ -550,10 +550,10 @@
 
 /* Right Sidebar */
 .right-sidebar {
-  width: 300px;
-  min-width: 300px;
+  width: 260px;
+  min-width: 260px;
   background-color: white;
-  padding: 1.25rem;
+  padding: 1rem;
   border-left: 1px solid #e9ecef;
   box-sizing: border-box;
   flex-shrink: 0;
@@ -562,48 +562,38 @@
 
 @media screen and (max-width: 1199px) {
   .right-sidebar {
-    width: 270px;
-    min-width: 270px;
+    width: 230px;
+    min-width: 230px;
   }
 }
 
 @media screen and (max-width: 1024px) {
   .right-sidebar {
-    width: 240px;
-    min-width: 240px;
-    padding: 1rem;
-  }
-  
-  .right-sidebar .calendar-weekdays div {
-    font-size: 0.7rem;
-    padding: 0.4rem 0;
-  }
-  
-  .right-sidebar .calendar-day {
-    font-size: 0.75rem;
-    padding: 0.4rem 0;
+    width: 200px;
+    min-width: 200px;
+    padding: 0.75rem;
   }
 }
 
 @media screen and (max-width: 900px) {
   .right-sidebar {
-    width: 200px;
-    min-width: 200px;
-    padding: 0.75rem;
+    width: 180px;
+    min-width: 180px;
+    padding: 0.5rem;
   }
   
-  .right-sidebar .calendar-weekdays div {
-    font-size: 0.6rem;
-    padding: 0.35rem 0;
+  .calendar-weekdays div {
+    font-size: 0.4rem;
+    padding: 0.15rem 0;
   }
   
-  .right-sidebar .calendar-day {
-    font-size: 0.65rem;
-    padding: 0.35rem 0;
+  .calendar-day {
+    font-size: 0.4rem;
+    padding: 0.15rem 0;
   }
   
   .calendar-header h3 {
-    font-size: 0.8rem;
+    font-size: 0.6rem;
   }
 }
 
@@ -671,42 +661,44 @@
 }
 
 .right-sidebar .calendar-weekdays {
-  display: flex;
+  display: flex !important;
   width: 100%;
-  min-width: unset;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
+  min-width: unset !important;
+  background-color: transparent;
+  border-bottom: none;
+  gap: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 .right-sidebar .calendar-weekdays div {
-  flex: 1 1 0;
-  width: calc(100% / 7);
+  flex: 0 0 calc(100% / 7);
   max-width: calc(100% / 7);
-  padding: 0.5rem 0;
+  padding: 0.35rem 0;
   text-align: center;
-  font-size: 0.75rem;
+  font-size: 0.6rem;
   font-weight: 600;
   color: #666;
   box-sizing: border-box;
 }
 
 .right-sidebar .calendar-days {
-  display: flex;
-  flex-wrap: wrap;
+  display: flex !important;
+  flex-wrap: wrap !important;
   width: 100%;
-  min-width: unset;
+  min-width: unset !important;
+  gap: 0 !important;
 }
 
 .right-sidebar .calendar-day {
-  flex: 1 1 0;
-  width: calc(100% / 7);
+  flex: 0 0 calc(100% / 7) !important;
   max-width: calc(100% / 7);
-  padding: 0.5rem 0;
+  padding: 0.3rem 0;
   text-align: center;
-  font-size: 0.8rem;
+  font-size: 0.6rem;
   cursor: pointer;
   transition: background-color 0.2s;
   box-sizing: border-box;
+  border: none !important;
 }
 
 /* Border styling handled by grid gap */
