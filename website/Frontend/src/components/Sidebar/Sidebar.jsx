@@ -16,6 +16,7 @@ const Sidebar = () => {
         <div className='nav-bar'>
             <Link className="logo" to="/">
                 <img src={logoImg} alt="Academathon" className="logo-img" />
+                <span className="coming-soon-tag">Coming Soon</span>
             </Link>
             <nav className={showNav ? 'mobile-show' : ""}>
                 <NavLink exact="true" activeClassName="active" to="/" onClick={closeNav}>
