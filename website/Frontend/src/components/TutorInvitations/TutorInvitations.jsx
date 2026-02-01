@@ -14,6 +14,8 @@ import AdminSidebar from '../Admin/AdminSidebar';
 import { useUser } from '../../context/UserContext';
 import './TutorInvitations.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 const TutorInvitations = () => {
   const { setUserType } = useUser();
   const [invitations, setInvitations] = useState([]);
@@ -39,7 +41,7 @@ const TutorInvitations = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8080/api/tutor-invitations', {
+      const response = await fetch(`${API_BASE_URL}/api/tutor-invitations`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -65,7 +67,7 @@ const TutorInvitations = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8080/api/tutor-invitations', {
+      const response = await fetch(`${API_BASE_URL}/api/tutor-invitations`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -94,7 +96,7 @@ const TutorInvitations = () => {
   const handleResendInvitation = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8080/api/tutor-invitations/${id}/resend`, {
+      const response = await fetch(`${API_BASE_URL}/api/tutor-invitations/${id}/resend`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -121,7 +123,7 @@ const TutorInvitations = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8080/api/tutor-invitations/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/tutor-invitations/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

@@ -3,6 +3,8 @@ import "./Login.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGraduationCap, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 function LoginPage() {
   
   const [email, setEmail] = useState('');
@@ -15,7 +17,7 @@ function LoginPage() {
     setError(null);
     
     try {
-      const response = await fetch('http://localhost:8080/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

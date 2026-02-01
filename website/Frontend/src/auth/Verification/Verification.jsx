@@ -11,6 +11,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import './Verification.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 function VerificationPage() {
   const [verificationCode, setVerificationCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -36,7 +38,7 @@ function VerificationPage() {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:8080/auth/verify', {
+      const response = await fetch(`${API_BASE_URL}/auth/verify`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,7 +80,7 @@ function VerificationPage() {
     setError('');
 
     try {
-      const response = await fetch(`http://localhost:8080/auth/resend?email=${encodeURIComponent(email)}`, {
+      const response = await fetch(`${API_BASE_URL}/auth/resend?email=${encodeURIComponent(email)}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

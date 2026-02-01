@@ -18,6 +18,8 @@ import {
   faStar
 } from '@fortawesome/free-solid-svg-icons';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 // Student signup page - for tutors, use the unique invitation link
 function SignUpPage() {
   
@@ -217,7 +219,7 @@ function SignUpPage() {
     setIsLoading(true);
     
     try {
-      const response = await fetch('http://localhost:8080/auth/signup', {
+      const response = await fetch(`${API_BASE_URL}/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

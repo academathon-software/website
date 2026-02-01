@@ -9,6 +9,8 @@ import {
   faCheck
 } from '@fortawesome/free-solid-svg-icons';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 function TutorSignup() {
   const { token } = useParams();
   const navigate = useNavigate();
@@ -117,7 +119,7 @@ function TutorSignup() {
   useEffect(() => {
     const validateToken = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/api/tutor-invitations/validate/${token}`);
+        const response = await fetch(`${API_BASE_URL}/api/tutor-invitations/validate/${token}`);
         const data = await response.json();
         
         if (data.valid) {
@@ -245,7 +247,7 @@ function TutorSignup() {
     setIsLoading(true);
     
     try {
-      const response = await fetch('http://localhost:8080/auth/signup/tutor', {
+      const response = await fetch(`${API_BASE_URL}/auth/signup/tutor`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
