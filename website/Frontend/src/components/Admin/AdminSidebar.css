@@ -240,6 +240,10 @@
   .admin-sidebar.mobile-open {
     display: flex;
   }
+
+  .admin-sidebar.mobile-open .admin-sidebar-header {
+    padding-left: 80px;
+  }
 }
 
 /* Scrollbar styling */

@@ -4,6 +4,7 @@
   min-height: 100vh;
   width: 100%;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: hidden;
 }
 
 .greenblock {
@@ -485,6 +486,8 @@ select.custom-input {
 @media (max-width: 768px) {
   .signup-container {
     padding: 90px 15px 40px 15px;
+    max-width: 100%;
+    box-sizing: border-box;
   }
   
   .name-row {
@@ -505,6 +508,11 @@ select.custom-input {
   
   .step-connector {
     width: 40px;
+  }
+  
+  .form-step {
+    max-width: 100%;
+    box-sizing: border-box;
   }
 }
 

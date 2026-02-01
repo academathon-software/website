@@ -142,8 +142,8 @@
 /* Mobile Styles */
 @media screen and (max-width: 1150px) {
     .nav-bar {
-        position: initial; 
-        height: 100px; 
+        position: relative; 
+        height: 80px;
         
         .logo {
             h1 { 
@@ -161,56 +161,140 @@
         }
 
         nav {
-            display: none;
-            width: 100%; 
-            height: 100%;
-            background: #1a0408;
-            top: 0; 
-            left: 0; 
-            position: fixed; 
-            z-index: 2; 
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100vh;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 9999;
+            transform: translateY(-100%);
+            opacity: 0;
+            transition: transform 0.4s ease-in-out, opacity 0.3s ease-in-out;
             margin: 0;
 
             a { 
                 display: flex;
-                padding-left: 33%; 
-                margin: 30px;
+                align-items: center;
+                justify-content: center;
+                padding: 1rem 2rem;
+                color: #374151;
+                text-decoration: none;
+                font-size: 1rem;
+                font-weight: 500;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                transition: all 0.3s ease;
+                position: relative;
+                margin: 0.25rem 0;
             }
 
-            a:after{
-                opacity: 1;
-                position: initial;
-                width: auto;
-                padding-left: 50px;
+            a::after {
+                content: '';
+                position: absolute;
+                bottom: 5px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 0;
+                height: 2px;
+                background: #10b981;
+                transition: width 0.3s ease;
+            }
+
+            a:hover {
+                color: #10b981;
+            }
+
+            a:hover::after {
+                width: 50%;
+            }
+
+            a.active {
+                color: #10b981;
+                font-weight: 600;
+            }
+
+            a.active::after {
+                width: 50%;
             }
 
             a span {
                 opacity: 1 !important;
+                font-size: 1rem;
+                font-weight: 500;
+                letter-spacing: 1px;
             }
 
             &.mobile-show { 
-                display: block;
+                transform: translateY(0);
+                opacity: 1;
             }
         }
         
-        .hamburger-icon, 
-        .close-icon {
+        .hamburger-icon {
             display: block;
             position: absolute; 
-            top: 15px; 
-            right: 15px;
-            color: #10b981; 
+            top: 50%;
+            transform: translateY(-50%);
+            right: 1.5rem;
+            color: #10b981;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .close-icon {
+            display: block;
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            color: #10b981;
+            cursor: pointer;
+            z-index: 10000;
+            transition: all 0.3s ease;
+        }
+        
+        .hamburger-icon:hover {
+            color: #059669;
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .close-icon:hover {
+            color: #059669;
+            transform: rotate(90deg);
         }
     }
 }
 
 @media screen and (max-width: 500px) {
     .nav-bar {
+        .logo {
+            left: 1rem;
+        }
+        
         nav {
             a { 
-                padding-left: 22%; 
-                margin: 30px;
+                padding: 0.875rem 1.5rem;
             }
+            
+            a span {
+                font-size: 0.9rem;
+            }
+        }
+        
+        .hamburger-icon {
+            right: 1rem;
+        }
+        
+        .close-icon {
+            top: 20px;
+            right: 20px;
         }
     }
 }
