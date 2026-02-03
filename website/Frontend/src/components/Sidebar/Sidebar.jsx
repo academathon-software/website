@@ -11,7 +11,7 @@ const Sidebar = () => {
     const closeNav = () => {
         setShowNav(false);
     };
-
+    //Navigation bar for the website
     return (
         <div className='nav-bar'>
             <Link className="logo" to="/">
