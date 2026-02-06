@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Pricing.css';
 import Footer from '../components/Footer/Footer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -12,6 +13,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 function Pricing() {
+  const navigate = useNavigate();
 
   const pricingPlans = [
     {
@@ -154,6 +156,7 @@ function Pricing() {
                 <button 
                   className={`plan-button ${plan.popular ? 'popular' : ''}`}
                   style={{ backgroundColor: plan.color }}
+                  onClick={() => navigate('/signup')}
                 >
                   Get Started
                 </button>
