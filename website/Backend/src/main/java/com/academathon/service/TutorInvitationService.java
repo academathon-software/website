@@ -4,6 +4,7 @@ import com.academathon.model.TutorInvitation;
 import com.academathon.repository.TutorInvitationRepository;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,9 @@ public class TutorInvitationService {
 
     @Autowired
     private EmailService emailService;
+
+    @Value("${app.frontend.url:http://localhost:3000}")
+    private String frontendUrl;
 
     public TutorInvitation createInvitation(String email) throws MessagingException {
         // Check if invitation already exists for this email
@@ -86,7 +90,7 @@ public class TutorInvitationService {
     }
 
     private void sendInvitationEmail(TutorInvitation invitation) throws MessagingException {
-        String signupLink = "http://localhost:3000/signup/tutor/" + invitation.getToken();
+        String signupLink = frontendUrl + "/signup/tutor/" + invitation.getToken();
         
         String subject = "Invitation to Join Academathon as a Tutor";
         
