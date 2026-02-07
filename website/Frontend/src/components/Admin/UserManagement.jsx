@@ -57,6 +57,29 @@ const UserManagement = () => {
     }
   };
 
+  const handleDeleteUser = async (userId, username, role) => {
+    if (role === 'ADMIN') {
+      alert('Cannot delete admin users.');
+      return;
+    }
+
+    if (!window.confirm(`Are you sure you want to permanently delete "${username}"? This will remove all their data including bookings, messages, and profile. This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      await adminAPI.deleteUser(userId);
+      fetchUsers();
+      if (showDetailsModal && selectedUser?.userId === userId) {
+        setShowDetailsModal(false);
+        setSelectedUser(null);
+      }
+    } catch (err) {
+      console.error('Error deleting user:', err);
+      alert(err.response?.data?.error || 'Failed to delete user. Please try again.');
+    }
+  };
+
   const handleViewDetails = async (userId) => {
     try {
       const response = await adminAPI.getUserDetails(userId);
@@ -205,6 +228,15 @@ const UserManagement = () => {
                           >
                             {user.enabled ? '🔒' : '✅'}
                           </button>
+                          {user.role !== 'ADMIN' && (
+                            <button
+                              className="btn-delete"
+                              onClick={() => handleDeleteUser(user.userId, user.username, user.role)}
+                              title="Delete User"
+                            >
+                              🗑️
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -225,6 +257,20 @@ const UserManagement = () => {
                 <button className="modal-close" onClick={() => setShowDetailsModal(false)}>×</button>
               </div>
               <div className="modal-body">
+                <div className="user-profile-picture-section">
+                  {selectedUser.profilePictureUrl ? (
+                    <img 
+                      src={selectedUser.profilePictureUrl} 
+                      alt={`${selectedUser.username}'s profile`} 
+                      className="user-detail-avatar"
+                    />
+                  ) : (
+                    <div className="user-detail-avatar-placeholder">
+                      {selectedUser.username?.charAt(0)?.toUpperCase() || '?'}
+                    </div>
+                  )}
+                  <h3 className="user-detail-name">{selectedUser.username}</h3>
+                </div>
                 <div className="user-detail-grid">
                   <div className="detail-item">
                     <label>User ID</label>

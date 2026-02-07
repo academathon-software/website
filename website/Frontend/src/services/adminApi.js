@@ -62,6 +62,8 @@ export const adminAPI = {
   updateUserStatus: (id, enabled) => 
     api.put(`/api/admin/users/${id}/status`, { enabled }),
   
+  deleteUser: (id) => api.delete(`/api/admin/users/${id}`),
+  
   // Booking management endpoints
   getBookings: (filters = {}) => {
     const params = new URLSearchParams();

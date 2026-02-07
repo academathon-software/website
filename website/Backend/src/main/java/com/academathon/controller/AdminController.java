@@ -7,12 +7,12 @@ import com.academathon.dto.PlatformStatisticsDTO;
 import com.academathon.dto.UserStatisticsDTO;
 import com.academathon.model.Booking;
 import com.academathon.model.User;
-import com.academathon.repository.BookingRepository;
-import com.academathon.repository.UserRepository;
+import com.academathon.repository.*;
 import com.academathon.service.AdminStatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -34,6 +34,33 @@ public class AdminController {
     
     @Autowired
     private BookingRepository bookingRepository;
+    
+    @Autowired
+    private ConversationRepository conversationRepository;
+    
+    @Autowired
+    private MessageRepository messageRepository;
+    
+    @Autowired
+    private TutorProfileRepository tutorProfileRepository;
+    
+    @Autowired
+    private PasswordResetTokenRepository passwordResetTokenRepository;
+    
+    @Autowired
+    private ReviewRepository reviewRepository;
+    
+    @Autowired
+    private PaymentRepository paymentRepository;
+    
+    @Autowired
+    private AvailabilityScheduleRepository availabilityScheduleRepository;
+    
+    @Autowired
+    private AvailabilityExceptionRepository availabilityExceptionRepository;
+    
+    @Autowired
+    private CourseContentRepository courseContentRepository;
     //dsad
     @GetMapping("/statistics")
     public ResponseEntity<PlatformStatisticsDTO> getPlatformStatistics() {
@@ -118,6 +145,85 @@ public class AdminController {
         response.put("message", "User status updated successfully");
         response.put("status", enabled ? "active" : "inactive");
         
+        return ResponseEntity.ok(response);
+    }
+    
+    @DeleteMapping("/users/{id}")
+    @Transactional
+    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Long id) {
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        // Prevent deleting admin users
+        if (user.getRole() == User.Role.ADMIN) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Cannot delete admin users");
+            return ResponseEntity.badRequest().body(error);
+        }
+        
+        // Delete password reset tokens
+        passwordResetTokenRepository.deleteByUser(user);
+        
+        // Delete conversations and messages where user is involved
+        List<com.academathon.model.Conversation> conversations = conversationRepository.findByUser(user);
+        for (com.academathon.model.Conversation conversation : conversations) {
+            List<com.academathon.model.Message> messages = messageRepository.findByConversationOrderByCreatedAtAsc(conversation);
+            messageRepository.deleteAll(messages);
+            conversationRepository.delete(conversation);
+        }
+        
+        // Handle tutor-specific data
+        if (user.getRole() == User.Role.TUTOR) {
+            tutorProfileRepository.findByUser(user).ifPresent(tutorProfile -> {
+                // Delete availability schedules and exceptions
+                availabilityScheduleRepository.deleteByTutorProfile(tutorProfile);
+                availabilityExceptionRepository.deleteByTutorProfile(tutorProfile);
+                
+                // Delete course content
+                courseContentRepository.deleteAll(
+                    courseContentRepository.findAll().stream()
+                        .filter(cc -> cc.getTutorProfile().getId().equals(tutorProfile.getId()))
+                        .collect(Collectors.toList())
+                );
+                
+                // Delete bookings associated with this tutor (and their reviews/payments)
+                List<Booking> tutorBookings = bookingRepository.findByTutorId(tutorProfile.getId());
+                for (Booking booking : tutorBookings) {
+                    // Delete reviews for this booking
+                    reviewRepository.findAll().stream()
+                        .filter(r -> r.getBooking().getId().equals(booking.getId()))
+                        .forEach(reviewRepository::delete);
+                    // Delete payments for this booking
+                    paymentRepository.findByBookingId(booking.getId())
+                        .forEach(paymentRepository::delete);
+                }
+                bookingRepository.deleteAll(tutorBookings);
+                
+                // Delete tutor profile
+                tutorProfileRepository.delete(tutorProfile);
+            });
+        }
+        
+        // Handle student-specific data
+        if (user.getRole() == User.Role.STUDENT) {
+            List<Booking> studentBookings = bookingRepository.findByStudentId(user.getId());
+            for (Booking booking : studentBookings) {
+                // Delete reviews for this booking
+                reviewRepository.findAll().stream()
+                    .filter(r -> r.getBooking().getId().equals(booking.getId()))
+                    .forEach(reviewRepository::delete);
+                // Delete payments for this booking
+                paymentRepository.findByBookingId(booking.getId())
+                    .forEach(paymentRepository::delete);
+            }
+            bookingRepository.deleteAll(studentBookings);
+        }
+        
+        // Delete the user
+        userRepository.delete(user);
+        
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "User deleted successfully");
         return ResponseEntity.ok(response);
     }
     
