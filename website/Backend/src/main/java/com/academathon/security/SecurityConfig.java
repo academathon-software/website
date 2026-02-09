@@ -99,7 +99,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
-        // Allow frontend origins (localhost for dev, Vercel for production)
+        // Allow frontend origins (localhost for dev, production domain)
         cfg.setAllowedOrigins(List.of(
             "http://localhost:3000", 
             "http://localhost:5173", 
@@ -107,7 +107,9 @@ public class SecurityConfig {
             "http://127.0.0.1:3000", 
             "http://127.0.0.1:5173", 
             "http://127.0.0.1:5174",
-            // Production Vercel domains - add your actual domain(s) here
+            // Production domains
+            "https://academathon.com",
+            "https://www.academathon.com",
             "https://academathon.vercel.app",
             "https://*.vercel.app"
         ));

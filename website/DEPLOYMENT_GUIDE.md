@@ -82,11 +82,11 @@ Go to **Environment** tab and add these variables:
 
 1. Click **"Create Web Service"**
 2. Render will build and deploy your application
-3. Once deployed, note your URL: `https://academathon-backend.onrender.com`
+3. Once deployed, note your URL: `https://academathon-backend.onrender.com` (or use your custom domain `https://api.academathon.com`)
 
 ### Step 5: Update CORS (if needed)
 
-If your Vercel domain is different from `academathon.vercel.app`, update the CORS configuration in:
+If your domain is different from `academathon.com`, update the CORS configuration in:
 - `website/Backend/src/main/java/com/academathon/security/SecurityConfig.java`
 
 ---
@@ -99,7 +99,7 @@ If your Vercel domain is different from `academathon.vercel.app`, update the COR
 2. Navigate to **Settings** → **Environment Variables**
 3. Add:
    - **Key**: `VITE_API_URL`
-   - **Value**: `https://academathon-backend.onrender.com` (your Render URL)
+   - **Value**: `https://api.academathon.com` (or your Render URL `https://academathon-backend.onrender.com`)
 4. Redeploy your frontend
 
 ---
@@ -115,7 +115,7 @@ If your Vercel domain is different from `academathon.vercel.app`, update the COR
 ### Test API Endpoints
 ```bash
 # Health check
-curl https://academathon-backend.onrender.com/actuator/health
+curl https://api.academathon.com/actuator/health
 
 # Should return: {"status":"UP"}
 ```
@@ -123,7 +123,7 @@ curl https://academathon-backend.onrender.com/actuator/health
 ### Update Stripe Webhook
 
 1. Go to Stripe Dashboard → Developers → Webhooks
-2. Add endpoint: `https://academathon-backend.onrender.com/api/payments/webhook`
+2. Add endpoint: `https://api.academathon.com/api/payments/webhook`
 3. Update `STRIPE_WEBHOOK_SECRET` in Render with the new signing secret
 
 ---
@@ -151,7 +151,7 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 ### Vercel (Frontend)
 
 ```env
-VITE_API_URL=https://academathon-backend.onrender.com
+VITE_API_URL=https://api.academathon.com
 ```
 
 ---
@@ -164,7 +164,7 @@ VITE_API_URL=https://academathon-backend.onrender.com
 - Verify the database is in the same region as Render for best performance
 
 ### CORS Errors
-- Update `SecurityConfig.java` with your exact Vercel domain
+- Update `SecurityConfig.java` with your exact production domain
 - Ensure the domain doesn't have a trailing slash
 
 ### Flyway Migration Issues
@@ -197,7 +197,7 @@ VITE_API_URL=https://academathon-backend.onrender.com
 openssl rand -base64 64
 
 # Test your deployed API
-curl -X GET https://your-render-url.onrender.com/actuator/health
+curl -X GET https://api.academathon.com/actuator/health
 
 # View Render logs
 # Go to Render Dashboard → Your Service → Logs
