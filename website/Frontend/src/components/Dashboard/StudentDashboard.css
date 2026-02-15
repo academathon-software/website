@@ -835,30 +835,6 @@
     flex-direction: column;
   }
   
-  .sidebar {
-    width: 100%;
-    flex-direction: row;
-    padding: 1rem;
-    justify-content: space-between;
-  }
-  
-  .logo {
-    margin-bottom: 0;
-  }
-  
-  .sidebar-nav {
-    flex-direction: row;
-    gap: 0.5rem;
-  }
-  
-  .nav-item {
-    padding: 0.5rem;
-  }
-  
-  .nav-item span {
-    display: none;
-  }
-  
   .right-sidebar {
     width: 100%;
     border-left: none;

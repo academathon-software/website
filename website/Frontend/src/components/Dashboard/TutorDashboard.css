@@ -8,68 +8,7 @@
   margin-right: 2rem;
 }
 
-/* Left Sidebar */
-.sidebar {
-  width: 250px;
-  background-color: #28a745;
-  padding: 2rem 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.logo {
-  margin-bottom: 3rem;
-}
-
-.logo-circle {
-  width: 60px;
-  height: 60px;
-  background-color: #28a745;
-  border: 3px solid white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: bold;
-  font-size: 1.2rem;
-}
-
-.sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  width: 100%;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  color: white;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: background-color 0.2s;
-}
-
-.nav-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.nav-item.active {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.nav-item svg {
-  font-size: 1.2rem;
-}
-
-.nav-item span {
-  font-size: 1rem;
-  font-weight: 500;
-}
+/* Sidebar styles are handled by TutorSidebar.css */
 
 /* Main Content */
 .main-content {
@@ -786,30 +725,6 @@
 @media (max-width: 968px) {
   .tutor-dashboard {
     flex-direction: column;
-  }
-  
-  .sidebar {
-    width: 100%;
-    flex-direction: row;
-    padding: 1rem;
-    justify-content: space-between;
-  }
-  
-  .logo {
-    margin-bottom: 0;
-  }
-  
-  .sidebar-nav {
-    flex-direction: row;
-    gap: 0.5rem;
-  }
-  
-  .nav-item {
-    padding: 0.5rem;
-  }
-  
-  .nav-item span {
-    display: none;
   }
   
   .right-sidebar {
