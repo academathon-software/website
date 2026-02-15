@@ -700,7 +700,7 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .main-content {
+  .book-lesson-page .main-content {
     margin-left: 0;
     padding: 1rem;
     padding-top: 80px;
@@ -716,21 +716,36 @@
     width: 100%;
   }
   
-  
   .page-header h1 {
-    font-size: 2rem;
+    font-size: 1.75rem;
   }
   
   .booking-card, .booking-card-wide {
     padding: 1rem;
   }
+
+  .booking-card h3, .booking-card-wide h3 {
+    font-size: 1.15rem;
+    margin-bottom: 1.25rem;
+  }
   
   .grade-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
   }
   
   .subject-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .subject-button {
+    padding: 1rem;
+    font-size: 0.85rem;
+  }
+
+  .subject-button svg {
+    font-size: 1.5rem;
   }
   
   .course-grid {
@@ -741,59 +756,190 @@
     flex-direction: column;
     gap: 1rem;
     min-height: auto;
+    margin-bottom: 80px;
   }
   
   .tutor-list {
     flex: none;
-    max-height: 200px;
+    max-height: none;
     flex-direction: row;
     overflow-x: auto;
     overflow-y: hidden;
     padding-right: 0;
     padding-bottom: 0.5rem;
+    gap: 0.5rem;
   }
   
   .tutor-card {
-    min-width: 150px;
+    min-width: 140px;
+    padding: 0.75rem;
+  }
+
+  .tutor-card-name {
+    font-size: 0.85rem;
   }
   
   .tutor-calendar {
     width: 100%;
   }
+
+  .calendar-header {
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
+  }
   
   .calendar-grid-container {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
   
   .time-column {
-    flex: 0 0 100px;
+    flex: 0 0 70px;
+    position: sticky;
+    left: 0;
+    z-index: 2;
   }
   
   .time-header {
-    font-size: 0.85rem;
-    padding: 0.5rem;
+    font-size: 0.7rem;
+    padding: 0.4rem;
+    height: 50px;
   }
   
   .time-label {
-    font-size: 0.8rem;
-    padding: 0.5rem;
+    font-size: 0.7rem;
+    padding: 0.25rem;
     height: 40px;
     box-sizing: border-box;
+  }
+
+  .day-headers {
+    height: 50px;
+  }
+
+  .day-header {
+    height: 50px;
+    padding: 0.4rem 0.2rem;
+    min-width: 45px;
+  }
+
+  .day-name {
+    font-size: 0.65rem;
+  }
+
+  .day-number {
+    font-size: 0.9rem;
   }
   
   .time-slot-cell {
     height: 40px;
     box-sizing: border-box;
+    min-width: 45px;
+  }
+
+  .day-slots {
+    min-width: 45px;
+  }
+
+  .no-availability-message {
+    padding: 1.5rem;
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
   }
   
   .booking-confirmation-popup {
-    min-width: 300px;
-    max-width: 90%;
+    min-width: auto;
+    max-width: 92%;
     padding: 1rem;
+    bottom: 1rem !important;
   }
   
   .booking-confirmation-popup p {
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  .booking-confirmation-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .book-lesson-page .main-content {
+    padding: 0.75rem;
+    padding-top: 70px;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .grade-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .grade-button {
+    padding: 0.75rem;
     font-size: 0.9rem;
+  }
+
+  .subject-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .subject-button {
+    padding: 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .subject-button svg {
+    font-size: 1.25rem;
+  }
+
+  .time-column {
+    flex: 0 0 55px;
+  }
+
+  .time-header {
+    font-size: 0.6rem;
+    padding: 0.25rem;
+    height: 45px;
+  }
+
+  .time-label {
+    font-size: 0.6rem;
+    height: 36px;
+  }
+
+  .day-headers {
+    height: 45px;
+  }
+
+  .day-header {
+    height: 45px;
+    min-width: 40px;
+    padding: 0.3rem 0.1rem;
+  }
+
+  .day-name {
+    font-size: 0.55rem;
+  }
+
+  .day-number {
+    font-size: 0.8rem;
+  }
+
+  .time-slot-cell {
+    height: 36px;
+    min-width: 40px;
+  }
+
+  .day-slots {
+    min-width: 40px;
   }
 }
 
@@ -852,6 +998,10 @@
   justify-content: center;
   z-index: 1000;
   animation: fadeIn 0.2s ease;
+  padding: 1rem;
+  box-sizing: border-box;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 @keyframes fadeIn {
@@ -865,14 +1015,15 @@
   padding: 2rem;
   width: 90%;
   max-width: 450px;
-  max-height: 90vh;
-  overflow-y: auto;
+  max-height: none;
+  overflow-y: visible;
   position: relative;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  animation: slideUp 0.3s ease;
+  animation: modalSlideUp 0.3s ease;
+  margin: auto;
 }
 
-@keyframes slideUp {
+@keyframes modalSlideUp {
   from { 
     opacity: 0;
     transform: translateY(20px);
@@ -884,21 +1035,24 @@
 }
 
 .tutor-profile-modal .modal-close-btn {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: none;
-  border: none;
+  position: sticky;
+  top: 0;
+  float: right;
+  background: white;
+  border: 1px solid #eee;
   font-size: 1.5rem;
   color: #999;
   cursor: pointer;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   transition: all 0.2s ease;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: -18px;
 }
 
 .tutor-profile-modal .modal-close-btn:hover {
@@ -1025,4 +1179,49 @@
 .select-tutor-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+/* Tutor Profile Modal - Mobile */
+@media (max-width: 768px) {
+  .tutor-profile-modal-overlay {
+    padding: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .tutor-profile-modal {
+    width: 95%;
+    padding: 1.25rem;
+    border-radius: 12px;
+    margin: 0.5rem auto;
+  }
+
+  .tutor-profile-modal .modal-close-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 1.3rem;
+  }
+
+  .tutor-profile-avatar,
+  .tutor-profile-avatar-img {
+    width: 70px;
+    height: 70px;
+  }
+
+  .tutor-profile-avatar {
+    font-size: 1.8rem;
+  }
+
+  .tutor-profile-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .subject-tag {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.6rem;
+  }
+
+  .select-tutor-btn {
+    padding: 0.75rem 2rem;
+    font-size: 0.95rem;
+  }
 }
