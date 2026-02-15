@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './TutorSignup.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -6,10 +6,243 @@ import {
   faArrowRight, 
   faArrowLeft,
   faSearch,
-  faCheck
+  faCheck,
+  faChevronDown
 } from '@fortawesome/free-solid-svg-icons';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
+// --- Searchable Dropdown Component ---
+const SearchableDropdown = ({ label, value, onChange, options, placeholder, error, errorText }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const dropdownRef = useRef(null);
+  const inputRef = useRef(null);
+
+  const filtered = options.filter(opt =>
+    opt.toLowerCase().includes(search.toLowerCase())
+  );
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsOpen(false);
+        setSearch('');
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSelect = (option) => {
+    onChange(option);
+    setIsOpen(false);
+    setSearch('');
+  };
+
+  const handleInputFocus = () => {
+    setIsOpen(true);
+    setSearch('');
+  };
+
+  const handleInputChange = (e) => {
+    setSearch(e.target.value);
+    if (!isOpen) setIsOpen(true);
+  };
+
+  return (
+    <div className="form-group searchable-dropdown-group" ref={dropdownRef}>
+      <label>{label}</label>
+      <div className={`searchable-dropdown ${isOpen ? 'open' : ''} ${error ? 'has-error' : ''}`}>
+        <div className="searchable-dropdown-input-wrapper" onClick={() => { setIsOpen(!isOpen); if (!isOpen && inputRef.current) inputRef.current.focus(); }}>
+          <input
+            ref={inputRef}
+            type="text"
+            className={`searchable-dropdown-input ${error ? 'error' : ''}`}
+            placeholder={value || placeholder || 'Select...'}
+            value={isOpen ? search : value}
+            onChange={handleInputChange}
+            onFocus={handleInputFocus}
+          />
+          <FontAwesomeIcon icon={faChevronDown} className={`dropdown-chevron ${isOpen ? 'rotated' : ''}`} />
+        </div>
+        {isOpen && (
+          <div className="searchable-dropdown-list">
+            {filtered.length > 0 ? (
+              filtered.map((option) => (
+                <div
+                  key={option}
+                  className={`searchable-dropdown-item ${option === value ? 'selected' : ''}`}
+                  onClick={() => handleSelect(option)}
+                >
+                  {option}
+                  {option === value && <FontAwesomeIcon icon={faCheck} className="check-icon" />}
+                </div>
+              ))
+            ) : (
+              <div className="searchable-dropdown-empty">No results found</div>
+            )}
+          </div>
+        )}
+      </div>
+      {errorText && <span className="error-text">{errorText}</span>}
+    </div>
+  );
+};
+
+// --- Canadian Universities ---
+const CANADIAN_UNIVERSITIES = [
+  'Acadia University',
+  'Alberta University of the Arts',
+  'Algoma University',
+  'Ambrose University',
+  'Athabasca University',
+  'Bishop\'s University',
+  'Brandon University',
+  'Brescia University College',
+  'Brock University',
+  'Burman University',
+  'Canadian Mennonite University',
+  'Cape Breton University',
+  'Capilano University',
+  'Carleton University',
+  'Crandall University',
+  'Concordia University',
+  'Concordia University of Edmonton',
+  'Dalhousie University',
+  'Emily Carr University of Art + Design',
+  'First Nations University of Canada',
+  'HEC Montréal',
+  'Huron University College',
+  'Université Laval',
+  'King\'s University',
+  'King\'s University College',
+  'Kwantlen Polytechnic University',
+  'Lakehead University',
+  'Laurentian University',
+  'MacEwan University',
+  'McGill University',
+  'McMaster University',
+  'Memorial University of Newfoundland',
+  'Mount Allison University',
+  'Mount Royal University',
+  'Mount Saint Vincent University',
+  'Nipissing University',
+  'NSCAD University',
+  'OCAD University',
+  'Ontario Tech University',
+  'Polytechnique Montréal',
+  'Queen\'s University',
+  'Redeemer University',
+  'Royal Military College of Canada',
+  'Royal Roads University',
+  'Saint Mary\'s University',
+  'Saint Paul University',
+  'Simon Fraser University',
+  'St. Francis Xavier University',
+  'St. Thomas University',
+  'Thompson Rivers University',
+  'Toronto Metropolitan University',
+  'Trent University',
+  'Trinity Western University',
+  'Université de Moncton',
+  'Université de Montréal',
+  'Université de Sherbrooke',
+  'Université du Québec à Chicoutimi',
+  'Université du Québec à Montréal',
+  'Université du Québec à Rimouski',
+  'Université du Québec à Trois-Rivières',
+  'Université du Québec en Abitibi-Témiscamingue',
+  'Université du Québec en Outaouais',
+  'Université Sainte-Anne',
+  'University of Alberta',
+  'University of British Columbia',
+  'University of Calgary',
+  'University of Guelph',
+  'University of King\'s College',
+  'University of Lethbridge',
+  'University of Manitoba',
+  'University of New Brunswick',
+  'University of Northern British Columbia',
+  'University of Ottawa',
+  'University of Prince Edward Island',
+  'University of Regina',
+  'University of Saskatchewan',
+  'University of the Fraser Valley',
+  'University of Toronto',
+  'University of Victoria',
+  'University of Waterloo',
+  'University of Windsor',
+  'University of Winnipeg',
+  'Vancouver Island University',
+  'Western University',
+  'Wilfrid Laurier University',
+  'York University'
+].sort();
+
+// --- Programs of Study ---
+const PROGRAMS_OF_STUDY = [
+  'Accounting',
+  'Actuarial Science',
+  'Applied Mathematics',
+  'Biochemistry',
+  'Biology',
+  'Biomedical Sciences',
+  'Business Administration',
+  'Chemical Engineering',
+  'Chemistry',
+  'Civil Engineering',
+  'Commerce',
+  'Communications',
+  'Computer Engineering',
+  'Computer Science',
+  'Creative Writing',
+  'Criminology',
+  'Data Science',
+  'Economics',
+  'Education',
+  'Electrical Engineering',
+  'English',
+  'English Literature',
+  'Entrepreneurship',
+  'Environmental Science',
+  'Environmental Studies',
+  'Finance',
+  'French',
+  'French Studies',
+  'Geography',
+  'Health Sciences',
+  'History',
+  'Human Resources Management',
+  'Information Systems',
+  'Information Technology',
+  'International Business',
+  'International Relations',
+  'Journalism',
+  'Kinesiology',
+  'Law',
+  'Linguistics',
+  'Management',
+  'Marketing',
+  'Mathematics',
+  'Mechanical Engineering',
+  'Media Studies',
+  'Music',
+  'Neuroscience',
+  'Nursing',
+  'Philosophy',
+  'Physics',
+  'Political Science',
+  'Psychology',
+  'Public Administration',
+  'Social Work',
+  'Sociology',
+  'Software Engineering',
+  'Statistics',
+  'Teaching / Education',
+  'Translation Studies',
+  'Urban Planning',
+].sort();
 
 function TutorSignup() {
   const { token } = useParams();
@@ -398,39 +631,45 @@ function TutorSignup() {
               <h2>Academic Information</h2>
               <p>Tell us about your university and program</p>
               
-              <div className="form-group">
-                <label>University</label>
-                <input
-                  type="text"
-                  value={formData.university}
-                  onChange={(e) => handleInputChange('university', e.target.value)}
-                  className={errors.university ? 'error' : ''}
-                />
-                {errors.university && <span className="error-text">{errors.university}</span>}
-              </div>
+              <SearchableDropdown
+                label="University"
+                value={formData.university}
+                onChange={(val) => handleInputChange('university', val)}
+                options={CANADIAN_UNIVERSITIES}
+                placeholder="Search for your university..."
+                error={!!errors.university}
+                errorText={errors.university}
+              />
 
-              <div className="form-group">
-                <label>Program</label>
-                <input
-                  type="text"
-                  value={formData.program}
-                  onChange={(e) => handleInputChange('program', e.target.value)}
-                  className={errors.program ? 'error' : ''}
-                />
-                {errors.program && <span className="error-text">{errors.program}</span>}
-              </div>
+              <SearchableDropdown
+                label="Program"
+                value={formData.program}
+                onChange={(val) => handleInputChange('program', val)}
+                options={PROGRAMS_OF_STUDY}
+                placeholder="Search for your program..."
+                error={!!errors.program}
+                errorText={errors.program}
+              />
 
-              <div className="form-group">
-                <label>Academic Year</label>
-                <input
-                  type="text"
-                  value={formData.academicYear}
-                  onChange={(e) => handleInputChange('academicYear', e.target.value)}
-                  placeholder="e.g., Junior, Senior, Graduate"
-                  className={errors.academicYear ? 'error' : ''}
-                />
-                {errors.academicYear && <span className="error-text">{errors.academicYear}</span>}
-              </div>
+              <SearchableDropdown
+                label="Academic Year"
+                value={formData.academicYear}
+                onChange={(val) => handleInputChange('academicYear', val)}
+                options={[
+                  '1st Year',
+                  '2nd Year',
+                  '3rd Year',
+                  '4th Year',
+                  '5th Year',
+                  'Graduate (Masters)',
+                  'Graduate (PhD)',
+                  'Post-Graduate',
+                  'Alumni'
+                ]}
+                placeholder="Select your academic year..."
+                error={!!errors.academicYear}
+                errorText={errors.academicYear}
+              />
 
               <div className="form-group">
                 <label>School Email</label>
@@ -449,6 +688,20 @@ function TutorSignup() {
             <div className="form-step">
               <h2>Grade Levels</h2>
               <p>Which grade levels will you be teaching?</p>
+
+              <button
+                type="button"
+                className="select-all-btn"
+                onClick={() => {
+                  if (formData.gradeLevels.length === availableGradeLevels.length) {
+                    setFormData(prev => ({ ...prev, gradeLevels: [] }));
+                  } else {
+                    setFormData(prev => ({ ...prev, gradeLevels: [...availableGradeLevels] }));
+                  }
+                }}
+              >
+                {formData.gradeLevels.length === availableGradeLevels.length ? 'Deselect All' : 'Select All'}
+              </button>
               
               <div className="selection-grid">
                 {availableGradeLevels.map(grade => (
@@ -470,15 +723,31 @@ function TutorSignup() {
             <div className="form-step">
               <h2>Subjects</h2>
               <p>Select the subjects you'll be teaching</p>
+              <p className="hint-text">Don't worry — you can always update your subjects later from your profile.</p>
               
-              <div className="search-box">
-                <FontAwesomeIcon icon={faSearch} className="search-icon" />
-                <input
-                  type="text"
-                  placeholder="Can't find your course? Search here"
-                  value={subjectSearch}
-                  onChange={(e) => setSubjectSearch(e.target.value)}
-                />
+              <div className="search-and-actions">
+                <div className="search-box">
+                  <FontAwesomeIcon icon={faSearch} className="search-icon" />
+                  <input
+                    type="text"
+                    placeholder="Can't find your course? Search here"
+                    value={subjectSearch}
+                    onChange={(e) => setSubjectSearch(e.target.value)}
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="select-all-btn"
+                  onClick={() => {
+                    if (formData.subjects.length === uniqueSubjects.length) {
+                      setFormData(prev => ({ ...prev, subjects: [] }));
+                    } else {
+                      setFormData(prev => ({ ...prev, subjects: [...uniqueSubjects] }));
+                    }
+                  }}
+                >
+                  {formData.subjects.length === uniqueSubjects.length ? 'Deselect All' : 'Select All'}
+                </button>
               </div>
 
               <div className="selection-grid subjects-grid">
