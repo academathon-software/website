@@ -17,6 +17,7 @@ const Calendar = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedDay, setSelectedDay] = useState(null); // { date, lessons }
 
   // Fetch bookings from backend
   useEffect(() => {
@@ -271,11 +272,18 @@ const Calendar = () => {
                         !day.isCurrentMonth ? 'other-month' : ''
                       } ${
                         day.isToday ? 'today' : ''
+                      } ${
+                        day.lessons.length > 0 ? 'has-lessons' : ''
                       }`}
+                      onClick={() => {
+                        if (day.lessons.length > 0) {
+                          setSelectedDay({ date: day.fullDate, lessons: day.lessons });
+                        }
+                      }}
                     >
                       <div className="calendar-day-number">{day.date}</div>
                       {day.lessons.map(lesson => (
-                        <div key={lesson.id} className="calendar-lesson">
+                        <div key={lesson.id} className="calendar-lesson calendar-lesson-clickable">
                           <div 
                             className="calendar-lesson-dot" 
                             style={{ backgroundColor: lesson.color }}
@@ -316,7 +324,11 @@ const Calendar = () => {
                           return (
                             <div key={timeIndex} className="week-time-cell">
                               {timeLessons.map(lesson => (
-                                <div key={lesson.id} className="week-lesson">
+                                <div 
+                                  key={lesson.id} 
+                                  className="week-lesson week-lesson-clickable"
+                                  onClick={() => setSelectedDay({ date: lesson.date, lessons: [lesson] })}
+                                >
                                   <div 
                                     className="week-lesson-dot" 
                                     style={{ backgroundColor: lesson.color }}
@@ -335,6 +347,52 @@ const Calendar = () => {
             )}
           </div>
         </div>
+        )}
+
+        {/* Lesson Detail Popup */}
+        {selectedDay && (
+          <div className="lesson-popup-overlay" onClick={() => setSelectedDay(null)}>
+            <div className="lesson-popup" onClick={(e) => e.stopPropagation()}>
+              <div className="lesson-popup-header">
+                <h3>
+                  {selectedDay.date.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    month: 'long', 
+                    day: 'numeric',
+                    year: 'numeric'
+                  })}
+                </h3>
+                <button className="lesson-popup-close" onClick={() => setSelectedDay(null)}>
+                  &times;
+                </button>
+              </div>
+              <div className="lesson-popup-body">
+                {selectedDay.lessons.length > 0 ? (
+                  <div className="lesson-popup-list">
+                    {selectedDay.lessons.map(lesson => (
+                      <div 
+                        key={lesson.id} 
+                        className="lesson-popup-item"
+                        style={{ borderLeftColor: lesson.color }}
+                      >
+                        <div className="lesson-popup-item-info">
+                          <div className="lesson-popup-item-time">{lesson.time}</div>
+                          <div className="lesson-popup-item-title">{lesson.title}</div>
+                          {lesson.status && (
+                            <span className={`lesson-popup-item-status status-${lesson.status.toLowerCase()}`}>
+                              {lesson.status}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="lesson-popup-no-lessons">No lessons on this day</div>
+                )}
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>

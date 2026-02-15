@@ -280,7 +280,7 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   border-bottom: 2px solid #e0e0e0;
-  background-color: #f8f9fa;
+  background-color: white;
 }
 
 .week-day-header {
@@ -293,6 +293,7 @@
   height: 60px;
   border-right: 1px solid #e0e0e0;
   box-sizing: border-box;
+  background-color: white;
 }
 
 .week-day-header:last-child {
@@ -339,6 +340,7 @@
   gap: 0.25rem;
   overflow: hidden;
   box-sizing: border-box;
+  background-color: white;
 }
 
 .week-lesson {
@@ -368,6 +370,203 @@
   text-overflow: ellipsis;
 }
 
+/* Clickable lesson styles */
+.calendar-lesson-clickable {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 1px 3px;
+  transition: background-color 0.15s ease;
+}
+
+.calendar-lesson-clickable:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.week-lesson-clickable {
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.week-lesson-clickable:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  transform: scale(1.02);
+}
+
+/* Day cell clickable (for mobile - click entire day) */
+.calendar-day-cell.has-lessons {
+  cursor: pointer;
+}
+
+.calendar-day-cell.has-lessons:hover {
+  background-color: #f0f8f0;
+}
+
+.calendar-day-cell.today.has-lessons:hover {
+  background-color: #fff0b3;
+}
+
+/* Lesson Detail Popup */
+.lesson-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
+  animation: popupFadeIn 0.2s ease;
+}
+
+@keyframes popupFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.lesson-popup {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 400px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: popupSlideUp 0.25s ease;
+}
+
+@keyframes popupSlideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lesson-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.lesson-popup-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.lesson-popup-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #999;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.lesson-popup-close:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.lesson-popup-body {
+  padding: 1.5rem;
+}
+
+.lesson-popup-date {
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 1.25rem;
+  font-weight: 500;
+}
+
+.lesson-popup-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.lesson-popup-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  border-left: 4px solid;
+  transition: background-color 0.15s ease;
+}
+
+.lesson-popup-item:hover {
+  background-color: #f0f1f3;
+}
+
+.lesson-popup-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.lesson-popup-item-time {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 0.2rem;
+}
+
+.lesson-popup-item-title {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+  word-break: break-word;
+}
+
+.lesson-popup-item-status {
+  font-size: 0.75rem;
+  margin-top: 0.3rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  display: inline-block;
+  font-weight: 500;
+}
+
+.lesson-popup-item-status.status-confirmed,
+.lesson-popup-item-status.status-scheduled {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.lesson-popup-item-status.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.lesson-popup-item-status.status-completed {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.lesson-popup-no-lessons {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #999;
+  font-size: 0.9rem;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .calendar-page {
@@ -375,69 +574,193 @@
     padding-top: 60px; /* Space for hamburger menu */
   }
   
-  .calendar-sidebar {
-    width: 100%;
-    flex-direction: row;
-    padding: 1rem;
-  }
-  
-  .calendar-logo {
-    margin-bottom: 0;
-    margin-right: 2rem;
-  }
-  
-  .calendar-sidebar-nav {
-    flex-direction: row;
-    gap: 0.5rem;
-    padding: 0;
-  }
-  
-  .calendar-nav-item {
-    padding: 0.5rem;
-  }
-  
-  .calendar-nav-item span {
-    display: none;
-  }
-  
-  .calendar-main-content {
-    padding: 1rem;
-  }
-  
-  .calendar-widget {
-    padding: 1rem;
-  }
-  
-  .calendar-day-cell {
-    min-height: 60px;
-    padding: 0.5rem 0.25rem;
-  }
-  
-  .calendar-lesson-text {
-    font-size: 0.7rem;
-  }
-  
   .calendar-main-content {
     margin-left: 0;
     padding: 1rem;
     padding-top: 1rem;
+    overflow-x: hidden;
   }
   
+  .calendar-page-header h1 {
+    font-size: 2rem;
+  }
+
+  .calendar-page-header p {
+    font-size: 0.95rem;
+  }
+  
+  .calendar-widget-container {
+    margin-top: 1rem;
+  }
+
+  .calendar-widget {
+    padding: 1rem;
+    border-radius: 10px;
+  }
+
+  .calendar-widget-header {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .calendar-month-year {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .calendar-nav-controls {
+    gap: 0.5rem;
+  }
+
+  .calendar-view-toggle {
+    gap: 0.25rem;
+  }
+
+  .calendar-view-btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  
+  .calendar-weekday {
+    padding: 0.5rem 0.15rem;
+    font-size: 0.7rem;
+  }
+
+  .calendar-day-cell {
+    min-height: 50px;
+    padding: 0.35rem 0.15rem;
+  }
+
+  .calendar-day-number {
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .calendar-lesson-text {
+    font-size: 0.6rem;
+  }
+
+  .calendar-lesson-dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .calendar-lesson {
+    gap: 0.25rem;
+  }
+  
+  /* Week view mobile */
   .week-day-header {
-    min-width: 80px;
-    padding: 0.5rem;
+    min-width: 70px;
+    padding: 0.5rem 0.25rem;
   }
   
   .week-day-column {
-    min-width: 80px;
+    min-width: 70px;
   }
   
   .week-time-slot {
     font-size: 0.75rem;
     padding: 0 0.25rem;
+    min-width: 55px;
+  }
+
+  .week-time-column {
+    min-width: 55px;
   }
   
   .week-lesson-text {
+    font-size: 0.6rem;
+  }
+
+  .week-day-name {
     font-size: 0.65rem;
+  }
+
+  .week-day-number {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendar-main-content {
+    padding: 0.75rem;
+    padding-top: 0.75rem;
+  }
+
+  .calendar-widget {
+    padding: 0.75rem;
+  }
+
+  .calendar-widget-header {
+    gap: 0.5rem;
+  }
+
+  .calendar-month-year {
+    font-size: 1.1rem;
+    width: 100%;
+  }
+
+  .calendar-nav-controls {
+    order: 0;
+  }
+
+  .calendar-view-toggle {
+    order: 1;
+  }
+
+  .calendar-weekday {
+    padding: 0.4rem 0.1rem;
+    font-size: 0.6rem;
+  }
+
+  .calendar-day-cell {
+    min-height: 40px;
+    padding: 0.25rem 0.1rem;
+  }
+
+  .calendar-day-number {
+    font-size: 0.75rem;
+  }
+
+  .calendar-lesson-text {
+    font-size: 0.55rem;
+    display: none;
+  }
+
+  .calendar-lesson {
+    justify-content: center;
+  }
+
+  .calendar-lesson-dot {
+    width: 5px;
+    height: 5px;
+  }
+
+  .week-time-column {
+    min-width: 45px;
+  }
+
+  .week-time-slot {
+    font-size: 0.65rem;
+    min-width: 45px;
+  }
+
+  .week-day-header {
+    min-width: 55px;
+    padding: 0.35rem 0.15rem;
+  }
+
+  .week-day-column {
+    min-width: 55px;
+  }
+
+  .week-day-name {
+    font-size: 0.55rem;
+  }
+
+  .week-day-number {
+    font-size: 0.85rem;
   }
 }
