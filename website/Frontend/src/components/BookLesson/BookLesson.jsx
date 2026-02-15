@@ -889,7 +889,7 @@ const BookLesson = () => {
               const weekDates = getWeekDates();
               return (
                 <>
-                  <p>Book {selectedGrade?.name} {selectedCourse} with {currentTutor?.displayName || currentTutor?.name} on {weekDays[weekDates[selectedTimeSlot.day]?.getDay()]}, {weekDates[selectedTimeSlot.day]?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at {selectedTimeSlot.timeSlot} - {selectedTimeSlot.timeSlot.split(' ')[0] === '12' ? '1' : parseInt(selectedTimeSlot.timeSlot.split(' ')[0]) + 1} {selectedTimeSlot.timeSlot.split(' ')[1]}</p>
+                  <p>Book {selectedGrade?.name} {selectedCourse} with {currentTutor?.displayName || currentTutor?.name} on {weekDays[weekDates[selectedTimeSlot.day]?.getDay()]}, {weekDates[selectedTimeSlot.day]?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at {selectedTimeSlot.timeSlot} - {new Date(selectedTimeSlot.slotData.endTime).toLocaleTimeString('en-US', { hour: 'numeric', hour12: true })}</p>
                   <div className="booking-confirmation-buttons">
                     <button 
                       className="confirm-book-button" 

@@ -162,6 +162,7 @@
   width: 100%;
   outline: none;
   margin: 0;
+  box-sizing: border-box;
 }
 
 .form-group input:focus,
