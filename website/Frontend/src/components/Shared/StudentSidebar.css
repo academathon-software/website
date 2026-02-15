@@ -298,7 +298,7 @@
   }
   
   .sidebar {
-    display: none;
+    display: none !important;
     position: fixed;
     top: 0;
     left: 0;
@@ -312,7 +312,7 @@
   }
   
   .sidebar.mobile-open {
-    display: flex;
+    display: flex !important;
   }
   
   .sidebar-logo {

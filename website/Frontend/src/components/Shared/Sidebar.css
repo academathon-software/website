@@ -150,20 +150,21 @@
   }
   
   .sidebar {
+    display: none !important;
     position: fixed;
     top: 0;
-    left: -250px;
+    left: 0;
     width: 250px;
     height: 100vh;
     flex-direction: column;
     padding: 2rem 0;
     justify-content: flex-start;
-    transition: left 0.3s ease;
     z-index: 1000;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
   }
   
   .sidebar.mobile-open {
+    display: flex !important;
     left: 0;
   }
   
