@@ -110,6 +110,8 @@ public class SecurityConfig {
             // Production domains
             "https://academathon.com",
             "https://www.academathon.com",
+            "https://academathon.ca",
+            "https://www.academathon.ca",
             "https://academathon.vercel.app",
             "https://*.vercel.app"
         ));
