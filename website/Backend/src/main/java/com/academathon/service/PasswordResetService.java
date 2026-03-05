@@ -5,6 +5,7 @@ import com.academathon.model.User;
 import com.academathon.repository.PasswordResetTokenRepository;
 import com.academathon.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,9 @@ public class PasswordResetService {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Value("${app.frontend.url:http://localhost:5173}")
+    private String frontendUrl;
     
     private static final int TOKEN_EXPIRATION_HOURS = 24;
     
@@ -80,7 +84,7 @@ public class PasswordResetService {
     }
     
     private void sendPasswordResetEmail(User user, String token) {
-        String resetLink = "http://localhost:5173/reset-password?token=" + token;
+        String resetLink = frontendUrl + "/reset-password?token=" + token;
         String subject = "Password Reset Request - Academathon";
         String body = String.format(
             "Hello %s,\n\n" +
