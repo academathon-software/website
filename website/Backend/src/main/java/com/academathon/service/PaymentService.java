@@ -13,6 +13,7 @@ import com.stripe.param.PaymentIntentCreateParams;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.format.DateTimeFormatter;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
@@ -23,6 +24,9 @@ import java.util.Map;
 
 @Service
 public class PaymentService {
+
+    private static final DateTimeFormatter EMAIL_DATE_FORMAT = 
+        DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy 'at' h:mm a");
 
     @Value("${stripe.api.key}")
     private String stripeApiKey;
@@ -157,7 +161,7 @@ public class PaymentService {
                 booking.getTutor().getDisplayName(),
                 booking.getTutor().getDisplayName(),
                 booking.getSubject(),
-                booking.getStartTime(),
+                booking.getStartTime().format(EMAIL_DATE_FORMAT),
                 booking.getAmount()
             );
             emailService.sendEmail(studentEmail, studentSubject, studentBody);
@@ -180,7 +184,7 @@ public class PaymentService {
                 booking.getStudent().getUsername(),
                 booking.getStudent().getUsername(),
                 booking.getSubject(),
-                booking.getStartTime(),
+                booking.getStartTime().format(EMAIL_DATE_FORMAT),
                 booking.getAmount()
             );
             emailService.sendEmail(tutorEmail, tutorSubject, tutorBody);

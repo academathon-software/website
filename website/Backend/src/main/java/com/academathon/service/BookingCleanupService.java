@@ -10,10 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
 public class BookingCleanupService {
+
+    private static final DateTimeFormatter EMAIL_DATE_FORMAT = 
+        DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy 'at' h:mm a");
 
     private final BookingRepository bookingRepository;
     private final EmailService emailService;
@@ -86,7 +90,7 @@ public class BookingCleanupService {
             "Academathon Team",
             booking.getStudent().getUsername(),
             booking.getTutor().getDisplayName(),
-            booking.getStartTime()
+            booking.getStartTime().format(EMAIL_DATE_FORMAT)
         );
         
         emailService.sendEmail(studentEmail, studentSubject, studentBody);
@@ -102,7 +106,7 @@ public class BookingCleanupService {
             "Academathon Team",
             booking.getTutor().getDisplayName(),
             booking.getStudent().getUsername(),
-            booking.getStartTime()
+            booking.getStartTime().format(EMAIL_DATE_FORMAT)
         );
         
         emailService.sendEmail(tutorEmail, tutorSubject, tutorBody);
@@ -173,7 +177,7 @@ public class BookingCleanupService {
             booking.getStudent().getUsername(),
             booking.getTutor().getDisplayName(),
             booking.getSubject(),
-            booking.getStartTime()
+            booking.getStartTime().format(EMAIL_DATE_FORMAT)
         );
         
         emailService.sendEmail(studentEmail, studentSubject, studentBody);
@@ -194,7 +198,7 @@ public class BookingCleanupService {
             booking.getTutor().getDisplayName(),
             booking.getStudent().getUsername(),
             booking.getSubject(),
-            booking.getStartTime()
+            booking.getStartTime().format(EMAIL_DATE_FORMAT)
         );
         
         emailService.sendEmail(tutorEmail, tutorSubject, tutorBody);
@@ -278,8 +282,8 @@ public class BookingCleanupService {
             booking.getStudent().getUsername(),
             booking.getTutor().getDisplayName(),
             booking.getSubject(),
-            booking.getStartTime(),
-            requestedStart
+            booking.getStartTime().format(EMAIL_DATE_FORMAT),
+            requestedStart.format(EMAIL_DATE_FORMAT)
         );
         
         emailService.sendEmail(studentEmail, studentSubject, studentBody);
@@ -300,8 +304,8 @@ public class BookingCleanupService {
             booking.getTutor().getDisplayName(),
             booking.getStudent().getUsername(),
             booking.getSubject(),
-            booking.getStartTime(),
-            requestedStart
+            booking.getStartTime().format(EMAIL_DATE_FORMAT),
+            requestedStart.format(EMAIL_DATE_FORMAT)
         );
         
         emailService.sendEmail(tutorEmail, tutorSubject, tutorBody);

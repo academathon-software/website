@@ -16,11 +16,15 @@ import com.academathon.repository.UserRepository;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class BookingService {
+
+    private static final DateTimeFormatter EMAIL_DATE_FORMAT = 
+        DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy 'at' h:mm a");
     
     private final BookingRepository bookingRepository;
     private final TutorProfileRepository tutorProfileRepository;
@@ -134,7 +138,7 @@ public class BookingService {
                 tutor.getDisplayName(),
                 student.getUsername(),
                 booking.getSubject(),
-                booking.getStartTime(),
+                booking.getStartTime().format(EMAIL_DATE_FORMAT),
                 java.time.Duration.between(booking.getStartTime(), booking.getEndTime()).toMinutes()
             );
             emailService.sendEmail(tutorEmail, subject, body);
@@ -333,7 +337,7 @@ public class BookingService {
                 booking.getTutor().getDisplayName(),
                 booking.getTutor().getDisplayName(),
                 booking.getSubject(),
-                booking.getStartTime(),
+                booking.getStartTime().format(EMAIL_DATE_FORMAT),
                 java.time.Duration.between(booking.getStartTime(), booking.getEndTime()).toMinutes()
             );
             emailService.sendEmail(studentEmail, subject, body);
@@ -383,7 +387,7 @@ public class BookingService {
                 booking.getStudent().getUsername(),
                 booking.getTutor().getDisplayName(),
                 booking.getSubject(),
-                booking.getStartTime(),
+                booking.getStartTime().format(EMAIL_DATE_FORMAT),
                 reason != null ? reason : "No reason provided"
             );
             emailService.sendEmail(studentEmail, subject, body);
@@ -587,10 +591,10 @@ public class BookingService {
                     "Academathon Team",
                     booking.getTutor().getDisplayName(),
                     booking.getStudent().getUsername(),
-                    oldStartTime,
-                    oldEndTime,
-                    newStartTime,
-                    newEndTime,
+                    oldStartTime.format(EMAIL_DATE_FORMAT),
+                    oldEndTime.format(EMAIL_DATE_FORMAT),
+                    newStartTime.format(EMAIL_DATE_FORMAT),
+                    newEndTime.format(EMAIL_DATE_FORMAT),
                     booking.getSubject(),
                     Duration.between(newStartTime, newEndTime).toMinutes()
                 );
@@ -642,10 +646,10 @@ public class BookingService {
                 booking.getTutor().getDisplayName(),
                 booking.getStudent().getUsername(),
                 booking.getSubject(),
-                booking.getOriginalStartTime(),
-                booking.getOriginalEndTime(),
-                newStartTime,
-                newEndTime,
+                booking.getOriginalStartTime().format(EMAIL_DATE_FORMAT),
+                booking.getOriginalEndTime().format(EMAIL_DATE_FORMAT),
+                newStartTime.format(EMAIL_DATE_FORMAT),
+                newEndTime.format(EMAIL_DATE_FORMAT),
                 java.time.Duration.between(newStartTime, newEndTime).toMinutes()
             );
             emailService.sendEmail(tutorEmail, subject, body);
@@ -705,7 +709,7 @@ public class BookingService {
                 booking.getStudent().getUsername(),
                 booking.getTutor().getDisplayName(),
                 booking.getSubject(),
-                booking.getStartTime(),
+                booking.getStartTime().format(EMAIL_DATE_FORMAT),
                 java.time.Duration.between(booking.getStartTime(), booking.getEndTime()).toMinutes()
             );
             emailService.sendEmail(studentEmail, subject, body);
@@ -770,10 +774,10 @@ public class BookingService {
                 booking.getStudent().getUsername(),
                 booking.getTutor().getDisplayName(),
                 booking.getSubject(),
-                booking.getStartTime(),
-                booking.getEndTime(),
-                rejectedStartTime,
-                rejectedEndTime,
+                booking.getStartTime().format(EMAIL_DATE_FORMAT),
+                booking.getEndTime().format(EMAIL_DATE_FORMAT),
+                rejectedStartTime.format(EMAIL_DATE_FORMAT),
+                rejectedEndTime.format(EMAIL_DATE_FORMAT),
                 reason != null ? reason : "No reason provided"
             );
             emailService.sendEmail(studentEmail, subject, body);
