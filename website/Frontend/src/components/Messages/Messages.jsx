@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { messageAPI } from '../../services/api';
 import StudentSidebar from '../Shared/StudentSidebar';
@@ -7,6 +7,9 @@ import { useUser } from '../../context/UserContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane, faArrowLeft, faEdit, faTrash, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import './Messages.css';
+
+const POLL_MESSAGES_INTERVAL = 3000;
+const POLL_CONVERSATIONS_INTERVAL = 10000;
 
 const Messages = () => {
   const { isTutor } = useUser();
@@ -20,17 +23,60 @@ const Messages = () => {
   const [editedContent, setEditedContent] = useState('');
   const [hoveredMessageId, setHoveredMessageId] = useState(null);
   const messagesEndRef = useRef(null);
+  const selectedConversationRef = useRef(null);
+  const messagesRef = useRef([]);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
+    selectedConversationRef.current = selectedConversation;
+  }, [selectedConversation]);
+
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
+
+  const pollMessages = useCallback(async () => {
+    const conv = selectedConversationRef.current;
+    if (!conv) return;
+    try {
+      const response = await messageAPI.getConversationMessages(conv.id);
+      const newMessages = response.data;
+      const hadNewMessages = newMessages.length !== messagesRef.current.length;
+      setMessages(newMessages);
+      if (hadNewMessages) {
+        await messageAPI.markAsRead(conv.id);
+      }
+    } catch (err) {
+      // Silent fail on poll — don't disrupt UI
+    }
+  }, []);
+
+  const pollConversations = useCallback(async () => {
+    try {
+      const response = await messageAPI.getConversations();
+      setConversations(response.data);
+    } catch (err) {
+      // Silent fail on poll
+    }
+  }, []);
+
+  useEffect(() => {
     fetchConversations();
 
-    // Check if we need to open a specific conversation
     if (location.state?.otherUserId && location.state?.bookingId) {
       openConversationWithUser(location.state.otherUserId, location.state.bookingId);
     }
-  }, [location.state]);
+
+    const convInterval = setInterval(pollConversations, POLL_CONVERSATIONS_INTERVAL);
+    return () => clearInterval(convInterval);
+  }, [location.state, pollConversations]);
+
+  useEffect(() => {
+    if (!selectedConversation) return;
+    const msgInterval = setInterval(pollMessages, POLL_MESSAGES_INTERVAL);
+    return () => clearInterval(msgInterval);
+  }, [selectedConversation, pollMessages]);
 
   useEffect(() => {
     scrollToBottom();
@@ -71,8 +117,7 @@ const Messages = () => {
       const response = await messageAPI.getConversationMessages(conversationId);
       setMessages(response.data);
       await messageAPI.markAsRead(conversationId);
-      // Refresh conversations to update unread count
-      await fetchConversations();
+      await pollConversations();
     } catch (err) {
       console.error('Error loading messages:', err);
       setError('Failed to load messages');

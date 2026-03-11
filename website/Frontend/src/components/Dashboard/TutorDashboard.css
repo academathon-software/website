@@ -535,10 +535,11 @@
 
 /* Right Sidebar */
 .right-sidebar {
-  width: 300px;
+  width: 350px;
   background-color: white;
   padding: 2rem;
   border-left: 1px solid #e9ecef;
+  flex-shrink: 0;
 }
 
 /* Calendar Section */
@@ -592,9 +593,9 @@
 }
 
 .calendar-weekdays div {
-  padding: 0.75rem 0.1rem;
+  padding: 0.75rem 0.25rem;
   text-align: center;
-  font-size: 0.85\rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: #666;
 }
@@ -718,17 +719,24 @@
 /* Responsive Design */
 @media (max-width: 1200px) {
   .right-sidebar {
-    width: 250px;
+    width: 300px;
   }
 }
 
 @media (max-width: 968px) {
   .tutor-dashboard {
     flex-direction: column;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .tutor-dashboard .main-content {
+    margin-left: 200px;
   }
   
   .right-sidebar {
-    width: 100%;
+    width: auto;
+    margin-left: 200px;
     border-left: none;
     border-top: 1px solid #e9ecef;
   }
@@ -738,8 +746,23 @@
   }
 }
 
+@media (max-width: 900px) {
+  .tutor-dashboard .main-content {
+    margin-left: 70px;
+  }
+
+  .right-sidebar {
+    margin-left: 70px;
+  }
+}
+
 @media (max-width: 768px) {
-  .main-content {
+  .tutor-dashboard {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .tutor-dashboard .main-content {
     padding: 1rem;
     margin-left: 0;
     padding-top: 80px;
@@ -747,6 +770,7 @@
   
   .right-sidebar {
     padding: 1rem;
+    margin-left: 0;
   }
   
   .welcome-section {

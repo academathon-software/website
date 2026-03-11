@@ -4,8 +4,7 @@
   min-height: 100vh;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: white;
-  width: 100vw;
-  max-width: 100vw;
+  width: 100%;
   overflow-x: hidden;
 }
 
@@ -550,10 +549,10 @@
 
 /* Right Sidebar */
 .right-sidebar {
-  width: 260px;
-  min-width: 260px;
+  width: 350px;
+  min-width: 350px;
   background-color: white;
-  padding: 1rem;
+  padding: 1.5rem;
   border-left: 1px solid #e9ecef;
   box-sizing: border-box;
   flex-shrink: 0;
@@ -562,44 +561,16 @@
 
 @media screen and (max-width: 1199px) {
   .right-sidebar {
-    width: 230px;
-    min-width: 230px;
+    width: 300px;
+    min-width: 300px;
   }
 }
 
 @media screen and (max-width: 1024px) {
   .right-sidebar {
-    width: 200px;
-    min-width: 200px;
-    padding: 0.75rem;
-  }
-}
-
-@media screen and (max-width: 900px) {
-  .right-sidebar {
-    width: 180px;
-    min-width: 180px;
-    padding: 0.5rem;
-  }
-  
-  .calendar-weekdays div {
-    font-size: 0.4rem;
-    padding: 0.15rem 0;
-  }
-  
-  .calendar-day {
-    font-size: 0.4rem;
-    padding: 0.15rem 0;
-  }
-  
-  .calendar-header h3 {
-    font-size: 0.6rem;
-  }
-}
-
-@media screen and (max-width: 800px) {
-  .right-sidebar {
-    display: none;
+    width: 280px;
+    min-width: 280px;
+    padding: 1rem;
   }
 }
 
@@ -623,15 +594,9 @@
 
 .calendar-header h3 {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: #333;
-}
-
-@media (max-width: 1100px) {
-  .calendar-header h3 {
-    font-size: 0.85rem;
-  }
 }
 
 .calendar-nav {
@@ -673,9 +638,9 @@
 .right-sidebar .calendar-weekdays div {
   flex: 0 0 calc(100% / 7);
   max-width: calc(100% / 7);
-  padding: 0.35rem 0;
+  padding: 0.5rem 0;
   text-align: center;
-  font-size: 0.6rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: #666;
   box-sizing: border-box;
@@ -692,9 +657,9 @@
 .right-sidebar .calendar-day {
   flex: 0 0 calc(100% / 7) !important;
   max-width: calc(100% / 7);
-  padding: 0.3rem 0;
+  padding: 0.5rem 0;
   text-align: center;
-  font-size: 0.6rem;
+  font-size: 0.85rem;
   cursor: pointer;
   transition: background-color 0.2s;
   box-sizing: border-box;
@@ -824,19 +789,15 @@
 }
 
 /* Responsive Design */
-@media (max-width: 1200px) {
-  .right-sidebar {
-    width: 250px;
-  }
-}
-
 @media (max-width: 968px) {
   .student-dashboard {
     flex-direction: column;
   }
   
   .right-sidebar {
-    width: 100%;
+    width: auto;
+    min-width: unset;
+    margin-left: 200px;
     border-left: none;
     border-top: 1px solid #e9ecef;
   }
@@ -867,28 +828,12 @@
   }
 }
 
-@media (max-width: 768px) {
-  .main-content {
-    padding: 1rem;
-  }
-  
+@media (max-width: 900px) {
   .right-sidebar {
-    padding: 1rem;
-  }
-  
-  .welcome-section {
-    flex-direction: column;
-    text-align: center;
-    gap: 1rem;
-  }
-  
-  .calendar-section,
-  .upcoming-section {
-    margin-bottom: 2rem;
+    margin-left: 70px;
   }
 }
 
-/* Responsive Design for Fixed Sidebar */
 @media (max-width: 768px) {
   .main-content {
     margin-left: 0;
@@ -901,10 +846,24 @@
   }
   
   .right-sidebar {
-    width: 100%;
+    width: auto;
+    min-width: unset;
+    margin-left: 0;
+    padding: 1rem;
     border-left: none;
     border-top: 1px solid #e9ecef;
     margin-top: 1rem;
+  }
+  
+  .welcome-section {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .calendar-section,
+  .upcoming-section {
+    margin-bottom: 2rem;
   }
 }
 
