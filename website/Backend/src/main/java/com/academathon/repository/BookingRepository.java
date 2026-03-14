@@ -28,12 +28,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     // Find bookings by tutor and status
     List<Booking> findByTutorIdAndStatus(Long tutorId, BookingStatus status);
     
-    // Find upcoming bookings for a student
-    @Query("SELECT b FROM Booking b WHERE b.student.id = :studentId AND b.startTime >= :now ORDER BY b.startTime ASC")
+    // Find upcoming bookings for a student (includes past lessons not yet completed)
+    @Query("SELECT b FROM Booking b WHERE b.student.id = :studentId AND (b.startTime >= :now OR (b.status IN ('SCHEDULED', 'CONFIRMED') AND b.endTime < :now)) ORDER BY b.startTime ASC")
     List<Booking> findUpcomingBookingsByStudent(@Param("studentId") Long studentId, @Param("now") LocalDateTime now);
     
-    // Find upcoming bookings for a tutor
-    @Query("SELECT b FROM Booking b WHERE b.tutor.id = :tutorId AND b.startTime >= :now ORDER BY b.startTime ASC")
+    // Find upcoming bookings for a tutor (includes past lessons not yet completed)
+    @Query("SELECT b FROM Booking b WHERE b.tutor.id = :tutorId AND (b.startTime >= :now OR (b.status IN ('SCHEDULED', 'CONFIRMED') AND b.endTime < :now)) ORDER BY b.startTime ASC")
     List<Booking> findUpcomingBookingsByTutor(@Param("tutorId") Long tutorId, @Param("now") LocalDateTime now);
     
     // Find past bookings for a student
