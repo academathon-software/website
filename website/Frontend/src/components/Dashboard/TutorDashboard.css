@@ -4,8 +4,6 @@
   min-height: 100vh;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: #f8f9fa;
-  margin-left: 2rem;
-  margin-right: 2rem;
 }
 
 /* Sidebar styles are handled by TutorSidebar.css */
@@ -15,6 +13,8 @@
   flex: 1;
   padding: 2rem;
   background-color: white;
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 /* Welcome Section */
@@ -180,7 +180,9 @@
 
 /* Table-based layout for Upcoming Lessons */
 .lessons-table {
-  margin-top: 1.5rem;
+  margin-top: 1rem;
+  border-top: 1px solid #e9ecef;
+  padding-top: 0.5rem;
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -188,8 +190,8 @@
 
 .lesson-row {
   display: grid;
-  grid-template-columns: 1.5fr 1.5fr 1.5fr 1.5fr 2.5fr;
-  gap: 1rem;
+  grid-template-columns: 1.5fr 1.5fr 1.2fr 1.2fr auto;
+  gap: 0.75rem;
   align-items: center;
   padding: 1rem 0.5rem;
   border-bottom: 1px solid #e9ecef;
@@ -533,6 +535,12 @@
   color: #e9ecef;
 }
 
+.no-rating-text {
+  font-size: 0.8rem;
+  color: #999;
+  font-style: italic;
+}
+
 /* Right Sidebar */
 .right-sidebar {
   width: 350px;
@@ -540,11 +548,17 @@
   padding: 2rem;
   border-left: 1px solid #e9ecef;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
 }
 
 /* Calendar Section */
 .calendar-section {
   margin-bottom: 3rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .calendar-header {
@@ -658,17 +672,27 @@
 }
 
 /* Upcoming Section */
+.upcoming-section {
+  width: 100%;
+}
+
+.upcoming-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1.25rem;
+}
+
 .upcoming-section h3 {
-  margin: 0 0 0.5rem 0;
+  margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
   color: #333;
 }
 
-.upcoming-date {
-  font-size: 0.9rem;
-  color: #666;
-  margin-bottom: 1.5rem;
+.upcoming-header-date {
+  font-size: 0.8rem;
+  color: #999;
 }
 
 .upcoming-list {
@@ -686,34 +710,55 @@
   border-radius: 6px;
 }
 
+.upcoming-time-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  flex-shrink: 0;
+}
+
 .upcoming-time {
   font-size: 0.85rem;
-  color: #666;
-  min-width: 60px;
+  color: #333;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .upcoming-date {
-  font-size: 0.85rem;
-  color: #666;
-  min-width: 100px;
+  font-size: 0.75rem;
+  color: #999;
+  white-space: nowrap;
 }
 
 .upcoming-separator {
-  width: 2px;
-  height: 30px;
+  width: 3px;
+  min-height: 40px;
+  border-radius: 2px;
   background-color: #dc3545;
-  margin: 0 0.5rem;
+  flex-shrink: 0;
+}
+
+.upcoming-info-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1;
 }
 
 .upcoming-student {
   font-weight: 600;
   color: #333;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .upcoming-subject {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #666;
+  word-break: break-word;
 }
 
 /* Responsive Design */
@@ -726,8 +771,6 @@
 @media (max-width: 968px) {
   .tutor-dashboard {
     flex-direction: column;
-    margin-left: 0;
-    margin-right: 0;
   }
 
   .tutor-dashboard .main-content {
@@ -757,11 +800,6 @@
 }
 
 @media (max-width: 768px) {
-  .tutor-dashboard {
-    margin-left: 0;
-    margin-right: 0;
-  }
-
   .tutor-dashboard .main-content {
     padding: 1rem;
     margin-left: 0;
@@ -782,6 +820,39 @@
   .calendar-section,
   .upcoming-section {
     margin-bottom: 2rem;
+  }
+
+  .lesson-header-row {
+    display: none;
+  }
+
+  .lesson-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem 0.75rem;
+  }
+
+  .lesson-datetime {
+    grid-column: 1 / -1;
+  }
+
+  .lesson-name {
+    grid-column: 1 / -1;
+    font-size: 0.95rem;
+  }
+
+  .tutor-name {
+    grid-column: 1;
+  }
+
+  .status-indicator {
+    grid-column: 2;
+    justify-self: end;
+  }
+
+  .lesson-actions {
+    grid-column: 1 / -1;
+    min-width: unset;
+    justify-content: flex-start;
   }
 }
 

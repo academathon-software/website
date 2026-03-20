@@ -502,3 +502,255 @@
     font-size: 0.8rem;
   }
 }
+
+/* Feedback Submitted Badge */
+.feedback-submitted-badge {
+  display: inline-block;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.3rem 0.75rem;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+/* View Feedback Button */
+.view-feedback-button {
+  display: inline-block;
+  background-color: #e3f2fd;
+  color: #1565c0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.3rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid #90caf9;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.view-feedback-button:hover {
+  background-color: #bbdefb;
+  border-color: #64b5f6;
+}
+
+/* View Feedback Modal Content */
+.view-feedback-comment {
+  margin-bottom: 1.25rem;
+}
+
+.view-feedback-comment label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+
+.view-feedback-comment p {
+  margin: 0;
+  padding: 0.75rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #333;
+  line-height: 1.5;
+  border: 1px solid #e9ecef;
+}
+
+.view-feedback-date {
+  font-size: 0.8rem;
+  color: #999;
+  margin-bottom: 1.25rem;
+}
+
+/* Feedback Modal */
+.feedback-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.feedback-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.feedback-modal h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.4rem;
+  color: #333;
+}
+
+.feedback-modal-subtitle {
+  margin: 0 0 1.5rem 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.feedback-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  color: #999;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.feedback-modal-close:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.feedback-modal-rating {
+  margin-bottom: 1.25rem;
+}
+
+.feedback-modal-rating label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+
+.feedback-stars {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.feedback-star {
+  font-size: 1.6rem;
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.feedback-star.filled {
+  color: #f5a623;
+}
+
+.feedback-star.empty {
+  color: #ddd;
+}
+
+.feedback-star:hover {
+  transform: scale(1.15);
+}
+
+.feedback-modal-comment {
+  margin-bottom: 1.5rem;
+}
+
+.feedback-modal-comment label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+
+.feedback-modal-comment textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.feedback-modal-comment textarea:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.feedback-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.feedback-cancel-btn {
+  padding: 0.65rem 1.25rem;
+  background-color: #f5f5f5;
+  color: #666;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.feedback-cancel-btn:hover {
+  background-color: #e9ecef;
+}
+
+.feedback-submit-btn {
+  padding: 0.65rem 1.5rem;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.feedback-submit-btn:hover:not(:disabled) {
+  background-color: #43a047;
+}
+
+.feedback-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .feedback-modal {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+
+  .feedback-modal-actions {
+    flex-direction: column;
+  }
+
+  .feedback-cancel-btn,
+  .feedback-submit-btn {
+    width: 100%;
+    text-align: center;
+  }
+}

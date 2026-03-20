@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './TutorDashboard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
-  faStar,
   faChevronLeft,
   faChevronRight,
-  faGraduationCap,
   faCheck,
   faUser
 } from '@fortawesome/free-solid-svg-icons';
@@ -13,7 +11,7 @@ import TutorSidebar from '../Shared/TutorSidebar';
 import BookingStatusBadge from '../Shared/BookingStatusBadge';
 import BookingActionModal from '../Shared/BookingActionModal';
 import { useUser } from '../../context/UserContext';
-import { bookingAPI, userAPI, tutorAPI } from '../../services/api';
+import { bookingAPI, userAPI, tutorAPI, reviewAPI } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 
 const TutorDashboard = () => {
@@ -104,12 +102,21 @@ const TutorDashboard = () => {
         return sum + (end - start) / (1000 * 60 * 60);
       }, 0);
 
+      let avgRating = 0;
+      try {
+        const ratingRes = await reviewAPI.getTutorRating(userResponse.data.id);
+        avgRating = ratingRes.data.averageRating || 0;
+      } catch {
+        avgRating = 0;
+      }
+
       setStats({
         totalStudents: uniqueStudents.size,
         totalLessons: completedLessons.length,
         totalHours: Math.round(totalHours * 10) / 10,
-        avgRating: 4.8 // TODO: Calculate from reviews when implemented
+        avgRating: Math.round(avgRating * 10) / 10
       });
+
 
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
@@ -145,17 +152,6 @@ const TutorDashboard = () => {
     });
   };
 
-  // Get lesson history from past bookings
-  const history = pastBookings
-    .filter(b => b.status === 'COMPLETED')
-    .slice(0, 4)
-    .map(booking => ({
-      id: booking.id,
-      grade: 'Tutoring',
-      subject: booking.studentName,
-      date: formatDate(booking.startTime),
-      rating: 4 // TODO: Get from reviews when implemented
-    }));
 
   const handleConfirmBooking = async (bookingId, reason) => {
     try {
@@ -431,7 +427,7 @@ const TutorDashboard = () => {
               <span>👥 {stats.totalStudents} Students</span>
               <span>📚 {stats.totalLessons} Lessons</span>
               <span>⏱️ {stats.totalHours}hrs</span>
-              <span>⭐ {stats.avgRating}/5.0</span>
+              <span>⭐ {stats.avgRating > 0 ? `${stats.avgRating}/5.0` : 'No ratings yet'}</span>
             </div>
           </div>
         </div>
@@ -553,13 +549,6 @@ const TutorDashboard = () => {
               </div>
             ) : (
               <>
-                <div className="lesson-row lesson-header-row">
-                  <div className="lesson-header-cell">Date/Time</div>
-                  <div className="lesson-header-cell">Lesson Name</div>
-                  <div className="lesson-header-cell">Student Name</div>
-                  <div className="lesson-header-cell"></div>
-                  <div className="lesson-header-cell"></div>
-                </div>
                 {upcomingBookings
                   .filter(b => b.status === 'SCHEDULED' || b.status === 'CONFIRMED')
                   .map(booking => {
@@ -619,47 +608,6 @@ const TutorDashboard = () => {
           </div>
         </div>
 
-        {/* History Section */}
-        <div className="history-section">
-          <h3>History</h3>
-          <button 
-            className="view-full-link"
-            onClick={() => navigate('/lesson-history')}
-            style={{ cursor: 'pointer', background: 'none', border: 'none', color: '#4CAF50' }}
-          >
-            View Full History
-          </button>
-          
-          <div className="history-list">
-            {history.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-                <p>No completed lessons yet.</p>
-              </div>
-            ) : (
-              history.map(item => (
-                <div key={item.id} className="history-item">
-                  <div className="history-icon">
-                    <FontAwesomeIcon icon={faGraduationCap} />
-                  </div>
-                  <div className="history-info">
-                    <div className="history-grade">{item.grade}</div>
-                    <div className="history-subject">{item.subject}</div>
-                    <div className="history-date">{item.date}</div>
-                  </div>
-                  <div className="history-rating">
-                    {[...Array(5)].map((_, i) => (
-                      <FontAwesomeIcon 
-                        key={i} 
-                        icon={faStar} 
-                        className={i < item.rating ? 'filled' : 'empty'} 
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
       </div>
 
       {/* Right Sidebar */}
@@ -712,9 +660,11 @@ const TutorDashboard = () => {
 
         {/* Upcoming Section */}
         <div className="upcoming-section">
-          <h3>Upcoming</h3>
-          <div className="upcoming-date">
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'short' })}
+          <div className="upcoming-header">
+            <h3>Upcoming</h3>
+            <span className="upcoming-header-date">
+              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+            </span>
           </div>
           
           <div className="upcoming-list">
@@ -725,11 +675,15 @@ const TutorDashboard = () => {
             ) : (
               upcomingSessions.map(session => (
                 <div key={session.id} className="upcoming-item">
-                  <div className="upcoming-time">{session.time}</div>
-                  <div className="upcoming-date">{session.date}</div>
+                  <div className="upcoming-time-block">
+                    <div className="upcoming-time">{session.time}</div>
+                    <div className="upcoming-date">{session.date}</div>
+                  </div>
                   <div className="upcoming-separator"></div>
-                  <div className="upcoming-student">{session.student}</div>
-                  <div className="upcoming-subject">{session.subject}</div>
+                  <div className="upcoming-info-block">
+                    <div className="upcoming-student">{session.student}</div>
+                    <div className="upcoming-subject">{session.subject}</div>
+                  </div>
                 </div>
               ))
             )}

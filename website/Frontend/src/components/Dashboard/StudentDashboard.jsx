@@ -667,13 +667,6 @@ const StudentDashboard = () => {
               </div>
             ) : (
               <>
-                <div className="lesson-row lesson-header-row">
-                  <div className="lesson-header-cell">Date/Time</div>
-                  <div className="lesson-header-cell">Lesson Name</div>
-                  <div className="lesson-header-cell">Tutor Name</div>
-                  <div className="lesson-header-cell"></div>
-                  <div className="lesson-header-cell"></div>
-                </div>
                 {upcomingLessons.map(booking => (
                   <div key={booking.id} className="lesson-row">
                     <div className="lesson-datetime">

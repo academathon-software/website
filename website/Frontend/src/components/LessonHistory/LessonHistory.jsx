@@ -7,12 +7,13 @@ import {
   faChevronLeft,
   faChevronRight,
   faAngleDoubleLeft,
-  faAngleDoubleRight
+  faAngleDoubleRight,
+  faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import StudentSidebar from '../Shared/StudentSidebar';
 import TutorSidebar from '../Shared/TutorSidebar';
 import { useUser } from '../../context/UserContext';
-import { bookingAPI } from '../../services/api';
+import { bookingAPI, reviewAPI } from '../../services/api';
 
 const LessonHistory = () => {
   const { isTutor } = useUser();
@@ -22,17 +23,28 @@ const LessonHistory = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cancellingBooking, setCancellingBooking] = useState(null);
-  const [timeFilter, setTimeFilter] = useState('30days'); // Default to 30 days
-  const [statusFilter, setStatusFilter] = useState('all'); // Default to all statuses
-  
-  // Fetch bookings when component mounts
-  useEffect(() => {
-    fetchBookings();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
+  const [timeFilter, setTimeFilter] = useState('30days');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [hoveredRating, setHoveredRating] = useState(null);
   const [ratings, setRatings] = useState({});
+  const [reviewedBookings, setReviewedBookings] = useState({});
+
+  // Feedback modal state
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackBooking, setFeedbackBooking] = useState(null);
+  const [feedbackComment, setFeedbackComment] = useState('');
+  const [feedbackRating, setFeedbackRating] = useState(0);
+  const [feedbackHoveredStar, setFeedbackHoveredStar] = useState(null);
+  const [submittingFeedback, setSubmittingFeedback] = useState(false);
+
+  // View received feedback state
+  const [receivedFeedback, setReceivedFeedback] = useState({});
+  const [showViewFeedbackModal, setShowViewFeedbackModal] = useState(false);
+  const [viewingFeedback, setViewingFeedback] = useState(null);
+  
+  useEffect(() => {
+    fetchBookings();
+  }, []);
 
   const fetchBookings = async () => {
     try {
@@ -40,6 +52,28 @@ const LessonHistory = () => {
       setError(null);
       const response = await bookingAPI.getUserBookings();
       setBookings(response.data);
+
+      const completedBookings = response.data.filter(b => b.status === 'COMPLETED');
+      const statuses = {};
+      const feedback = {};
+      await Promise.all(
+        completedBookings.map(async (b) => {
+          try {
+            const [statusRes, feedbackRes] = await Promise.all([
+              reviewAPI.getReviewStatus(b.id),
+              reviewAPI.getReceivedFeedback(b.id)
+            ]);
+            statuses[b.id] = statusRes.data.hasReviewed;
+            if (feedbackRes.data.hasFeedback) {
+              feedback[b.id] = feedbackRes.data;
+            }
+          } catch {
+            statuses[b.id] = false;
+          }
+        })
+      );
+      setReviewedBookings(statuses);
+      setReceivedFeedback(feedback);
     } catch (err) {
       console.error('Error fetching bookings:', err);
       if (err.response?.status === 401 || err.response?.status === 403 || !localStorage.getItem('token')) {
@@ -55,12 +89,8 @@ const LessonHistory = () => {
   const filterBookings = (bookings) => {
     const now = new Date();
     const timeRanges = {
-      '7days': 7,
-      '2weeks': 14,
-      '30days': 30,
-      '3months': 90,
-      'year+': 365,
-      'all': Infinity
+      '7days': 7, '2weeks': 14, '30days': 30,
+      '3months': 90, 'year+': 365, 'all': Infinity
     };
 
     const daysToFilter = timeRanges[timeFilter];
@@ -69,16 +99,11 @@ const LessonHistory = () => {
       filterDate.setDate(filterDate.getDate() - daysToFilter);
     }
 
-    // Filter bookings by time range, status, and sort by date (newest first)
     return bookings
       .filter(booking => {
-        // Time filter
         const bookingDate = new Date(booking.startTime);
         const passesTimeFilter = daysToFilter === Infinity || bookingDate >= filterDate;
-        
-        // Status filter
         const passesStatusFilter = statusFilter === 'all' || booking.status === statusFilter;
-        
         return passesTimeFilter && passesStatusFilter;
       })
       .sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
@@ -91,37 +116,68 @@ const LessonHistory = () => {
   const currentBookings = filteredBookings.slice(startIndex, startIndex + lessonsPerPage);
 
   const handleRatingClick = (lessonId, rating) => {
-    setRatings(prev => ({
-      ...prev,
-      [lessonId]: rating
-    }));
+    setRatings(prev => ({ ...prev, [lessonId]: rating }));
   };
 
-  const handleLeaveFeedback = (lessonId) => {
-    // Handle feedback functionality
-    console.log(`Leave feedback for lesson ${lessonId}`);
+  const handleLeaveFeedback = (booking) => {
+    setFeedbackBooking(booking);
+    setFeedbackComment('');
+    setFeedbackRating(isTutor ? 0 : (ratings[booking.id] || 0));
+    setFeedbackHoveredStar(null);
+    setShowFeedbackModal(true);
   };
 
-  const handleMessageTutor = (booking) => {
-    // Navigate to messages page with the other user's info
-    const otherUserId = isTutor ? booking.studentUserId : booking.tutorUserId;
-    navigate('/messages', {
-      state: {
-        otherUserId: otherUserId,
-        bookingId: booking.id
-      }
-    });
-  };
+  const handleSubmitFeedback = async () => {
+    if (!feedbackBooking) return;
 
-  const handleCancelBooking = async (bookingId) => {
-    if (!window.confirm('Are you sure you want to cancel this booking?')) {
+    if (!isTutor && feedbackRating === 0) {
+      alert('Please select a star rating');
+      return;
+    }
+
+    if (!feedbackComment.trim()) {
+      alert('Please write some feedback');
       return;
     }
 
     try {
+      setSubmittingFeedback(true);
+      await reviewAPI.leaveReview(
+        feedbackBooking.id,
+        isTutor ? null : feedbackRating,
+        feedbackComment.trim()
+      );
+      setReviewedBookings(prev => ({ ...prev, [feedbackBooking.id]: true }));
+      setShowFeedbackModal(false);
+      setFeedbackBooking(null);
+      alert('Feedback submitted successfully!');
+    } catch (err) {
+      console.error('Error submitting feedback:', err);
+      alert(err.response?.data?.error || 'Failed to submit feedback');
+    } finally {
+      setSubmittingFeedback(false);
+    }
+  };
+
+  const handleViewFeedback = (booking) => {
+    setViewingFeedback({
+      ...receivedFeedback[booking.id],
+      booking
+    });
+    setShowViewFeedbackModal(true);
+  };
+
+  const handleMessageTutor = (booking) => {
+    const otherUserId = isTutor ? booking.studentUserId : booking.tutorUserId;
+    navigate('/messages', { state: { otherUserId, bookingId: booking.id } });
+  };
+
+  const handleCancelBooking = async (bookingId) => {
+    if (!window.confirm('Are you sure you want to cancel this booking?')) return;
+
+    try {
       setCancellingBooking(bookingId);
       await bookingAPI.cancelBooking(bookingId);
-      // Refresh bookings after cancellation
       await fetchBookings();
     } catch (err) {
       console.error('Error cancelling booking:', err);
@@ -131,43 +187,30 @@ const LessonHistory = () => {
     }
   };
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
+  const handlePageChange = (page) => { setCurrentPage(page); };
 
   const formatBookingDateTime = (booking) => {
     const date = new Date(booking.startTime);
     return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
+      month: 'short', day: 'numeric', year: 'numeric',
+      hour: 'numeric', minute: '2-digit', hour12: true
     });
   };
 
   const getStatusBadge = (booking) => {
     const { status, paymentStatus } = booking;
-    
-    // Check if booking is confirmed but payment not succeeded
     const isAwaitingPayment = status === 'CONFIRMED' && paymentStatus !== 'SUCCEEDED';
     
     let displayStatus = status;
     let color = 'gray';
     
     if (isAwaitingPayment) {
-      // Show different text for tutor vs student
       displayStatus = isTutor ? 'AWAITING PAYMENT' : 'PAYMENT REQUIRED';
-      color = '#2196f3'; // Blue color
+      color = '#2196f3';
     } else {
-      // Use default status colors
       const statusColors = {
-        CONFIRMED: 'green',
-        PENDING: 'orange',
-        CANCELLED: 'red',
-        COMPLETED: 'blue',
-        SCHEDULED: '#4caf50'
+        CONFIRMED: 'green', PENDING: 'orange', CANCELLED: 'red',
+        COMPLETED: 'blue', SCHEDULED: '#4caf50'
       };
       color = statusColors[status] || 'gray';
     }
@@ -177,19 +220,14 @@ const LessonHistory = () => {
         className="booking-status" 
         style={{ 
           background: status === 'SCHEDULED' 
-            ? 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)' 
-            : color,
+            ? 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)' : color,
           color: 'white',
           padding: status === 'SCHEDULED' ? '6px 16px' : '4px 8px',
-          borderRadius: '12px',
-          fontSize: '12px',
+          borderRadius: '12px', fontSize: '12px',
           fontWeight: status === 'SCHEDULED' ? '700' : '600',
           marginLeft: '10px',
-          boxShadow: status === 'SCHEDULED' 
-            ? '0 2px 8px rgba(76, 175, 80, 0.3)' 
-            : 'none',
-          textTransform: 'uppercase',
-          letterSpacing: '0.5px'
+          boxShadow: status === 'SCHEDULED' ? '0 2px 8px rgba(76, 175, 80, 0.3)' : 'none',
+          textTransform: 'uppercase', letterSpacing: '0.5px'
         }}
       >
         {displayStatus}
@@ -200,7 +238,6 @@ const LessonHistory = () => {
   const renderStars = (lessonId) => {
     const currentRating = ratings[lessonId] || 0;
     const stars = [];
-
     for (let i = 1; i <= 5; i++) {
       stars.push(
         <FontAwesomeIcon
@@ -213,7 +250,6 @@ const LessonHistory = () => {
         />
       );
     }
-
     return stars;
   };
 
@@ -227,20 +263,12 @@ const LessonHistory = () => {
           <p>{isTutor ? "View all the lessons you've taught so far!" : "View all the lessons you've taken so far!"}</p>
         </div>
 
-        {/* Filters */}
         <div className="filter-section">
           <div className="filter-controls">
             <div className="filter-group">
               <label htmlFor="time-filter" className="filter-label">Time:</label>
-              <select
-                id="time-filter"
-                className="filter-dropdown"
-                value={timeFilter}
-                onChange={(e) => {
-                  setTimeFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-              >
+              <select id="time-filter" className="filter-dropdown" value={timeFilter}
+                onChange={(e) => { setTimeFilter(e.target.value); setCurrentPage(1); }}>
                 <option value="7days">Past 7 Days</option>
                 <option value="2weeks">Past 2 Weeks</option>
                 <option value="30days">Past 30 Days</option>
@@ -249,18 +277,10 @@ const LessonHistory = () => {
                 <option value="all">All Time</option>
               </select>
             </div>
-            
             <div className="filter-group">
               <label htmlFor="status-filter" className="filter-label">Status:</label>
-              <select
-                id="status-filter"
-                className="filter-dropdown"
-                value={statusFilter}
-                onChange={(e) => {
-                  setStatusFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-              >
+              <select id="status-filter" className="filter-dropdown" value={statusFilter}
+                onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}>
                 <option value="all">All Statuses</option>
                 <option value="SCHEDULED">Scheduled</option>
                 <option value="PENDING">Pending</option>
@@ -285,8 +305,7 @@ const LessonHistory = () => {
             <p style={{ color: '#666', marginBottom: '20px' }}>Your session has expired. Please log back in to continue.</p>
             <button 
               onClick={() => { localStorage.clear(); navigate('/login'); }}
-              style={{ padding: '12px 30px', backgroundColor: '#1A803D', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '16px', fontWeight: '600' }}
-            >
+              style={{ padding: '12px 30px', backgroundColor: '#1A803D', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '16px', fontWeight: '600' }}>
               Log Back In
             </button>
           </div>
@@ -294,15 +313,11 @@ const LessonHistory = () => {
         {error && !loading && error !== 'SESSION_EXPIRED' && <div className="error">{error}</div>}
 
         {!loading && !error && bookings.length === 0 && (
-          <div className="no-bookings">
-            <p>No bookings yet. Book your first lesson!</p>
-          </div>
+          <div className="no-bookings"><p>No bookings yet. Book your first lesson!</p></div>
         )}
 
         {!loading && !error && bookings.length > 0 && filteredBookings.length === 0 && (
-          <div className="no-bookings">
-            <p>No lessons found in the selected time period. Try a different time range!</p>
-          </div>
+          <div className="no-bookings"><p>No lessons found in the selected time period. Try a different time range!</p></div>
         )}
 
         {!loading && !error && filteredBookings.length > 0 && (
@@ -324,25 +339,35 @@ const LessonHistory = () => {
               </div>
               
               <div className="lesson-actions">
-                <div className="rating-section">
-                  {booking.status === 'COMPLETED' && renderStars(booking.id)}
-                </div>
+                {/* Only students see star ratings */}
+                {!isTutor && booking.status === 'COMPLETED' && !reviewedBookings[booking.id] && (
+                  <div className="rating-section">
+                    {renderStars(booking.id)}
+                  </div>
+                )}
+
+                {booking.status === 'COMPLETED' && reviewedBookings[booking.id] && (
+                  <span className="feedback-submitted-badge">Feedback Sent</span>
+                )}
+
+                {booking.status === 'COMPLETED' && receivedFeedback[booking.id] && (
+                  <button className="view-feedback-button" onClick={() => handleViewFeedback(booking)}>
+                    View Feedback
+                  </button>
+                )}
                 
                 <div className="action-buttons">
-                  {booking.status === 'COMPLETED' && (
+                  {booking.status === 'COMPLETED' && !reviewedBookings[booking.id] && (
                     <button 
-                      className={`feedback-button ${ratings[booking.id] > 0 ? 'enabled' : 'disabled'}`}
-                      onClick={() => handleLeaveFeedback(booking.id)}
-                      disabled={ratings[booking.id] === 0}
+                      className={`feedback-button ${isTutor || ratings[booking.id] > 0 ? 'enabled' : 'disabled'}`}
+                      onClick={() => handleLeaveFeedback(booking)}
+                      disabled={!isTutor && ratings[booking.id] === 0}
                     >
                       {isTutor ? 'Leave Student Feedback' : 'Leave Tutor Feedback'}
                     </button>
                   )}
                   
-                  <button 
-                    className="message-button"
-                    onClick={() => handleMessageTutor(booking)}
-                  >
+                  <button className="message-button" onClick={() => handleMessageTutor(booking)}>
                     {isTutor ? 'Message Student' : 'Message Tutor'}
                   </button>
 
@@ -350,8 +375,7 @@ const LessonHistory = () => {
                     <button 
                       className="cancel-button"
                       onClick={() => handleCancelBooking(booking.id)}
-                      disabled={cancellingBooking === booking.id}
-                    >
+                      disabled={cancellingBooking === booking.id}>
                       {cancellingBooking === booking.id ? 'Cancelling...' : 'Cancel Booking'}
                     </button>
                   )}
@@ -362,53 +386,139 @@ const LessonHistory = () => {
         </div>
 
         <div className="pagination">
-          <button 
-            className="pagination-button"
-            onClick={() => handlePageChange(1)}
-            disabled={currentPage === 1}
-          >
+          <button className="pagination-button" onClick={() => handlePageChange(1)} disabled={currentPage === 1}>
             <FontAwesomeIcon icon={faAngleDoubleLeft} />
           </button>
-          
-          <button 
-            className="pagination-button"
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
+          <button className="pagination-button" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
             <FontAwesomeIcon icon={faChevronLeft} />
           </button>
-          
           <div className="page-numbers">
             {[...Array(totalPages)].map((_, index) => (
-              <button
-                key={index + 1}
-                className={`page-number ${currentPage === index + 1 ? 'active' : ''}`}
-                onClick={() => handlePageChange(index + 1)}
-              >
+              <button key={index + 1} className={`page-number ${currentPage === index + 1 ? 'active' : ''}`}
+                onClick={() => handlePageChange(index + 1)}>
                 {index + 1}
               </button>
             ))}
           </div>
-          
-          <button 
-            className="pagination-button"
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
+          <button className="pagination-button" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
             <FontAwesomeIcon icon={faChevronRight} />
           </button>
-          
-          <button 
-            className="pagination-button"
-            onClick={() => handlePageChange(totalPages)}
-            disabled={currentPage === totalPages}
-          >
+          <button className="pagination-button" onClick={() => handlePageChange(totalPages)} disabled={currentPage === totalPages}>
             <FontAwesomeIcon icon={faAngleDoubleRight} />
           </button>
         </div>
         </>
         )}
       </div>
+
+      {/* Feedback Modal */}
+      {showFeedbackModal && feedbackBooking && (
+        <div className="feedback-modal-overlay" onClick={() => setShowFeedbackModal(false)}>
+          <div className="feedback-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="feedback-modal-close" onClick={() => setShowFeedbackModal(false)}>
+              <FontAwesomeIcon icon={faTimes} />
+            </button>
+            
+            <h2>{isTutor ? 'Leave Student Feedback' : 'Leave Tutor Feedback'}</h2>
+            <p className="feedback-modal-subtitle">
+              Feedback for <strong>{isTutor ? feedbackBooking.studentName : feedbackBooking.tutorName}</strong>
+              {' '}— {feedbackBooking.subject || 'Tutoring Session'}
+            </p>
+
+            {!isTutor && (
+              <div className="feedback-modal-rating">
+                <label>Rating</label>
+                <div className="feedback-stars">
+                  {[1, 2, 3, 4, 5].map(i => (
+                    <FontAwesomeIcon
+                      key={i}
+                      icon={faStar}
+                      className={`feedback-star ${i <= (feedbackHoveredStar || feedbackRating) ? 'filled' : 'empty'}`}
+                      onClick={() => setFeedbackRating(i)}
+                      onMouseEnter={() => setFeedbackHoveredStar(i)}
+                      onMouseLeave={() => setFeedbackHoveredStar(null)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="feedback-modal-comment">
+              <label>{isTutor ? 'Feedback for the student' : 'Your review'}</label>
+              <textarea
+                value={feedbackComment}
+                onChange={(e) => setFeedbackComment(e.target.value)}
+                placeholder={isTutor 
+                  ? "Share how the student did — effort, understanding, areas to improve..." 
+                  : "Share your experience with this tutor..."}
+                rows={4}
+              />
+            </div>
+
+            <div className="feedback-modal-actions">
+              <button className="feedback-cancel-btn" onClick={() => setShowFeedbackModal(false)}>
+                Cancel
+              </button>
+              <button 
+                className="feedback-submit-btn" 
+                onClick={handleSubmitFeedback}
+                disabled={submittingFeedback || (!isTutor && feedbackRating === 0) || !feedbackComment.trim()}>
+                {submittingFeedback ? 'Submitting...' : 'Submit Feedback'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* View Received Feedback Modal */}
+      {showViewFeedbackModal && viewingFeedback && (
+        <div className="feedback-modal-overlay" onClick={() => setShowViewFeedbackModal(false)}>
+          <div className="feedback-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="feedback-modal-close" onClick={() => setShowViewFeedbackModal(false)}>
+              <FontAwesomeIcon icon={faTimes} />
+            </button>
+            
+            <h2>Feedback Received</h2>
+            <p className="feedback-modal-subtitle">
+              From <strong>{viewingFeedback.reviewerName}</strong>
+              {' '}— {viewingFeedback.booking?.subject || 'Tutoring Session'}
+            </p>
+
+            {viewingFeedback.rating && (
+              <div className="feedback-modal-rating">
+                <label>Rating</label>
+                <div className="feedback-stars">
+                  {[1, 2, 3, 4, 5].map(i => (
+                    <FontAwesomeIcon
+                      key={i}
+                      icon={faStar}
+                      className={`feedback-star ${i <= viewingFeedback.rating ? 'filled' : 'empty'}`}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {viewingFeedback.comment && (
+              <div className="view-feedback-comment">
+                <label>Comment</label>
+                <p>{viewingFeedback.comment}</p>
+              </div>
+            )}
+
+            <div className="view-feedback-date">
+              {new Date(viewingFeedback.createdAt).toLocaleDateString('en-US', {
+                month: 'long', day: 'numeric', year: 'numeric'
+              })}
+            </div>
+
+            <div className="feedback-modal-actions">
+              <button className="feedback-cancel-btn" onClick={() => setShowViewFeedbackModal(false)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

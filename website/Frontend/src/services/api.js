@@ -259,4 +259,19 @@ export const messageAPI = {
     api.delete(`/api/messages/${messageId}`),
 };
 
+// Review/Feedback API
+export const reviewAPI = {
+  leaveReview: (bookingId, rating, comment) =>
+    api.post('/api/reviews', { bookingId, rating, comment }),
+
+  getReviewStatus: (bookingId) =>
+    api.get(`/api/reviews/booking/${bookingId}/status`),
+
+  getTutorRating: (tutorUserId) =>
+    api.get(`/api/reviews/tutor/${tutorUserId}/rating`),
+
+  getReceivedFeedback: (bookingId) =>
+    api.get(`/api/reviews/booking/${bookingId}/received`),
+};
+
 export default api;
