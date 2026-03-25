@@ -1,7 +1,7 @@
 import './Sidebar.css';
 import { Link, NavLink } from "react-router-dom"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHome, faSearch, faEnvelope, faClose, faBars, faUser, faUserPlus } from '@fortawesome/free-solid-svg-icons'
+import { faClose, faBars } from '@fortawesome/free-solid-svg-icons'
 import { useState } from 'react'
 import logoImg from '../../assets/logo.avif'
 
@@ -11,7 +11,7 @@ const Sidebar = () => {
     const closeNav = () => {
         setShowNav(false);
     };
-    //Navigation bar for the website
+
     return (
         <div className='nav-bar'>
             <Link className="logo" to="/">
@@ -29,10 +29,18 @@ const Sidebar = () => {
                     <span>Our Team</span>
                 </NavLink>
                 <NavLink exact="true" activeClassName="active" className="dashboard-link" to="/pricing" onClick={closeNav}>
-                    <span>Pricing</span>
+                    <span>Prices</span>
                 </NavLink>
+                <NavLink exact="true" activeClassName="active" to="/login" onClick={closeNav} className="mobile-login-link">
+                    <span>Login</span>
+                </NavLink>
+                <Link to="/signup" onClick={closeNav} className="mobile-cta-link">Get Started</Link>
                 <FontAwesomeIcon icon={faClose} size="3x" className="close-icon" onClick={closeNav} />
             </nav>
+            <div className="nav-actions">
+                <Link to="/login" className="nav-login-btn">Login</Link>
+                <Link to="/signup" className="nav-cta-btn">Get Started</Link>
+            </div>
             <FontAwesomeIcon onClick={() => setShowNav(!showNav)} icon={faBars} size="3x" className="hamburger-icon" />
         </div>
     )
