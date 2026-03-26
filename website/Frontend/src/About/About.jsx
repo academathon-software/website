@@ -35,19 +35,19 @@ const values = [
 const impact = [
   {
     title: 'Grade Improvement',
-    stat: '85% of our students see measurable improvement in their grades within 3 months.'
+    stat: '85% of our students see measurable improvement in their grades within 2 months.'
   },
   {
     title: 'Student Satisfaction',
-    stat: '98% satisfaction rating, with over 1,000 positive reviews.'
+    stat: '98% satisfaction rating, with over 50 positive reviews.'
   },
   {
     title: 'Tutor Quality',
-    stat: 'All tutors are certified educators with an average of 8 years teaching experience.'
+    stat: 'All tutors are certified educators with an average of 5 years teaching experience.'
   },
   {
     title: 'Global Reach',
-    stat: 'Students from over 75 countries have benefited from our platform.'
+    stat: 'Students from over Ontario, Canada have benefited from our platform.'
   }
 ];
 

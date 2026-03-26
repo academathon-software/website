@@ -19,7 +19,7 @@ const Footer = () => {
             <FontAwesomeIcon icon={faInstagram} />
           </a>
         </div>
-        <Link to="/contact" className="footer-contact">Contact Us</Link>
+        <Link to="/contact" className="footer-contact" onClick={() => window.scrollTo(0, 0)}>Contact Us</Link>
         <p>&copy; {new Date().getFullYear()} Academathon. All rights reserved.</p>
       </div>
     </footer>

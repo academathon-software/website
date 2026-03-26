@@ -24,7 +24,7 @@ const features = [
   {
     icon: faChartLine,
     title: 'Proven Results',
-    description: '97% of our students see significant improvement within 3 months.'
+    description: '97% of our students see significant improvement within 2 months.'
   },
   {
     icon: faClock,

@@ -21,11 +21,9 @@ public class CourseContent {
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
     
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String lessonPlan;
     
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String syllabus;
     

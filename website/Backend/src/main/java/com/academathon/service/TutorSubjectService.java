@@ -53,7 +53,7 @@ public class TutorSubjectService {
         String sql = "SELECT s.id, s.name, ts.status, ts.added_date, ts.removed_date " +
                     "FROM subjects s " +
                     "JOIN tutor_subjects ts ON s.id = ts.subject_id " +
-                    "WHERE ts.tutor_profile_id = ? AND ts.status = ? " +
+                    "WHERE ts.tutor_profile_id = ? AND ts.status = ?::course_status " +
                     "ORDER BY ts.added_date DESC";
         
         return jdbcTemplate.query(sql, (rs, rowNum) -> new TutorSubjectDTO(
@@ -87,7 +87,7 @@ public class TutorSubjectService {
         }
         
         // Insert with status
-        String insertSql = "INSERT INTO tutor_subjects (tutor_profile_id, subject_id, status, added_date) VALUES (?, ?, ?, NOW())";
+        String insertSql = "INSERT INTO tutor_subjects (tutor_profile_id, subject_id, status, added_date) VALUES (?, ?, ?::course_status, NOW())";
         jdbcTemplate.update(insertSql, tutorProfileId, subject.getId(), status);
         
         return new TutorSubjectDTO(
@@ -113,7 +113,7 @@ public class TutorSubjectService {
         }
         
         // Update status
-        String updateSql = "UPDATE tutor_subjects SET status = ?, removed_date = ? WHERE tutor_profile_id = ? AND subject_id = ?";
+        String updateSql = "UPDATE tutor_subjects SET status = ?::course_status, removed_date = ? WHERE tutor_profile_id = ? AND subject_id = ?";
         LocalDateTime removedDate = "PAST".equals(newStatus) ? LocalDateTime.now() : null;
         jdbcTemplate.update(updateSql, newStatus, removedDate, tutorProfileId, subjectId);
         

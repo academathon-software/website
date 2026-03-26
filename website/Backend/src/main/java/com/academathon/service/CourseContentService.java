@@ -32,7 +32,11 @@ public class CourseContentService {
     public CourseContentDTO getCourseContent(Long tutorProfileId, String subjectName) {
         // Find subject by name
         Subject subject = subjectRepository.findByName(subjectName)
-            .orElseThrow(() -> new RuntimeException("Subject not found: " + subjectName));
+            .orElse(null);
+        
+        if (subject == null) {
+            return new CourseContentDTO(null, subjectName, null, "", "", null);
+        }
         
         // Find course content or return empty content
         CourseContent content = courseContentRepository

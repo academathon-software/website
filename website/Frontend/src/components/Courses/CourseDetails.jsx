@@ -86,8 +86,9 @@ const CourseDetails = () => {
       setLessonPlan(content.lessonPlan || '');
       setSyllabus(content.syllabus || '');
     } catch (error) {
-      console.error('Error fetching course content:', error);
-      showMessage('Failed to load course content', 'error');
+      const serverMsg = error.response?.data?.error;
+      console.error('Error fetching course content:', serverMsg || error.message, error);
+      showMessage(serverMsg || 'Failed to load course content', 'error');
     } finally {
       setLoading(false);
     }
