@@ -420,12 +420,13 @@ const Messages = () => {
                 </div>
 
                 <form className="message-input-form" onSubmit={sendMessage}>
-                  <input
-                    type="text"
+                  <textarea
                     className="message-input"
                     placeholder="Type a message..."
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
+                    rows={1}
+                    enterKeyHint="enter"
                   />
                   <button type="submit" className="send-button" disabled={!newMessage.trim()}>
                     <FontAwesomeIcon icon={faPaperPlane} />

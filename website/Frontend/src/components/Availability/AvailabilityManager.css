@@ -92,7 +92,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid #28a745;
 }
@@ -112,6 +112,7 @@
   font-size: 0.85rem;
   cursor: pointer;
   transition: background-color 0.2s;
+  flex-shrink: 0;
 }
 
 .add-slot-btn:hover {
@@ -140,6 +141,7 @@
   border-radius: 4px;
   font-size: 0.9rem;
   flex: 1;
+  min-width: 0;
 }
 
 .time-slot span {
@@ -405,6 +407,20 @@
   
   .schedule-grid {
     grid-template-columns: 1fr;
+  }
+
+  .day-header {
+    margin-bottom: 1.25rem;
+  }
+
+  .time-slot {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+
+  .time-slot span {
+    width: 100%;
+    text-align: center;
   }
   
   .exceptions-header {
