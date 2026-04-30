@@ -20,7 +20,7 @@ import {
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-// Student signup page - for tutors, use the unique invitation link
+// Student signup page - for tutors, use the unique invitation link.
 function SignUpPage() {
   
   const [formData, setFormData] = useState({
