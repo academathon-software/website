@@ -18,7 +18,7 @@ import StudentSidebar from '../Shared/StudentSidebar';
 import BookingStatusBadge from '../Shared/BookingStatusBadge';
 import PaymentModal from '../Payment/PaymentModal';
 import { useUser } from '../../context/UserContext';
-import { bookingAPI, userAPI, availabilityAPI } from '../../services/api';
+import { bookingAPI, userAPI, availabilityAPI, tutorAPI } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 
 const StudentDashboard = () => {
@@ -96,12 +96,9 @@ const StudentDashboard = () => {
 
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
-      // Check if it's an authentication error
-      if (err.response?.status === 401 || err.response?.status === 403 || !localStorage.getItem('token')) {
-        setError('SESSION_EXPIRED');
-      } else {
-        setError('Failed to load dashboard data');
-      }
+      // 401s are intercepted globally and redirect to /login with a
+      // session-expired notice; only surface other failures here.
+      setError('Failed to load dashboard data');
     } finally {
       setLoading(false);
     }
@@ -400,13 +397,25 @@ const StudentDashboard = () => {
       subjects: []
     });
     
-    // Try to fetch more details if available
+    // Try to fetch more details if available - fetch both user-level and tutor-profile-level info
     try {
-      const response = await userAPI.getUserProfile(booking.tutorUserId);
+      const [userRes, tutorRes] = await Promise.allSettled([
+        userAPI.getUserProfile(booking.tutorUserId),
+        tutorAPI.getTutorByUserId(booking.tutorUserId)
+      ]);
+
+      const userData = userRes.status === 'fulfilled' ? userRes.value.data : {};
+      const tutorData = tutorRes.status === 'fulfilled' ? tutorRes.value.data : {};
+
       setSelectedTutorProfile(prev => ({
         ...prev,
-        ...response.data,
-        name: booking.tutorName // Keep original name
+        ...userData,
+        university: tutorData.university,
+        program: tutorData.program,
+        academicYear: tutorData.academicYear,
+        gradeLevels: tutorData.gradeLevels,
+        subjects: tutorData.subjects || prev.subjects,
+        name: booking.tutorName
       }));
     } catch (err) {
       console.log('Could not fetch additional tutor details');
@@ -536,57 +545,26 @@ const StudentDashboard = () => {
   }
 
   if (error) {
-    const isSessionExpired = error === 'SESSION_EXPIRED';
-    
     return (
       <div className="student-dashboard">
         <StudentSidebar />
         <div className="main-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
           <div style={{ textAlign: 'center' }}>
-            {isSessionExpired ? (
-              <>
-                <div style={{ fontSize: '48px', marginBottom: '20px' }}>🔒</div>
-                <h2 style={{ color: '#333', marginBottom: '10px' }}>Session Expired</h2>
-                <p style={{ color: '#666', marginBottom: '20px' }}>Your session has expired. Please log back in to continue.</p>
-                <button 
-                  onClick={() => {
-                    localStorage.clear();
-                    navigate('/login');
-                  }}
-                  style={{
-                    marginTop: '10px',
-                    padding: '12px 30px',
-                    backgroundColor: '#1A803D',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontSize: '16px',
-                    fontWeight: '600'
-                  }}
-                >
-                  Log Back In
-                </button>
-              </>
-            ) : (
-              <>
-                <h2 style={{ color: 'red' }}>{error}</h2>
-                <button 
-                  onClick={fetchDashboardData}
-                  style={{
-                    marginTop: '20px',
-                    padding: '10px 20px',
-                    backgroundColor: '#4CAF50',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Retry
-                </button>
-              </>
-            )}
+            <h2 style={{ color: 'red' }}>{error}</h2>
+            <button
+              onClick={fetchDashboardData}
+              style={{
+                marginTop: '20px',
+                padding: '10px 20px',
+                backgroundColor: '#4CAF50',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Retry
+            </button>
           </div>
         </div>
       </div>
@@ -932,6 +910,11 @@ const StudentDashboard = () => {
                     </div>
                   )}
                   <h2>{selectedTutorProfile.name || 'Tutor'}</h2>
+                  {selectedTutorProfile.pronouns && (
+                    <div style={{ color: '#6b7280', fontSize: '0.9rem', marginTop: '4px' }}>
+                      {selectedTutorProfile.pronouns}
+                    </div>
+                  )}
                 </div>
                 
                 <div className="tutor-profile-details">
@@ -941,7 +924,46 @@ const StudentDashboard = () => {
                       <span className="tutor-profile-value">{selectedTutorProfile.bio}</span>
                     </div>
                   )}
-                  
+
+                  {(selectedTutorProfile.university || selectedTutorProfile.program || selectedTutorProfile.academicYear) && (
+                    <div className="tutor-profile-item">
+                      <span className="tutor-profile-label">Education</span>
+                      <span className="tutor-profile-value">
+                        {[
+                          selectedTutorProfile.program,
+                          selectedTutorProfile.academicYear,
+                          selectedTutorProfile.university
+                        ].filter(Boolean).join(' • ')}
+                      </span>
+                    </div>
+                  )}
+
+                  {selectedTutorProfile.subjects && selectedTutorProfile.subjects.length > 0 && (
+                    <div className="tutor-profile-item">
+                      <span className="tutor-profile-label">Subjects</span>
+                      <div className="tutor-subjects-list">
+                        {selectedTutorProfile.subjects.map((subject, index) => (
+                          <span key={index} className="subject-tag">
+                            {subject.name || subject}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedTutorProfile.gradeLevels && selectedTutorProfile.gradeLevels.length > 0 && (
+                    <div className="tutor-profile-item">
+                      <span className="tutor-profile-label">Grade Levels</span>
+                      <div className="tutor-subjects-list">
+                        {selectedTutorProfile.gradeLevels.map((grade, index) => (
+                          <span key={index} className="subject-tag">
+                            {grade}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {selectedTutorProfile.contactEmail && (
                     <div className="tutor-profile-item">
                       <span className="tutor-profile-label">Email</span>

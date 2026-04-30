@@ -12,6 +12,7 @@ import {
   faBars,
   faTimes
 } from '@fortawesome/free-solid-svg-icons';
+import { logout } from '../../services/auth';
 import './StudentSidebar.css';
 
 const StudentSidebar = () => {
@@ -25,15 +26,11 @@ const StudentSidebar = () => {
     setIsMobileMenuOpen(false); // Close mobile menu after navigation
   };
 
-  // Sign out handler - clears all auth data
+  // Voluntary sign-out — no `reason` so the login page won't show a
+  // "session expired" notice the user didn't trigger.
   const handleSignOut = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('username');
-    localStorage.removeItem('userType');
     setIsMobileMenuOpen(false);
-    navigate('/login');
+    logout();
   };
 
   // Check if a navigation item is active

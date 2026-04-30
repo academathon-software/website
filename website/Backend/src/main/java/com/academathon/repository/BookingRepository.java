@@ -44,9 +44,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking b WHERE b.tutor.id = :tutorId AND b.endTime < :now ORDER BY b.startTime DESC")
     List<Booking> findPastBookingsByTutor(@Param("tutorId") Long tutorId, @Param("now") LocalDateTime now);
     
-    // Check for conflicting bookings for a tutor
+    // Check for conflicting bookings for a tutor. CANCELLED and REJECTED
+    // bookings free up the slot, so they're excluded. This filter must stay in
+    // sync with AvailabilityService.calculateDayAvailability so the calendar
+    // and the click-to-book conflict check agree on what's bookable.
     @Query("SELECT b FROM Booking b WHERE b.tutor.id = :tutorId " +
-           "AND b.status != 'CANCELLED' " +
+           "AND b.status NOT IN ('CANCELLED', 'REJECTED') " +
            "AND ((b.startTime < :endTime AND b.endTime > :startTime))")
     List<Booking> findConflictingBookings(@Param("tutorId") Long tutorId, 
                                           @Param("startTime") LocalDateTime startTime, 
@@ -54,7 +57,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     
     // Check for conflicting bookings for a student
     @Query("SELECT b FROM Booking b WHERE b.student.id = :studentId " +
-           "AND b.status != 'CANCELLED' " +
+           "AND b.status NOT IN ('CANCELLED', 'REJECTED') " +
            "AND ((b.startTime < :endTime AND b.endTime > :startTime))")
     List<Booking> findConflictingStudentBookings(@Param("studentId") Long studentId, 
                                                   @Param("startTime") LocalDateTime startTime, 

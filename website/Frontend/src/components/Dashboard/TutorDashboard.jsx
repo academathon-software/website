@@ -120,12 +120,9 @@ const TutorDashboard = () => {
 
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
-      // Check if it's an authentication error
-      if (err.response?.status === 401 || err.response?.status === 403 || !localStorage.getItem('token')) {
-        setError('SESSION_EXPIRED');
-      } else {
-        setError('Failed to load dashboard data');
-      }
+      // 401s are intercepted globally and redirect to /login with a
+      // session-expired notice; only surface other failures here.
+      setError('Failed to load dashboard data');
     } finally {
       setLoading(false);
     }
@@ -229,7 +226,7 @@ const TutorDashboard = () => {
     }
   };
 
-  const handleViewStudentProfile = async (studentUserId, studentName) => {
+  const handleViewStudentProfile = async (studentUserId, studentName, bookingId = null) => {
     try {
       setLoadingProfile(true);
       setShowStudentProfile(true);
@@ -238,14 +235,16 @@ const TutorDashboard = () => {
       const response = await userAPI.getUserProfile(studentUserId);
       setSelectedStudentProfile({
         ...response.data,
-        name: studentName
+        name: studentName,
+        bookingId
       });
     } catch (err) {
       console.error('Error fetching student profile:', err);
       // Set basic profile if fetch fails
       setSelectedStudentProfile({
         name: studentName,
-        userId: studentUserId
+        userId: studentUserId,
+        bookingId
       });
     } finally {
       setLoadingProfile(false);
@@ -346,57 +345,26 @@ const TutorDashboard = () => {
   }
 
   if (error) {
-    const isSessionExpired = error === 'SESSION_EXPIRED';
-    
     return (
       <div className="tutor-dashboard">
         <TutorSidebar />
         <div className="main-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
           <div style={{ textAlign: 'center' }}>
-            {isSessionExpired ? (
-              <>
-                <div style={{ fontSize: '48px', marginBottom: '20px' }}>🔒</div>
-                <h2 style={{ color: '#333', marginBottom: '10px' }}>Session Expired</h2>
-                <p style={{ color: '#666', marginBottom: '20px' }}>Your session has expired. Please log back in to continue.</p>
-                <button 
-                  onClick={() => {
-                    localStorage.clear();
-                    navigate('/login');
-                  }}
-                  style={{
-                    marginTop: '10px',
-                    padding: '12px 30px',
-                    backgroundColor: '#1A803D',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontSize: '16px',
-                    fontWeight: '600'
-                  }}
-                >
-                  Log Back In
-                </button>
-              </>
-            ) : (
-              <>
-                <h2 style={{ color: 'red' }}>{error}</h2>
-                <button 
-                  onClick={fetchDashboardData}
-                  style={{
-                    marginTop: '20px',
-                    padding: '10px 20px',
-                    backgroundColor: '#4CAF50',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Retry
-                </button>
-              </>
-            )}
+            <h2 style={{ color: 'red' }}>{error}</h2>
+            <button
+              onClick={fetchDashboardData}
+              style={{
+                marginTop: '20px',
+                padding: '10px 20px',
+                backgroundColor: '#4CAF50',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Retry
+            </button>
           </div>
         </div>
       </div>
@@ -441,7 +409,17 @@ const TutorDashboard = () => {
                 <div key={booking.id} className="pending-booking-card">
                   <div className="pending-booking-info">
                     <div className="booking-header">
-                      <h4>{booking.studentName}</h4>
+                      <h4>
+                        {booking.studentName}
+                        <button
+                          className="view-profile-btn"
+                          onClick={() => handleViewStudentProfile(booking.studentUserId, booking.studentName, booking.id)}
+                          title="View student profile"
+                          style={{ marginLeft: '8px' }}
+                        >
+                          <FontAwesomeIcon icon={faUser} />
+                        </button>
+                      </h4>
                       <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                         {booking.hasRescheduleRequest && (
                           <span style={{
@@ -568,7 +546,7 @@ const TutorDashboard = () => {
                           {booking.studentName}
                           <button 
                             className="view-profile-btn"
-                            onClick={() => handleViewStudentProfile(booking.studentUserId, booking.studentName)}
+                            onClick={() => handleViewStudentProfile(booking.studentUserId, booking.studentName, booking.id)}
                             title="View Profile"
                           >
                             <FontAwesomeIcon icon={faUser} />
@@ -743,37 +721,28 @@ const TutorDashboard = () => {
                     </div>
                   )}
                   <h2>{selectedStudentProfile.name || 'Student'}</h2>
+                  {selectedStudentProfile.pronouns && (
+                    <div style={{ color: '#6b7280', fontSize: '0.9rem', marginTop: '4px' }}>
+                      {selectedStudentProfile.pronouns}
+                    </div>
+                  )}
                 </div>
                 
                 <div className="profile-details">
+                  {selectedStudentProfile.studentGrade && (
+                    <div className="profile-item">
+                      <span className="profile-label">Grade</span>
+                      <span className="profile-value">{selectedStudentProfile.studentGrade}</span>
+                    </div>
+                  )}
+
                   {selectedStudentProfile.email && (
                     <div className="profile-item">
                       <span className="profile-label">Email</span>
                       <span className="profile-value">{selectedStudentProfile.email}</span>
                     </div>
                   )}
-                  
-                  {selectedStudentProfile.phone && (
-                    <div className="profile-item">
-                      <span className="profile-label">Phone</span>
-                      <span className="profile-value">{selectedStudentProfile.phone}</span>
-                    </div>
-                  )}
-                  
-                  {selectedStudentProfile.grade && (
-                    <div className="profile-item">
-                      <span className="profile-label">Grade</span>
-                      <span className="profile-value">{selectedStudentProfile.grade}</span>
-                    </div>
-                  )}
-                  
-                  {selectedStudentProfile.school && (
-                    <div className="profile-item">
-                      <span className="profile-label">School</span>
-                      <span className="profile-value">{selectedStudentProfile.school}</span>
-                    </div>
-                  )}
-                  
+
                   {selectedStudentProfile.bio && (
                     <div className="profile-item bio">
                       <span className="profile-label">About</span>
@@ -787,7 +756,12 @@ const TutorDashboard = () => {
                     className="message-btn"
                     onClick={() => {
                       setShowStudentProfile(false);
-                      navigate('/messages', { state: { otherUserId: selectedStudentProfile.userId || selectedStudentProfile.id } });
+                      navigate('/messages', {
+                        state: {
+                          otherUserId: selectedStudentProfile.userId || selectedStudentProfile.id,
+                          bookingId: selectedStudentProfile.bookingId || null
+                        }
+                      });
                     }}
                   >
                     Send Message

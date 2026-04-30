@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { isSessionExpired, logout, LOGOUT_REASON_SESSION_EXPIRED } from '../../services/auth';
 import './ProtectedRoute.css';
 
 const ProtectedRoute = ({ children, allowedRoles = [], requireAuth = true }) => {
@@ -9,7 +10,16 @@ const ProtectedRoute = ({ children, allowedRoles = [], requireAuth = true }) => 
   
   const token = localStorage.getItem('token');
   const userRole = localStorage.getItem('userRole')?.toUpperCase();
-  
+
+  // If we still have a token but it's already past its expiry timestamp, hand
+  // off to the central logout flow so the user lands on /login with a notice
+  // instead of seeing a generic "Authentication Required" panel.
+  useEffect(() => {
+    if (requireAuth && token && isSessionExpired()) {
+      logout({ reason: LOGOUT_REASON_SESSION_EXPIRED });
+    }
+  }, [requireAuth, token]);
+
   useEffect(() => {
     // Check authentication
     if (requireAuth && !token) {

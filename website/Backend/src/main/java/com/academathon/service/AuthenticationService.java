@@ -36,6 +36,16 @@ public class AuthenticationService {
     }
 
     public User signup(RegisterUserDTO input){
+        // Pronouns are required for every new account
+        if (input.getPronouns() == null || input.getPronouns().isBlank()) {
+            throw new RuntimeException("Pronouns are required.");
+        }
+        // Students must declare which grade they're learning at
+        if (input.getRole() == User.Role.STUDENT
+                && (input.getStudentGrade() == null || input.getStudentGrade().isBlank())) {
+            throw new RuntimeException("Grade is required for student accounts.");
+        }
+
         // Check if user with this email already exists
         if (userRepository.findByEmail(input.getEmail()).isPresent()) {
             throw new RuntimeException("An account with this email address already exists. Please use a different email or try logging in.");
@@ -47,6 +57,10 @@ public class AuthenticationService {
         }
         
         User user = new User(input.getUsername(), input.getEmail(), passwordEncoder.encode(input.getPassword()), input.getRole());
+        user.setPronouns(input.getPronouns());
+        if (input.getRole() == User.Role.STUDENT) {
+            user.setStudentGrade(input.getStudentGrade());
+        }
         user.setVerificationCode(generateVerificationCode());
         user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
         user.setEnabled(false);
@@ -115,16 +129,28 @@ public class AuthenticationService {
     }
 
     public void sendVerificationEmail(User user){
-        String subject = "Account Verification";
+        String subject = "Academathon - Verify Your Account";
         String verificationCode = user.getVerificationCode();
         String htmlMessage = "<html>"
-                + "<body style=\"font-family: Arial, sans-serif;\">"
-                + "<div style=\"background-color: #f5f5f5; padding: 20px;\">"
-                + "<h2 style=\"color: #333;\">Welcome to our app!</h2>"
-                + "<p style=\"font-size: 16px;\">Please enter the verification code below to continue:</p>"
-                + "<div style=\"background-color: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);\">"
-                + "<h3 style=\"color: #333;\">Verification Code:</h3>"
-                + "<p style=\"font-size: 18px; font-weight: bold; color: #007bff;\">" + verificationCode + "</p>"
+                + "<body style=\"margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0fdf4;\">"
+                + "<div style=\"max-width: 560px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08);\">"
+                + "<div style=\"background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 32px; text-align: center;\">"
+                + "<div style=\"width: 56px; height: 56px; background-color: rgba(255,255,255,0.2); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px;\">"
+                + "<span style=\"color: #ffffff; font-size: 20px; font-weight: 700;\">at</span>"
+                + "</div>"
+                + "<h1 style=\"color: #ffffff; margin: 0; font-size: 24px; font-weight: 600;\">Academathon</h1>"
+                + "</div>"
+                + "<div style=\"padding: 40px 32px;\">"
+                + "<h2 style=\"color: #1a1a2e; margin: 0 0 8px; font-size: 20px;\">Verify your account</h2>"
+                + "<p style=\"color: #6b7280; font-size: 15px; line-height: 1.6; margin: 0 0 28px;\">Thanks for signing up! Enter the code below in the app to activate your account.</p>"
+                + "<div style=\"background-color: #ecfdf5; border: 1px solid #d1fae5; border-radius: 8px; padding: 24px; text-align: center;\">"
+                + "<p style=\"margin: 0 0 8px; color: #6b7280; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;\">Verification Code</p>"
+                + "<p style=\"margin: 0; font-size: 32px; font-weight: 700; color: #10b981; letter-spacing: 4px;\">" + verificationCode + "</p>"
+                + "</div>"
+                + "<p style=\"color: #9ca3af; font-size: 13px; margin: 24px 0 0; line-height: 1.5;\">This code expires in 15 minutes. If you didn't create an account, you can safely ignore this email.</p>"
+                + "</div>"
+                + "<div style=\"background-color: #f9fafb; padding: 20px 32px; text-align: center; border-top: 1px solid #e5e7eb;\">"
+                + "<p style=\"margin: 0; color: #9ca3af; font-size: 12px;\">&copy; Academathon. All rights reserved.</p>"
                 + "</div>"
                 + "</div>"
                 + "</body>"

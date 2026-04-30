@@ -67,14 +67,15 @@ public class UserService {
         if (request.getBio() != null) {
             user.setBio(request.getBio());
         }
-        if (request.getPronouns() != null) {
-            user.setPronouns(request.getPronouns());
-        }
         if (request.getContactEmail() != null) {
             user.setContactEmail(request.getContactEmail());
         }
-        if (request.getContactPhone() != null) {
-            user.setContactPhone(request.getContactPhone());
+        if (request.getPronouns() != null) {
+            user.setPronouns(request.getPronouns());
+        }
+        // Only students can have a studentGrade
+        if (request.getStudentGrade() != null && user.getRole() == User.Role.STUDENT) {
+            user.setStudentGrade(request.getStudentGrade());
         }
         
         return userRepository.save(user);

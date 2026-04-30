@@ -18,9 +18,6 @@ public class TutorProfile {
     @Column(name = "display_name", nullable = false)
     private String displayName;
 
-    @Column(columnDefinition = "TEXT")
-    private String bio;
-
     @Column(name = "hourly_rate", nullable = false)
     private BigDecimal hourlyRate = BigDecimal.ZERO;
 
@@ -32,9 +29,6 @@ public class TutorProfile {
 
     @Column(name = "academic_year")
     private String academicYear;
-
-    @Column(name = "school_email")
-    private String schoolEmail;
 
     @Column(name = "grade_levels", columnDefinition = "TEXT")
     private String gradeLevels; // JSON array stored as string
@@ -57,10 +51,9 @@ public class TutorProfile {
         // JPA requires a public no-args constructor
     }
 
-    public TutorProfile(User user, String displayName, String bio, BigDecimal hourlyRate, List<Subject> subjects) {
+    public TutorProfile(User user, String displayName, BigDecimal hourlyRate, List<Subject> subjects) {
         this.user = user;
         this.displayName = displayName;
-        this.bio = bio;
         this.hourlyRate = hourlyRate;
         this.subjects = subjects;
     }
@@ -83,14 +76,6 @@ public class TutorProfile {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
-    }
-
-    public String getBio() {
-        return bio;
-    }
-
-    public void setBio(String bio) {
-        this.bio = bio;
     }
 
     public BigDecimal getHourlyRate() {
@@ -145,14 +130,6 @@ public class TutorProfile {
 
     public void setAcademicYear(String academicYear) {
         this.academicYear = academicYear;
-    }
-
-    public String getSchoolEmail() {
-        return schoolEmail;
-    }
-
-    public void setSchoolEmail(String schoolEmail) {
-        this.schoolEmail = schoolEmail;
     }
 
     public String getGradeLevels() {

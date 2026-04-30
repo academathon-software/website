@@ -7,6 +7,7 @@ public record UserDTO(
     String email,
     String role,
     String profilePictureUrl,
+    String pronouns,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) {}

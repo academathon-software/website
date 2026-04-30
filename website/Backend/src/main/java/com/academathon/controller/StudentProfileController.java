@@ -43,6 +43,7 @@ public class StudentProfileController {
                 currentUser.getEmail(),
                 currentUser.getRole().name(),
                 currentUser.getProfilePictureUrl(),
+                currentUser.getPronouns(),
                 currentUser.getCreatedAt(),
                 currentUser.getUpdatedAt()
             );
@@ -86,6 +87,7 @@ public class StudentProfileController {
                 currentUser.getEmail(),
                 currentUser.getRole().name(),
                 currentUser.getProfilePictureUrl(),
+                currentUser.getPronouns(),
                 currentUser.getCreatedAt(),
                 currentUser.getUpdatedAt()
             );
@@ -119,6 +121,7 @@ public class StudentProfileController {
                     student.getEmail(),
                     student.getRole().name(),
                     student.getProfilePictureUrl(),
+                    student.getPronouns(),
                     student.getCreatedAt(),
                     student.getUpdatedAt()
                 ))

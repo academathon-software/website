@@ -198,6 +198,24 @@
   margin: 0;
 }
 
+.login-page .login-notice {
+  width: 100%;
+  background-color: #fffbeb;
+  border: 1px solid #fbbf24;
+  color: #92400e;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.login-page .login-notice p {
+  margin: 0;
+  font-weight: 500;
+}
+
 .login-page .login-signup-link {
   text-align: center;
   font-weight: 400;

@@ -17,7 +17,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import StudentSidebar from '../Shared/StudentSidebar';
 import { useUser } from '../../context/UserContext';
-import { tutorAPI, bookingAPI, availabilityAPI } from '../../services/api';
+import { tutorAPI, bookingAPI, availabilityAPI, userAPI } from '../../services/api';
 
 const BookLesson = () => {
   const navigate = useNavigate();
@@ -30,7 +30,30 @@ const BookLesson = () => {
     setUserType('student');
   }, [setUserType]);
 
+  // Load the student's grade from their profile — they can no longer choose
+  // a grade per booking; it's locked to whatever they have set on their profile.
+  useEffect(() => {
+    let cancelled = false;
+    const loadProfileGrade = async () => {
+      try {
+        const response = await userAPI.getCurrentUser();
+        if (cancelled) return;
+        const grade = response.data?.studentGrade || '';
+        setStudentGradeLabel(grade);
+        setSelectedGrade(resolveGradeFromLabel(grade));
+      } catch (err) {
+        console.error('Failed to load profile grade:', err);
+      } finally {
+        if (!cancelled) setProfileLoading(false);
+      }
+    };
+    loadProfileGrade();
+    return () => { cancelled = true; };
+  }, []);
+
   const [selectedGrade, setSelectedGrade] = useState(null);
+  const [studentGradeLabel, setStudentGradeLabel] = useState('');
+  const [profileLoading, setProfileLoading] = useState(true);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedTutor, setSelectedTutor] = useState(null);
@@ -44,20 +67,18 @@ const BookLesson = () => {
   const [showTutorProfile, setShowTutorProfile] = useState(false);
   const [selectedTutorProfile, setSelectedTutorProfile] = useState(null);
 
-  const grades = [
-    { id: 1, name: "Grade 1" },
-    { id: 2, name: "Grade 2" },
-    { id: 3, name: "Grade 3" },
-    { id: 4, name: "Grade 4" },
-    { id: 5, name: "Grade 5" },
-    { id: 6, name: "Grade 6" },
-    { id: 7, name: "Grade 7" },
-    { id: 8, name: "Grade 8" },
-    { id: 9, name: "Grade 9" },
-    { id: 10, name: "Grade 10" },
-    { id: 11, name: "Grade 11" },
-    { id: 12, name: "Grade 12" }
-  ];
+  // Map a stored profile grade label (e.g. "8th Grade", "College/University")
+  // back onto our internal grade object so getSubjectsForGrade keeps working.
+  // Non-K12 labels fall back to the broadest subject list (treated like grade 12).
+  const resolveGradeFromLabel = (label) => {
+    if (!label) return null;
+    const match = label.match(/^(\d{1,2})(?:st|nd|rd|th) Grade$/);
+    if (match) {
+      const id = parseInt(match[1], 10);
+      return { id, name: `Grade ${id}` };
+    }
+    return { id: 12, name: label };
+  };
 
   // Grade-specific subject and course structure
   const getSubjectsForGrade = (gradeId) => {
@@ -201,9 +222,10 @@ const BookLesson = () => {
       
       // Use the specific course if selected, otherwise use the subject category
       const searchSubject = selectedCourse || selectedSubject.name;
-      console.log('Searching for tutors with subject:', searchSubject);
-      const response = await tutorAPI.searchTutors({ 
+      console.log('Searching for tutors with subject:', searchSubject, 'and grade:', studentGradeLabel);
+      const response = await tutorAPI.searchTutors({
         subject: searchSubject,
+        gradeLevel: studentGradeLabel || undefined,
         size: 500
       });
       
@@ -344,13 +366,6 @@ const BookLesson = () => {
     }
   };
 
-  const handleGradeSelect = (grade) => {
-    setSelectedGrade(grade);
-    // Reset subject and course when grade changes
-    setSelectedSubject(null);
-    setSelectedCourse(null);
-  };
-
   const handleSubjectSelect = (subject) => {
     setSelectedSubject(subject);
     // Reset course when subject changes
@@ -447,7 +462,7 @@ const BookLesson = () => {
         tutorProfileId: tutor.id,
         startTime: slotData.startTime,
         endTime: slotData.endTime,
-        notes: `${selectedGrade.name} ${selectedCourse}`
+        notes: `${studentGradeLabel || selectedGrade?.name || ''} ${selectedCourse}`.trim()
       };
 
       await bookingAPI.createBooking(bookingData);
@@ -465,7 +480,8 @@ const BookLesson = () => {
 
   const handleBookNewLesson = () => {
     setCurrentStep(1);
-    setSelectedGrade(null);
+    // Keep selectedGrade in place — it's locked to the student's profile and
+    // resolveGradeFromLabel(studentGradeLabel) is the source of truth.
     setSelectedSubject(null);
     setSelectedCourse(null);
     setSelectedTutor(null);
@@ -484,41 +500,104 @@ const BookLesson = () => {
       case 1:
         return (
           <div className="booking-card">
-            <h3>Choose your grade level:</h3>
-            <div className="grade-grid">
-              {grades.map(grade => (
+            <h3>Your grade level</h3>
+
+            {profileLoading ? (
+              <p>Loading your profile…</p>
+            ) : studentGradeLabel ? (
+              <>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '1.25rem 1.5rem',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '12px',
+                  backgroundColor: '#f0fdf4'
+                }}>
+                  <div>
+                    <div style={{ fontSize: '0.85rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Booking as
+                    </div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1A803D', marginTop: '4px' }}>
+                      {studentGradeLabel}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/profile')}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      border: '1px solid #1A803D',
+                      borderRadius: '6px',
+                      backgroundColor: 'white',
+                      color: '#1A803D',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem',
+                      fontWeight: 500
+                    }}
+                  >
+                    Change in profile
+                  </button>
+                </div>
+                <p style={{ marginTop: '1rem', color: '#6b7280', fontSize: '0.9rem' }}>
+                  We'll only show tutors who teach this grade.
+                </p>
+
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  marginTop: '1.5rem',
+                  width: '100%'
+                }}>
+                  <button
+                    onClick={handleNext}
+                    style={{
+                      padding: '0.75rem 1.5rem',
+                      border: 'none',
+                      borderRadius: '6px',
+                      backgroundColor: '#1A803D',
+                      color: 'white',
+                      cursor: 'pointer',
+                      fontSize: '1rem',
+                      fontWeight: '600'
+                    }}
+                  >
+                    Continue
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div style={{
+                padding: '1.5rem',
+                border: '1px solid #fbbf24',
+                borderRadius: '12px',
+                backgroundColor: '#fffbeb'
+              }}>
+                <div style={{ fontWeight: 600, color: '#92400e', marginBottom: '0.5rem' }}>
+                  Set your grade level to continue
+                </div>
+                <p style={{ color: '#78350f', marginBottom: '1rem', fontSize: '0.95rem' }}>
+                  We use your grade to show only tutors who teach at your level. You can update it any time on your profile.
+                </p>
                 <button
-                  key={grade.id}
-                  className={`grade-button ${selectedGrade?.id === grade.id ? 'selected' : ''}`}
-                  onClick={() => handleGradeSelect(grade)}
+                  type="button"
+                  onClick={() => navigate('/profile')}
+                  style={{
+                    padding: '0.6rem 1.25rem',
+                    border: 'none',
+                    borderRadius: '6px',
+                    backgroundColor: '#1A803D',
+                    color: 'white',
+                    cursor: 'pointer',
+                    fontSize: '0.95rem',
+                    fontWeight: 600
+                  }}
                 >
-                  {grade.name}
+                  Go to profile
                 </button>
-              ))}
-            </div>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'flex-end', 
-              marginTop: '1.5rem',
-              width: '100%'
-            }}>
-              <button 
-                onClick={handleNext}
-                disabled={!selectedGrade}
-                style={{ 
-                  padding: '0.75rem 1.5rem', 
-                  border: 'none', 
-                  borderRadius: '6px', 
-                  backgroundColor: selectedGrade ? '#1A803D' : '#ccc', 
-                  color: 'white',
-                  cursor: selectedGrade ? 'pointer' : 'not-allowed',
-                  fontSize: '1rem',
-                  fontWeight: '600'
-                }}
-              >
-                Continue
-              </button>
-            </div>
+              </div>
+            )}
           </div>
         );
 
@@ -716,6 +795,21 @@ const BookLesson = () => {
                         <FontAwesomeIcon icon={faUser} />
                       </button>
                     </div>
+                    <div className="tutor-card-rating">
+                      <FontAwesomeIcon icon={faStar} className="tutor-card-star" />
+                      {tutor.averageRating && tutor.averageRating > 0 ? (
+                        <>
+                          <span className="tutor-card-rating-value">{tutor.averageRating.toFixed(1)}</span>
+                          {tutor.reviewCount > 0 && (
+                            <span className="tutor-card-review-count">
+                              ({tutor.reviewCount})
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <span className="tutor-card-no-rating">No ratings yet</span>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -889,7 +983,7 @@ const BookLesson = () => {
               const weekDates = getWeekDates();
               return (
                 <>
-                  <p>Book {selectedGrade?.name} {selectedCourse} with {currentTutor?.displayName || currentTutor?.name} on {weekDays[weekDates[selectedTimeSlot.day]?.getDay()]}, {weekDates[selectedTimeSlot.day]?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at {selectedTimeSlot.timeSlot} - {new Date(selectedTimeSlot.slotData.endTime).toLocaleTimeString('en-US', { hour: 'numeric', hour12: true })}</p>
+                  <p>Book {studentGradeLabel || selectedGrade?.name} {selectedCourse} with {currentTutor?.displayName || currentTutor?.name} on {weekDays[weekDates[selectedTimeSlot.day]?.getDay()]}, {weekDates[selectedTimeSlot.day]?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at {selectedTimeSlot.timeSlot} - {new Date(selectedTimeSlot.slotData.endTime).toLocaleTimeString('en-US', { hour: 'numeric', hour12: true })}</p>
                   <div className="booking-confirmation-buttons">
                     <button 
                       className="confirm-book-button" 
@@ -947,12 +1041,26 @@ const BookLesson = () => {
                 </div>
               )}
               <h2>{selectedTutorProfile.displayName || selectedTutorProfile.name || 'Tutor'}</h2>
-              {selectedTutorProfile.rating && (
-                <div className="tutor-rating">
-                  <FontAwesomeIcon icon={faStar} className="star-icon" />
-                  <span>{selectedTutorProfile.rating.toFixed(1)}</span>
+              {selectedTutorProfile.user?.pronouns && (
+                <div style={{ color: '#6b7280', fontSize: '0.9rem', marginTop: '4px' }}>
+                  {selectedTutorProfile.user.pronouns}
                 </div>
               )}
+              <div className="tutor-rating">
+                <FontAwesomeIcon icon={faStar} className="star-icon" />
+                {selectedTutorProfile.averageRating && selectedTutorProfile.averageRating > 0 ? (
+                  <>
+                    <span>{selectedTutorProfile.averageRating.toFixed(1)}</span>
+                    {selectedTutorProfile.reviewCount > 0 && (
+                      <span className="tutor-rating-count">
+                        ({selectedTutorProfile.reviewCount} {selectedTutorProfile.reviewCount === 1 ? 'review' : 'reviews'})
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <span className="tutor-rating-empty">No ratings yet</span>
+                )}
+              </div>
             </div>
             
             <div className="tutor-profile-details">
@@ -962,7 +1070,20 @@ const BookLesson = () => {
                   <span className="tutor-profile-value">{selectedTutorProfile.bio}</span>
                 </div>
               )}
-              
+
+              {(selectedTutorProfile.university || selectedTutorProfile.program || selectedTutorProfile.academicYear) && (
+                <div className="tutor-profile-item">
+                  <span className="tutor-profile-label">Education</span>
+                  <span className="tutor-profile-value">
+                    {[
+                      selectedTutorProfile.program,
+                      selectedTutorProfile.academicYear,
+                      selectedTutorProfile.university
+                    ].filter(Boolean).join(' • ')}
+                  </span>
+                </div>
+              )}
+
               {selectedTutorProfile.subjects && selectedTutorProfile.subjects.length > 0 && (
                 <div className="tutor-profile-item">
                   <span className="tutor-profile-label">Subjects</span>
@@ -975,18 +1096,17 @@ const BookLesson = () => {
                   </div>
                 </div>
               )}
-              
-              {selectedTutorProfile.experience && (
-                <div className="tutor-profile-item">
-                  <span className="tutor-profile-label">Experience</span>
-                  <span className="tutor-profile-value">{selectedTutorProfile.experience}</span>
-                </div>
-              )}
 
-              {selectedTutorProfile.education && (
+              {selectedTutorProfile.gradeLevels && selectedTutorProfile.gradeLevels.length > 0 && (
                 <div className="tutor-profile-item">
-                  <span className="tutor-profile-label">Education</span>
-                  <span className="tutor-profile-value">{selectedTutorProfile.education}</span>
+                  <span className="tutor-profile-label">Grade Levels</span>
+                  <div className="tutor-subjects-list">
+                    {selectedTutorProfile.gradeLevels.map((grade, index) => (
+                      <span key={index} className="subject-tag">
+                        {grade}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

@@ -8,6 +8,8 @@ public class RegisterUserDTO {
     private String password;
     private String username;
     private Role role;
+    private String pronouns;
+    private String studentGrade;
 
     public CharSequence getPassword() {
         return password;
@@ -25,6 +27,14 @@ public class RegisterUserDTO {
         return role;
     }
 
+    public String getPronouns() {
+        return pronouns;
+    }
+
+    public String getStudentGrade() {
+        return studentGrade;
+    }
+
     public void setEmail(String email) {
         this.email = email;
     }
@@ -39,5 +49,13 @@ public class RegisterUserDTO {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public void setPronouns(String pronouns) {
+        this.pronouns = pronouns;
+    }
+
+    public void setStudentGrade(String studentGrade) {
+        this.studentGrade = studentGrade;
     }
 }

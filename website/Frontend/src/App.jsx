@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route} from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom';
 import React from 'react';
 import Home from './components/Home/Home';
 import './App.css'
@@ -19,22 +19,20 @@ import Courses from './components/Courses/Courses';
 import CourseDetails from './components/Courses/CourseDetails';
 import AvailabilityManager from './components/Availability/AvailabilityManager';
 import Messages from './components/Messages/Messages';
-import TutorInvitations from './components/TutorInvitations/TutorInvitations';
 import About from './About/About';
 import Pricing from './Pricing/Pricing';
 import Team from './Team/Team';
 import Contact from './Contact/Contact';
 import { UserProvider } from './context/UserContext';
 import AdminDashboard from './components/Admin/AdminDashboard';
-import UserManagement from './components/Admin/UserManagement';
-import Statistics from './components/Admin/Statistics';
-import BookingOversight from './components/Admin/BookingOversight';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
+import SessionExpiryWatcher from './components/Auth/SessionExpiryWatcher';
 
 function App() {
   return (
     <UserProvider>
       <Router>
+      <SessionExpiryWatcher />
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
@@ -110,32 +108,16 @@ function App() {
             </ProtectedRoute>
           } />
           
-          {/* Admin-only routes */}
+          {/* Admin-only routes - all admin functionality is now tabs in /admin-dashboard */}
           <Route path="admin-dashboard" element={
             <ProtectedRoute allowedRoles={['ADMIN']}>
               <AdminDashboard />
             </ProtectedRoute>
           } />
-          <Route path="admin/users" element={
-            <ProtectedRoute allowedRoles={['ADMIN']}>
-              <UserManagement />
-            </ProtectedRoute>
-          } />
-          <Route path="admin/statistics" element={
-            <ProtectedRoute allowedRoles={['ADMIN']}>
-              <Statistics />
-            </ProtectedRoute>
-          } />
-          <Route path="admin/bookings" element={
-            <ProtectedRoute allowedRoles={['ADMIN']}>
-              <BookingOversight />
-            </ProtectedRoute>
-          } />
-          <Route path="admin/invitations" element={
-            <ProtectedRoute allowedRoles={['ADMIN']}>
-              <TutorInvitations />
-            </ProtectedRoute>
-          } />
+          <Route path="admin/users" element={<Navigate to="/admin-dashboard?tab=users" replace />} />
+          <Route path="admin/statistics" element={<Navigate to="/admin-dashboard?tab=statistics" replace />} />
+          <Route path="admin/bookings" element={<Navigate to="/admin-dashboard?tab=bookings" replace />} />
+          <Route path="admin/invitations" element={<Navigate to="/admin-dashboard?tab=tutors" replace />} />
       </Routes>
     </Router>
     </UserProvider>

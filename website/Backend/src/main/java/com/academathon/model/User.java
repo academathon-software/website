@@ -50,8 +50,8 @@ public class User implements UserDetails{
     @Column(name = "contact_email")
     private String contactEmail;
 
-    @Column(name = "contact_phone")
-    private String contactPhone;
+    @Column(name = "student_grade")
+    private String studentGrade;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -206,14 +206,6 @@ public class User implements UserDetails{
         this.bio = bio;
     }
 
-    public String getPronouns() {
-        return pronouns;
-    }
-
-    public void setPronouns(String pronouns) {
-        this.pronouns = pronouns;
-    }
-
     public String getContactEmail() {
         return contactEmail;
     }
@@ -222,12 +214,20 @@ public class User implements UserDetails{
         this.contactEmail = contactEmail;
     }
 
-    public String getContactPhone() {
-        return contactPhone;
+    public String getPronouns() {
+        return pronouns;
     }
 
-    public void setContactPhone(String contactPhone) {
-        this.contactPhone = contactPhone;
+    public void setPronouns(String pronouns) {
+        this.pronouns = pronouns;
+    }
+
+    public String getStudentGrade() {
+        return studentGrade;
+    }
+
+    public void setStudentGrade(String studentGrade) {
+        this.studentGrade = studentGrade;
     }
 }
 

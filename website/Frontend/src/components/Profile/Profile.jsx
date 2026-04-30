@@ -4,7 +4,37 @@ import './Profile.css';
 import StudentSidebar from '../Shared/StudentSidebar';
 import TutorSidebar from '../Shared/TutorSidebar';
 import { useUser } from '../../context/UserContext';
-import { userAPI } from '../../services/api';
+import { userAPI, tutorAPI } from '../../services/api';
+
+const PRONOUN_OPTIONS = [
+  'she/her',
+  'he/him',
+  'they/them',
+  'she/they',
+  'he/they',
+  'Prefer not to say'
+];
+
+const STUDENT_GRADE_OPTIONS = [
+  '1st Grade',
+  '2nd Grade',
+  '3rd Grade',
+  '4th Grade',
+  '5th Grade',
+  '6th Grade',
+  '7th Grade',
+  '8th Grade',
+  '9th Grade',
+  '10th Grade',
+  '11th Grade',
+  '12th Grade',
+  'College/University',
+  'Adult Learner'
+];
+
+// Tutors pick from the same set so the JSON-LIKE filter on
+// tutor_profiles.grade_levels stays aligned with what students store.
+const TUTOR_GRADE_OPTIONS = STUDENT_GRADE_OPTIONS;
 
 const Profile = () => {
   const { isTutor } = useUser();
@@ -13,9 +43,9 @@ const Profile = () => {
     bio: '',
     username: '',
     email: '',
-    pronouns: '',
     contactEmail: '',
-    contactPhone: ''
+    pronouns: '',
+    studentGrade: ''
   });
   const [originalData, setOriginalData] = useState(null);
   const [profilePictureUrl, setProfilePictureUrl] = useState(null);
@@ -27,6 +57,20 @@ const Profile = () => {
   const [successMessage, setSuccessMessage] = useState(null);
 
   const [isEditing, setIsEditing] = useState(false);
+
+  // Tutor-only state
+  const [tutorProfileId, setTutorProfileId] = useState(null);
+  const [tutorGradeLevels, setTutorGradeLevels] = useState([]);
+  const [originalTutorGradeLevels, setOriginalTutorGradeLevels] = useState([]);
+
+  const toggleTutorGradeLevel = (grade) => {
+    if (!isEditing) return;
+    setTutorGradeLevels(prev => (
+      prev.includes(grade)
+        ? prev.filter(g => g !== grade)
+        : [...prev, grade]
+    ));
+  };
 
   // Fetch user profile on mount
   useEffect(() => {
@@ -40,29 +84,40 @@ const Profile = () => {
           bio: userData.bio || '',
           username: userData.displayUsername || userData.username || '',
           email: userData.email || '',
-          pronouns: userData.pronouns || '',
           contactEmail: userData.contactEmail || '',
-          contactPhone: userData.contactPhone || ''
+          pronouns: userData.pronouns || '',
+          studentGrade: userData.studentGrade || ''
         };
         
         setProfileData(data);
         setOriginalData(data);
         setProfilePictureUrl(userData.profilePictureUrl);
+
+        // Tutors also have a TutorProfile with grade levels they teach
+        if (isTutor) {
+          try {
+            const tutorRes = await tutorAPI.getMyProfile();
+            const grades = Array.isArray(tutorRes.data?.gradeLevels) ? tutorRes.data.gradeLevels : [];
+            setTutorProfileId(tutorRes.data?.id || null);
+            setTutorGradeLevels(grades);
+            setOriginalTutorGradeLevels(grades);
+          } catch (tutorErr) {
+            console.error('Could not load tutor profile:', tutorErr);
+          }
+        }
+
         setError(null);
       } catch (err) {
         console.error('Error fetching profile:', err);
-        if (err.response?.status === 401 || err.response?.status === 403 || !localStorage.getItem('token')) {
-          setError('SESSION_EXPIRED');
-        } else {
-          setError('Failed to load profile data');
-        }
+        // 401s redirect globally; everything else is surfaced as a load error.
+        setError('Failed to load profile data');
       } finally {
         setLoading(false);
       }
     };
 
     fetchProfile();
-  }, []);
+  }, [isTutor]);
 
   const handleInputChange = (field, value) => {
     setProfileData(prev => ({
@@ -121,6 +176,13 @@ const Profile = () => {
         const { email, ...profileUpdateData } = profileData;
         await userAPI.updateProfile(profileUpdateData);
       }
+
+      // For tutors: also persist their teaching grade levels
+      if (isTutor && tutorProfileId) {
+        await tutorAPI.updateTutor(tutorProfileId, {
+          gradeLevels: tutorGradeLevels
+        });
+      }
       
       // Refetch user data to ensure we have the latest from the backend
       const userResponse = await userAPI.getCurrentUser();
@@ -130,14 +192,19 @@ const Profile = () => {
         bio: userData.bio || '',
         username: userData.displayUsername || userData.username || '',
         email: userData.email || '',
-        pronouns: userData.pronouns || '',
         contactEmail: userData.contactEmail || '',
-        contactPhone: userData.contactPhone || ''
+        pronouns: userData.pronouns || '',
+        studentGrade: userData.studentGrade || ''
       };
       
       setProfileData(updatedData);
       setOriginalData(updatedData);
       setProfilePictureUrl(newProfilePictureUrl || userData.profilePictureUrl);
+
+      // Snapshot the saved grade levels as the new "original" so cancel works
+      if (isTutor) {
+        setOriginalTutorGradeLevels(tutorGradeLevels);
+      }
       
       // Clear preview and file after URL is set
       setProfilePictureFile(null);
@@ -160,6 +227,7 @@ const Profile = () => {
     setProfileData(originalData);
     setProfilePictureFile(null);
     setProfilePicturePreview(null);
+    setTutorGradeLevels(originalTutorGradeLevels);
     setIsEditing(false);
     setError(null);
   };
@@ -208,20 +276,7 @@ const Profile = () => {
             <p>Complete Your Profile</p>
           </div>
 
-          {error === 'SESSION_EXPIRED' && (
-            <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-              <div style={{ fontSize: '48px', marginBottom: '20px' }}>🔒</div>
-              <h2 style={{ color: '#333', marginBottom: '10px' }}>Session Expired</h2>
-              <p style={{ color: '#666', marginBottom: '20px' }}>Your session has expired. Please log back in to continue.</p>
-              <button 
-                onClick={() => { localStorage.clear(); navigate('/login'); }}
-                style={{ padding: '12px 30px', backgroundColor: '#1A803D', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '16px', fontWeight: '600' }}
-              >
-                Log Back In
-              </button>
-            </div>
-          )}
-          {error && error !== 'SESSION_EXPIRED' && <div className="error-message">{error}</div>}
+          {error && <div className="error-message">{error}</div>}
           {successMessage && <div className="success-message">{successMessage}</div>}
 
           <div className="profile-content">
@@ -308,18 +363,6 @@ const Profile = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="pronouns">Add/Edit Pronouns</label>
-                <input
-                  id="pronouns"
-                  type="text"
-                  value={profileData.pronouns}
-                  onChange={(e) => handleInputChange('pronouns', e.target.value)}
-                  placeholder="e.g., they/them, he/him, she/her"
-                  disabled={!isEditing}
-                />
-              </div>
-
-              <div className="form-group">
                 <label htmlFor="contactEmail">Edit Contact Email</label>
                 <input
                   id="contactEmail"
@@ -332,16 +375,79 @@ const Profile = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="contactPhone">Edit/Add Contact Phone Number</label>
-                <input
-                  id="contactPhone"
-                  type="tel"
-                  value={profileData.contactPhone}
-                  onChange={(e) => handleInputChange('contactPhone', e.target.value)}
-                  placeholder="Enter your phone number"
+                <label htmlFor="pronouns">Pronouns</label>
+                <select
+                  id="pronouns"
+                  value={profileData.pronouns}
+                  onChange={(e) => handleInputChange('pronouns', e.target.value)}
                   disabled={!isEditing}
-                />
+                >
+                  <option value="">Select your pronouns</option>
+                  {PRONOUN_OPTIONS.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
               </div>
+
+              {!isTutor && (
+                <div className="form-group">
+                  <label htmlFor="studentGrade">Grade Level</label>
+                  <select
+                    id="studentGrade"
+                    value={profileData.studentGrade}
+                    onChange={(e) => handleInputChange('studentGrade', e.target.value)}
+                    disabled={!isEditing}
+                  >
+                    <option value="">Select your grade level</option>
+                    {STUDENT_GRADE_OPTIONS.map(option => (
+                      <option key={option} value={option}>{option}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {isTutor && (
+                <div className="form-group">
+                  <label>Grade Levels You Teach</label>
+                  <div style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '8px',
+                    padding: '12px',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    backgroundColor: isEditing ? '#fff' : '#f9fafb'
+                  }}>
+                    {TUTOR_GRADE_OPTIONS.map(option => {
+                      const selected = tutorGradeLevels.includes(option);
+                      return (
+                        <button
+                          type="button"
+                          key={option}
+                          onClick={() => toggleTutorGradeLevel(option)}
+                          disabled={!isEditing}
+                          style={{
+                            padding: '6px 14px',
+                            borderRadius: '999px',
+                            border: `1px solid ${selected ? '#1A803D' : '#d1d5db'}`,
+                            backgroundColor: selected ? '#1A803D' : 'white',
+                            color: selected ? 'white' : '#374151',
+                            cursor: isEditing ? 'pointer' : 'default',
+                            fontSize: '0.85rem',
+                            fontWeight: 500,
+                            opacity: isEditing ? 1 : 0.85
+                          }}
+                        >
+                          {option}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p style={{ marginTop: '6px', fontSize: '0.8rem', color: '#6b7280' }}>
+                    Students looking for help will only see you in the tutor list for these grade levels.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 

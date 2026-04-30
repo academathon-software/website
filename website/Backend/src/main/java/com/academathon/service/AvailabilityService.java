@@ -218,11 +218,14 @@ public class AvailabilityService {
             }
         }
         
-        // Remove booked times
+        // Remove booked times. Any booking that is still "live" (i.e. not
+        // explicitly cancelled or rejected) blocks the slot. This must stay in
+        // sync with BookingRepository.findConflictingBookings so the calendar
+        // doesn't show green slots that the booking conflict check will reject.
         List<Booking> dayBookings = bookings.stream()
             .filter(b -> b.getStartTime().toLocalDate().equals(date))
-            .filter(b -> b.getStatus() == Booking.BookingStatus.CONFIRMED || 
-                        b.getStatus() == Booking.BookingStatus.PENDING)
+            .filter(b -> b.getStatus() != Booking.BookingStatus.CANCELLED &&
+                         b.getStatus() != Booking.BookingStatus.REJECTED)
             .collect(Collectors.toList());
         
         for (Booking booking : dayBookings) {

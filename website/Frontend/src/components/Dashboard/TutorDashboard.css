@@ -327,12 +327,15 @@
   color: #666;
 }
 
-.profile-header {
+.student-profile-modal .profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
   margin-bottom: 1.5rem;
 }
 
-.profile-avatar {
+.student-profile-modal .profile-avatar {
   width: 80px;
   height: 80px;
   border-radius: 50%;
@@ -346,17 +349,18 @@
   margin: 0 auto 1rem;
 }
 
-.profile-avatar-img {
+.student-profile-modal .profile-avatar-img {
   width: 80px;
   height: 80px;
   border-radius: 50%;
   object-fit: cover;
+  display: block;
   margin: 0 auto 1rem;
   border: 3px solid #4CAF50;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.profile-header h2 {
+.student-profile-modal .profile-header h2 {
   margin: 0;
   font-size: 1.5rem;
   color: #333;

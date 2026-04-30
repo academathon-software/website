@@ -13,5 +13,11 @@ public record TutorProfileDTO(
     BigDecimal hourlyRate,
     LocalDateTime createdAt,
     LocalDateTime updatedAt,
-    List<SubjectDTO> subjects
+    List<SubjectDTO> subjects,
+    String university,
+    String program,
+    String academicYear,
+    List<String> gradeLevels,
+    Double averageRating,
+    Long reviewCount
 ) {}

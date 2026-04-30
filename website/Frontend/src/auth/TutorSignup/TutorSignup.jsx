@@ -258,10 +258,10 @@ function TutorSignup() {
     email: '',
     password: '',
     confirmPassword: '',
+    pronouns: '',
     university: '',
     program: '',
     academicYear: '',
-    schoolEmail: '',
     gradeLevels: [],
     subjects: [],
     bio: '',
@@ -270,6 +270,15 @@ function TutorSignup() {
 
   const [errors, setErrors] = useState({});
   const [subjectSearch, setSubjectSearch] = useState('');
+
+  const pronounOptions = [
+    'she/her',
+    'he/him',
+    'they/them',
+    'she/they',
+    'he/they',
+    'Prefer not to say'
+  ];
 
   const availableGradeLevels = [
     '1st Grade',
@@ -402,6 +411,7 @@ function TutorSignup() {
     
     if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
     if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
+    if (!formData.pronouns) newErrors.pronouns = 'Please select your pronouns';
     if (!formData.password) newErrors.password = 'Password is required';
     else if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
     if (formData.password !== formData.confirmPassword) {
@@ -418,7 +428,6 @@ function TutorSignup() {
     if (!formData.university.trim()) newErrors.university = 'University is required';
     if (!formData.program.trim()) newErrors.program = 'Program is required';
     if (!formData.academicYear.trim()) newErrors.academicYear = 'Academic year is required';
-    if (!formData.schoolEmail.trim()) newErrors.schoolEmail = 'School email is required';
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -491,10 +500,10 @@ function TutorSignup() {
           lastName: formData.lastName,
           email: formData.email,
           password: formData.password,
+          pronouns: formData.pronouns,
           university: formData.university,
           program: formData.program,
           academicYear: formData.academicYear,
-          schoolEmail: formData.schoolEmail,
           gradeLevels: formData.gradeLevels,
           subjects: formData.subjects,
           bio: formData.bio,
@@ -595,6 +604,21 @@ function TutorSignup() {
               </div>
 
               <div className="form-group">
+                <label>Pronouns</label>
+                <select
+                  value={formData.pronouns}
+                  onChange={(e) => handleInputChange('pronouns', e.target.value)}
+                  className={errors.pronouns ? 'error' : ''}
+                >
+                  <option value="">Select your pronouns</option>
+                  {pronounOptions.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+                {errors.pronouns && <span className="error-text">{errors.pronouns}</span>}
+              </div>
+
+              <div className="form-group">
                 <label>Password</label>
                 <input
                   type="password"
@@ -670,17 +694,6 @@ function TutorSignup() {
                 error={!!errors.academicYear}
                 errorText={errors.academicYear}
               />
-
-              <div className="form-group">
-                <label>School Email</label>
-                <input
-                  type="email"
-                  value={formData.schoolEmail}
-                  onChange={(e) => handleInputChange('schoolEmail', e.target.value)}
-                  className={errors.schoolEmail ? 'error' : ''}
-                />
-                {errors.schoolEmail && <span className="error-text">{errors.schoolEmail}</span>}
-              </div>
             </div>
           )}
 

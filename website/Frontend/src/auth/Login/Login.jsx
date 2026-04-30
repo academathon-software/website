@@ -1,7 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import "./Login.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGraduationCap, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import {
+  consumeLogoutReason,
+  LOGOUT_REASON_SESSION_EXPIRED,
+} from '../../services/auth';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -11,6 +15,14 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
+  const [notice, setNotice] = useState(null);
+
+  useEffect(() => {
+    const reason = consumeLogoutReason();
+    if (reason === LOGOUT_REASON_SESSION_EXPIRED) {
+      setNotice('Your session expired. Please log in again.');
+    }
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -30,9 +42,12 @@ function LoginPage() {
 
       if (response.ok) {
         const data = await response.json();
-        // Store JWT token, user role, userId, and username in localStorage
+        // Store JWT token, user role, userId, and username in localStorage.
+        // tokenExpiry is stored as an absolute ms-since-epoch (server sends a
+        // duration in `expiresIn`) so the SessionExpiryWatcher can check it
+        // directly without re-doing the math.
         localStorage.setItem('token', data.token);
-        localStorage.setItem('tokenExpiry', data.expiresIn);
+        localStorage.setItem('tokenExpiry', Date.now() + Number(data.expiresIn));
         localStorage.setItem('userRole', data.role);
         localStorage.setItem('userId', data.userId);
         localStorage.setItem('username', data.username);
@@ -82,7 +97,13 @@ function LoginPage() {
         <form onSubmit={handleLogin} className="login-form">
           <h2 className="login-title">Login</h2>
           <h3 className="login-subtitle">Welcome back! Login into your account</h3>
-          
+
+          {notice && (
+            <div className="login-notice" role="status">
+              <p>{notice}</p>
+            </div>
+          )}
+
           <div className="login-input-group">
             <label className="login-label">Email</label>
             <input

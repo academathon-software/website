@@ -35,4 +35,18 @@ public interface TutorProfileRepository extends JpaRepository<TutorProfile, Long
     
     // Find tutor profiles by hourly rate range
     Page<TutorProfile> findByHourlyRateBetween(BigDecimal minRate, BigDecimal maxRate, Pageable pageable);
+
+    // Filter by grade level — gradeLevels is stored as a JSON string like ["1st Grade","2nd Grade"]
+    // so we LIKE-match a quoted label such as %"1st Grade"% to avoid substring collisions.
+    @Query("SELECT t FROM TutorProfile t WHERE t.gradeLevels LIKE :gradePattern")
+    Page<TutorProfile> findByGradeLevelPattern(@Param("gradePattern") String gradePattern, Pageable pageable);
+
+    // Filter by subject name AND grade level (both required).
+    @Query("SELECT DISTINCT t FROM TutorProfile t JOIN t.subjects s " +
+           "WHERE LOWER(s.name) = LOWER(:subjectName) " +
+           "AND t.gradeLevels LIKE :gradePattern")
+    Page<TutorProfile> findBySubjectAndGradeLevel(
+            @Param("subjectName") String subjectName,
+            @Param("gradePattern") String gradePattern,
+            Pageable pageable);
 }

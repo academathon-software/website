@@ -1,223 +1,140 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import AdminSidebar from './AdminSidebar';
-import adminAPI from '../../services/adminApi';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faChartColumn,
+  faUsers,
+  faUserPlus,
+  faCalendarDays,
+  faRightFromBracket,
+  faCircleUser,
+  faChevronDown,
+} from '@fortawesome/free-solid-svg-icons';
+import StatisticsTab from './StatisticsTab';
+import UsersTab from './UsersTab';
+import TutorsTab from './TutorsTab';
+import BookingsTab from './BookingsTab';
+import logoImg from '../../assets/logo.avif';
+import { logout } from '../../services/auth';
 import './AdminDashboard.css';
 
+const TABS = [
+  { id: 'statistics', label: 'Statistics', icon: faChartColumn },
+  { id: 'users', label: 'Users', icon: faUsers },
+  { id: 'tutors', label: 'Tutors', icon: faUserPlus },
+  { id: 'bookings', label: 'Bookings', icon: faCalendarDays },
+];
+
+const VALID_TAB_IDS = TABS.map((t) => t.id);
+
 const AdminDashboard = () => {
-  const navigate = useNavigate();
-  const [statistics, setStatistics] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  const tabFromUrl = searchParams.get('tab');
+  const activeTab = VALID_TAB_IDS.includes(tabFromUrl) ? tabFromUrl : 'statistics';
 
   useEffect(() => {
-    fetchStatistics();
+    if (!VALID_TAB_IDS.includes(tabFromUrl)) {
+      setSearchParams({ tab: 'statistics' }, { replace: true });
+    }
+  }, [tabFromUrl, setSearchParams]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const fetchStatistics = async () => {
-    try {
-      setLoading(true);
-      const response = await adminAPI.getStatistics();
-      setStatistics(response.data);
-      setError(null);
-    } catch (err) {
-      console.error('Error fetching statistics:', err);
-      if (err.response?.status === 401 || err.response?.status === 403 || !localStorage.getItem('token')) {
-        setError('SESSION_EXPIRED');
-      } else {
-        setError('Failed to load statistics. Please try again.');
-      }
-    } finally {
-      setLoading(false);
+  const handleTabChange = (tabId) => {
+    setSearchParams({ tab: tabId });
+  };
+
+  // Voluntary sign-out — no `reason` so the login page won't show a
+  // "session expired" notice the user didn't trigger.
+  const handleSignOut = () => {
+    logout();
+  };
+
+  const renderActiveTab = () => {
+    switch (activeTab) {
+      case 'users':
+        return <UsersTab />;
+      case 'tutors':
+        return <TutorsTab />;
+      case 'bookings':
+        return <BookingsTab />;
+      case 'statistics':
+      default:
+        return <StatisticsTab onNavigate={handleTabChange} />;
     }
   };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-CA', {
-      style: 'currency',
-      currency: 'CAD',
-    }).format(amount || 0);
-  };
-
-  const formatPercentage = (value) => {
-    if (value === null || value === undefined) return '0%';
-    return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
-  };
-
-  const getGrowthColor = (value) => {
-    if (value > 0) return 'positive';
-    if (value < 0) return 'negative';
-    return 'neutral';
-  };
-
-  if (loading) {
-    return (
-      <div className="admin-dashboard">
-        <AdminSidebar />
-        <div className="admin-content">
-          <div className="loading-spinner">Loading...</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    const isSessionExpired = error === 'SESSION_EXPIRED';
-    return (
-      <div className="admin-dashboard">
-        <AdminSidebar />
-        <div className="admin-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-          {isSessionExpired ? (
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '48px', marginBottom: '20px' }}>🔒</div>
-              <h2 style={{ color: '#333', marginBottom: '10px' }}>Session Expired</h2>
-              <p style={{ color: '#666', marginBottom: '20px' }}>Your session has expired. Please log back in to continue.</p>
-              <button 
-                onClick={() => { localStorage.clear(); navigate('/login'); }}
-                style={{ padding: '12px 30px', backgroundColor: '#1A803D', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '16px', fontWeight: '600' }}
-              >
-                Log Back In
-              </button>
-            </div>
-          ) : (
-            <div className="error-message">{error}</div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="admin-dashboard">
-      <AdminSidebar />
-      <div className="admin-content">
-        <div className="dashboard-header">
-          <h1>Admin Dashboard</h1>
-          <p className="dashboard-subtitle">Monitor and manage your platform</p>
-        </div>
+    <div className="admin-shell">
+      <header className="admin-topbar">
+        <div className="admin-topbar-inner">
+          <Link to="/" className="admin-logo" aria-label="Academathon home">
+            <img src={logoImg} alt="Academathon" className="admin-logo-img" />
+          </Link>
 
-        {/* Statistics Cards */}
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-icon">👥</div>
-            <div className="stat-details">
-              <h3>Total Users</h3>
-              <p className="stat-value">{statistics?.totalUsers || 0}</p>
-              <div className="stat-breakdown">
-                <span>{statistics?.totalStudents || 0} Students</span>
-                <span>{statistics?.totalTutors || 0} Tutors</span>
-              </div>
-            </div>
-            <div className={`stat-growth ${getGrowthColor(statistics?.userGrowthRate)}`}>
-              {formatPercentage(statistics?.userGrowthRate)}
-            </div>
+          <div className="admin-topbar-title">
+            <h1>Admin Dashboard</h1>
+            <p className="admin-topbar-subtitle">Manage your platform</p>
           </div>
 
-          <div className="stat-card">
-            <div className="stat-icon">✅</div>
-            <div className="stat-details">
-              <h3>Active Users</h3>
-              <p className="stat-value">
-                {(statistics?.activeStudents || 0) + (statistics?.activeTutors || 0)}
-              </p>
-              <div className="stat-breakdown">
-                <span>{statistics?.activeStudents || 0} Students</span>
-                <span>{statistics?.activeTutors || 0} Tutors</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-icon">📚</div>
-            <div className="stat-details">
-              <h3>Total Bookings</h3>
-              <p className="stat-value">{statistics?.totalBookings || 0}</p>
-              <div className="stat-breakdown">
-                <span>{statistics?.completedBookings || 0} Completed</span>
-                <span>{statistics?.pendingBookings || 0} Pending</span>
-              </div>
-            </div>
-            <div className={`stat-growth ${getGrowthColor(statistics?.bookingGrowthRate)}`}>
-              {formatPercentage(statistics?.bookingGrowthRate)}
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-icon">💰</div>
-            <div className="stat-details">
-              <h3>Total Revenue</h3>
-              <p className="stat-value">{formatCurrency(statistics?.totalRevenue)}</p>
-              <div className="stat-breakdown">
-                <span>Avg: {formatCurrency(statistics?.averageBookingValue)}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="quick-actions-section">
-          <h2>Quick Actions</h2>
-          <div className="quick-actions-grid">
+          <div className="admin-topbar-account" ref={menuRef}>
             <button
-              className="action-card"
-              onClick={() => navigate('/admin/users')}
+              className="admin-account-button"
+              onClick={() => setMenuOpen((prev) => !prev)}
+              aria-haspopup="true"
+              aria-expanded={menuOpen}
             >
-              <span className="action-icon">👥</span>
-              <span className="action-title">Manage Users</span>
-              <span className="action-description">View and manage all users</span>
+              <FontAwesomeIcon icon={faCircleUser} className="admin-account-icon" />
+              <span className="admin-account-label">Administrator</span>
+              <FontAwesomeIcon
+                icon={faChevronDown}
+                className={`admin-account-chevron ${menuOpen ? 'open' : ''}`}
+              />
             </button>
 
-            <button
-              className="action-card"
-              onClick={() => navigate('/admin/invitations')}
-            >
-              <span className="action-icon">✉️</span>
-              <span className="action-title">Invite Tutors</span>
-              <span className="action-description">Send tutor invitations</span>
-            </button>
-
-            <button
-              className="action-card"
-              onClick={() => navigate('/admin/bookings')}
-            >
-              <span className="action-icon">📅</span>
-              <span className="action-title">View Bookings</span>
-              <span className="action-description">Oversee all bookings</span>
-            </button>
-
-            <button
-              className="action-card"
-              onClick={() => navigate('/admin/statistics')}
-            >
-              <span className="action-icon">📈</span>
-              <span className="action-title">View Reports</span>
-              <span className="action-description">Detailed analytics</span>
-            </button>
+            {menuOpen && (
+              <div className="admin-account-menu" role="menu">
+                <button className="admin-account-menu-item" onClick={handleSignOut}>
+                  <FontAwesomeIcon icon={faRightFromBracket} />
+                  <span>Sign out</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
+      </header>
 
-        {/* Booking Status Overview */}
-        <div className="booking-overview-section">
-          <h2>Booking Overview</h2>
-          <div className="booking-status-grid">
-            <div className="booking-status-card completed">
-              <h3>{statistics?.completedBookings || 0}</h3>
-              <p>Completed</p>
-            </div>
-            <div className="booking-status-card pending">
-              <h3>{statistics?.pendingBookings || 0}</h3>
-              <p>Pending</p>
-            </div>
-            <div className="booking-status-card cancelled">
-              <h3>{statistics?.cancelledBookings || 0}</h3>
-              <p>Cancelled</p>
-            </div>
-          </div>
+      <nav className="admin-tabs" role="tablist">
+        <div className="admin-tabs-inner">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              role="tab"
+              aria-selected={activeTab === tab.id}
+              className={`admin-tab ${activeTab === tab.id ? 'active' : ''}`}
+              onClick={() => handleTabChange(tab.id)}
+            >
+              <FontAwesomeIcon icon={tab.icon} className="admin-tab-icon" />
+              <span>{tab.label}</span>
+            </button>
+          ))}
         </div>
-      </div>
+      </nav>
+
+      <main className="admin-tab-panel">{renderActiveTab()}</main>
     </div>
   );
 };
 
 export default AdminDashboard;
-

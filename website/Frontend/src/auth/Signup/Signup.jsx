@@ -30,9 +30,19 @@ function SignUpPage() {
     firstName: '',
     lastName: '',
     role: 'STUDENT',
+    pronouns: '',
     gradeLevel: '',
     interests: []
   });
+
+  const pronounOptions = [
+    'she/her',
+    'he/him',
+    'they/them',
+    'she/they',
+    'he/they',
+    'Prefer not to say'
+  ];
   
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -48,10 +58,21 @@ function SignUpPage() {
     'Economics', 'Psychology', 'Philosophy'
   ];
 
+  // Must match the labels tutors store on their profile so grade-based
+  // tutor filtering ("%\"7th Grade\"%") works without translation.
   const gradeLevels = [
-    'Elementary (K-5)',
-    'Middle School (6-8)', 
-    'High School (9-12)',
+    '1st Grade',
+    '2nd Grade',
+    '3rd Grade',
+    '4th Grade',
+    '5th Grade',
+    '6th Grade',
+    '7th Grade',
+    '8th Grade',
+    '9th Grade',
+    '10th Grade',
+    '11th Grade',
+    '12th Grade',
     'College/University',
     'Adult Learner'
   ];
@@ -161,7 +182,10 @@ function SignUpPage() {
 
   const validateStep2 = () => {
     const newErrors = {};
-    
+
+    if (!formData.pronouns) {
+      newErrors.pronouns = 'Please select your pronouns';
+    }
     if (!formData.gradeLevel) {
       newErrors.gradeLevel = 'Please select your grade level';
     }
@@ -227,8 +251,10 @@ function SignUpPage() {
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
-          username: formData.firstName,
-          role: formData.role
+          username: `${formData.firstName} ${formData.lastName}`.trim(),
+          role: formData.role,
+          pronouns: formData.pronouns,
+          studentGrade: formData.gradeLevel
         })
       });
 
@@ -435,6 +461,25 @@ function SignUpPage() {
 
           {signupStep === 2 && (
             <div className="form-step">
+              <div className="input-group">
+                <label className='text'>Pronouns</label>
+                <div className="input-wrapper">
+                  <FontAwesomeIcon icon={faUser} className="input-icon" />
+                  <select
+                    className={`custom-input ${errors.pronouns ? 'error' : ''}`}
+                    value={formData.pronouns}
+                    onChange={(e) => handleInputChange('pronouns', e.target.value)}
+                    required
+                  >
+                    <option value="">Select your pronouns</option>
+                    {pronounOptions.map(option => (
+                      <option key={option} value={option}>{option}</option>
+                    ))}
+                  </select>
+                </div>
+                {errors.pronouns && <span className="error-text">{errors.pronouns}</span>}
+              </div>
+
               <div className="input-group">
                 <label className='text'>Grade Level</label>
                 <div className="input-wrapper">

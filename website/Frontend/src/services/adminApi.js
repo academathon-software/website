@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { logout, LOGOUT_REASON_SESSION_EXPIRED } from './auth';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -24,19 +25,14 @@ api.interceptors.request.use(
   }
 );
 
-// Add response interceptor to handle errors
+// Add response interceptor to handle errors. Mirrors the public api.js: any
+// 401 means the session is no longer valid, so we route through the shared
+// logout helper to land on /login with a "session expired" notice.
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Unauthorized - redirect to login
-      localStorage.removeItem('token');
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('username');
-      window.location.href = '/login';
+      logout({ reason: LOGOUT_REASON_SESSION_EXPIRED });
     }
     return Promise.reject(error);
   }

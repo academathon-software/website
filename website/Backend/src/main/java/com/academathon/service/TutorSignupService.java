@@ -52,6 +52,11 @@ public class TutorSignupService {
         if (!invitation.getEmail().equalsIgnoreCase(dto.email())) {
             throw new RuntimeException("Email does not match invitation");
         }
+
+        // 2b. Pronouns are required for tutor accounts
+        if (dto.pronouns() == null || dto.pronouns().isBlank()) {
+            throw new RuntimeException("Pronouns are required.");
+        }
         
         // 3. Check if user already exists
         if (userRepository.findByEmail(dto.email()).isPresent()) {
@@ -66,6 +71,10 @@ public class TutorSignupService {
             passwordEncoder.encode(dto.password()),
             User.Role.TUTOR
         );
+        user.setPronouns(dto.pronouns());
+        if (dto.bio() != null) {
+            user.setBio(dto.bio());
+        }
         user.setVerificationCode(generateVerificationCode());
         user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
         user.setEnabled(false);
@@ -85,16 +94,14 @@ public class TutorSignupService {
             throw new RuntimeException("Failed to serialize grade levels", e);
         }
         
-        // 7. Create TutorProfile
+        // 7. Create TutorProfile (bio lives on the User itself)
         TutorProfile tutorProfile = new TutorProfile();
         tutorProfile.setUser(user);
         tutorProfile.setDisplayName(displayName);
-        tutorProfile.setBio(dto.bio() != null ? dto.bio() : "");
         tutorProfile.setHourlyRate(dto.hourlyRate() != null ? dto.hourlyRate() : BigDecimal.ZERO);
         tutorProfile.setUniversity(dto.university());
         tutorProfile.setProgram(dto.program());
         tutorProfile.setAcademicYear(dto.academicYear());
-        tutorProfile.setSchoolEmail(dto.schoolEmail());
         tutorProfile.setGradeLevels(gradeLevelsJson);
         tutorProfile.setSubjects(subjects);
         tutorProfileRepository.save(tutorProfile);

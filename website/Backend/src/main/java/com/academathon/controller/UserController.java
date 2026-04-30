@@ -53,7 +53,11 @@ public class UserController {
             userProfile.put("profilePictureUrl", user.getProfilePictureUrl());
             userProfile.put("bio", user.getBio());
             userProfile.put("contactEmail", user.getContactEmail());
-            userProfile.put("contactPhone", user.getContactPhone());
+            userProfile.put("pronouns", user.getPronouns());
+            // Only surface studentGrade for student profiles
+            if (user.getRole() == User.Role.STUDENT) {
+                userProfile.put("studentGrade", user.getStudentGrade());
+            }
             return ResponseEntity.ok(userProfile);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();

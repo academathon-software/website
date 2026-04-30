@@ -64,8 +64,8 @@ const Messages = () => {
   useEffect(() => {
     fetchConversations();
 
-    if (location.state?.otherUserId && location.state?.bookingId) {
-      openConversationWithUser(location.state.otherUserId, location.state.bookingId);
+    if (location.state?.otherUserId) {
+      openConversationWithUser(location.state.otherUserId, location.state.bookingId || null);
     }
 
     const convInterval = setInterval(pollConversations, POLL_CONVERSATIONS_INTERVAL);
@@ -90,11 +90,10 @@ const Messages = () => {
       setError('');
     } catch (err) {
       console.error('Error fetching conversations:', err);
-      if (err.response?.status === 401 || err.response?.status === 403 || !localStorage.getItem('token')) {
-        setError('SESSION_EXPIRED');
-      } else {
-        setError('Failed to load conversations');
-      }
+      // 401s are handled globally by the axios interceptor (which redirects
+      // to /login with a session-expired notice). Anything else is a real
+      // load error worth surfacing here.
+      setError('Failed to load conversations');
     } finally {
       setLoading(false);
     }
@@ -256,22 +255,8 @@ const Messages = () => {
           {/* Conversations List */}
           <div className="conversations-list">
             {loading && <div className="loading">Loading conversations...</div>}
-            
-            {!loading && error === 'SESSION_EXPIRED' && (
-              <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-                <div style={{ fontSize: '36px', marginBottom: '15px' }}>🔒</div>
-                <h3 style={{ color: '#333', marginBottom: '8px' }}>Session Expired</h3>
-                <p style={{ color: '#666', marginBottom: '15px', fontSize: '14px' }}>Please log back in to continue.</p>
-                <button 
-                  onClick={() => { localStorage.clear(); navigate('/login'); }}
-                  style={{ padding: '10px 20px', backgroundColor: '#1A803D', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }}
-                >
-                  Log Back In
-                </button>
-              </div>
-            )}
 
-            {!loading && error && error !== 'SESSION_EXPIRED' && (
+            {!loading && error && (
               <div className="error-message">{error}</div>
             )}
             

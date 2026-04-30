@@ -65,10 +65,11 @@ public class DataLoader implements ApplicationRunner {
         // Jane Doe profile - only create if doesn't exist
         TutorProfile jane = tutorRepo.findByUser(janeUser)
             .orElseGet(() -> {
+                janeUser.setBio("Experienced science tutor");
+                userRepo.save(janeUser);
                 TutorProfile newProfile = new TutorProfile();
                 newProfile.setUser(janeUser);
                 newProfile.setDisplayName("Jane Doe");
-                newProfile.setBio("Experienced science tutor");
                 newProfile.setHourlyRate(new BigDecimal("60.00"));
                 newProfile.setSubjects(List.of(math, physics, chemistry));
                 TutorProfile saved = tutorRepo.save(newProfile);
@@ -99,10 +100,11 @@ public class DataLoader implements ApplicationRunner {
         // John Doe profile - only create if doesn't exist
         TutorProfile john = tutorRepo.findByUser(johnUser)
             .orElseGet(() -> {
+                johnUser.setBio("Experienced math tutor");
+                userRepo.save(johnUser);
                 TutorProfile newProfile = new TutorProfile();
                 newProfile.setUser(johnUser);
                 newProfile.setDisplayName("John Doe");
-                newProfile.setBio("Experienced math tutor");
                 newProfile.setHourlyRate(new BigDecimal("60.00"));
                 newProfile.setSubjects(List.of(math));
                 TutorProfile saved = tutorRepo.save(newProfile);

@@ -15,8 +15,11 @@ import com.academathon.dto.TutorProfileCreateDTO;
 import com.academathon.dto.TutorProfileUpdateDTO;
 import com.academathon.model.Subject;
 import com.academathon.model.User.Role;
+import com.academathon.repository.ReviewRepository;
 import com.academathon.repository.SubjectRepository;
 import com.academathon.repository.UserRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -36,16 +40,22 @@ public class TutorController {
 
     private final UserRepository userRepo;
     private final SubjectRepository subjectRepo;
+    private final ReviewRepository reviewRepo;
     private final PasswordEncoder passwordEncoder;
+    private final ObjectMapper objectMapper;
 
     public TutorController(TutorProfileRepository tutorRepo,
                             UserRepository userRepo,
                             SubjectRepository subjectRepo,
-                            PasswordEncoder passwordEncoder) {
+                            ReviewRepository reviewRepo,
+                            PasswordEncoder passwordEncoder,
+                            ObjectMapper objectMapper) {
         this.tutorRepo = tutorRepo;
         this.userRepo = userRepo;
         this.subjectRepo = subjectRepo;
+        this.reviewRepo = reviewRepo;
         this.passwordEncoder = passwordEncoder;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -55,6 +65,7 @@ public class TutorController {
     @GetMapping
     public ResponseEntity<?> searchTutors(
             @RequestParam(name = "subject", required = false) String subjectName,
+            @RequestParam(name = "gradeLevel", required = false) String gradeLevel,
             @RequestParam(name = "name", required = false) String tutorName,
             @RequestParam(name = "minRate", required = false) BigDecimal minRate,
             @RequestParam(name = "maxRate", required = false) BigDecimal maxRate,
@@ -71,11 +82,17 @@ public class TutorController {
             );
 
             Page<TutorProfile> tutorPage;
+            boolean hasSubject = subjectName != null && !subjectName.isBlank();
+            boolean hasGrade = gradeLevel != null && !gradeLevel.isBlank();
+            String gradePattern = hasGrade ? "%\"" + gradeLevel + "\"%" : null;
 
             // Apply filters based on provided parameters
-            if (subjectName != null && !subjectName.isBlank()) {
-                // Search for tutors teaching this subject (case-insensitive)
+            if (hasSubject && hasGrade) {
+                tutorPage = tutorRepo.findBySubjectAndGradeLevel(subjectName, gradePattern, pageable);
+            } else if (hasSubject) {
                 tutorPage = tutorRepo.findBySubjects_NameIgnoreCase(subjectName, pageable);
+            } else if (hasGrade) {
+                tutorPage = tutorRepo.findByGradeLevelPattern(gradePattern, pageable);
             } else if (tutorName != null && !tutorName.isBlank()) {
                 tutorPage = tutorRepo.findByDisplayNameContainingIgnoreCase(tutorName, pageable);
             } else if (minRate != null || maxRate != null) {
@@ -140,11 +157,16 @@ public class TutorController {
                     .orElseGet(() -> subjectRepo.save(new Subject(name))))
                 .toList();
             
+            // 2b) Bio lives on the User (single source of truth)
+            if (dto.bio() != null) {
+                user.setBio(dto.bio());
+                user = userRepo.save(user);
+            }
+
             // 3) Build & save the TutorProfile
             TutorProfile tp = new TutorProfile();
             tp.setUser(user);
             tp.setDisplayName(dto.displayName());
-            tp.setBio(dto.bio());
             tp.setHourlyRate(dto.hourlyRate());
             tp.setSubjects(subjects);
             tp = tutorRepo.save(tp);
@@ -208,7 +230,7 @@ public class TutorController {
                 user.setUsername(dto.displayName());
             }
             if (dto.bio() != null) {
-                tutor.setBio(dto.bio());
+                user.setBio(dto.bio());
             }
             if (dto.hourlyRate() != null) {
                 tutor.setHourlyRate(dto.hourlyRate());
@@ -223,6 +245,16 @@ public class TutorController {
                 tutor.setSubjects(subjects);
             }
 
+            // Update grade levels if provided (serialized to JSON)
+            if (dto.gradeLevels() != null) {
+                try {
+                    tutor.setGradeLevels(objectMapper.writeValueAsString(dto.gradeLevels()));
+                } catch (Exception e) {
+                    return ResponseEntity.badRequest()
+                        .body("Failed to serialize grade levels: " + e.getMessage());
+                }
+            }
+
             tutor = tutorRepo.save(tutor);
             userRepo.save(user);
 
@@ -230,6 +262,25 @@ public class TutorController {
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                 .body("Failed to update tutor profile: " + e.getMessage());
+        }
+    }
+
+    /**
+     * GET /api/tutors/by-user/{userId}
+     * Get tutor profile by user ID (for viewing other tutors' profiles)
+     */
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity<?> getTutorByUserId(@PathVariable Long userId) {
+        try {
+            Optional<TutorProfile> tutorOpt = tutorRepo.findByUserId(userId);
+            if (tutorOpt.isPresent()) {
+                return ResponseEntity.ok(toDTO(tutorOpt.get()));
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                .body("Failed to retrieve tutor profile: " + e.getMessage());
         }
     }
 
@@ -295,6 +346,7 @@ public class TutorController {
             u.getEmail(),
             u.getRole().name(),
             u.getProfilePictureUrl(),
+            u.getPronouns(),
             u.getCreatedAt(),
             u.getUpdatedAt()
         );
@@ -304,15 +356,35 @@ public class TutorController {
             .sorted(Comparator.comparing(SubjectDTO::name))
             .toList();
 
+        Double avgRating = reviewRepo.getAverageRatingForTutor(u.getId());
+        Long reviewCount = reviewRepo.countRatingsForTutor(u.getId());
+
         return new TutorProfileDTO(
             tp.getId(),
             userDto,
             tp.getDisplayName(),
-            tp.getBio(),
+            u.getBio(),
             tp.getHourlyRate(),
             tp.getCreatedAt(),
             tp.getUpdatedAt(),
-            subjectDTOs
+            subjectDTOs,
+            tp.getUniversity(),
+            tp.getProgram(),
+            tp.getAcademicYear(),
+            parseGradeLevels(tp.getGradeLevels()),
+            avgRating,
+            reviewCount != null ? reviewCount : 0L
         );
+    }
+
+    private List<String> parseGradeLevels(String gradeLevelsJson) {
+        if (gradeLevelsJson == null || gradeLevelsJson.isBlank()) {
+            return Collections.emptyList();
+        }
+        try {
+            return objectMapper.readValue(gradeLevelsJson, new TypeReference<List<String>>() {});
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
     }
 }

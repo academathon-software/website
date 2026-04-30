@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { logout, LOGOUT_REASON_SESSION_EXPIRED } from './auth';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -24,16 +25,14 @@ api.interceptors.request.use(
   }
 );
 
-// Add response interceptor to handle errors
+// Add response interceptor to handle errors. A 401 always means the token is
+// missing/expired/invalid — bounce the user to /login with a notice. 403 is
+// handled per-call because it's an authorization (not authentication) failure.
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+      logout({ reason: LOGOUT_REASON_SESSION_EXPIRED });
     }
     return Promise.reject(error);
   }
@@ -72,7 +71,10 @@ export const tutorAPI = {
   
   // Get tutor by ID
   getTutorById: (id) => api.get(`/api/tutors/${id}`),
-  
+
+  // Get tutor profile by underlying user ID
+  getTutorByUserId: (userId) => api.get(`/api/tutors/by-user/${userId}`),
+
   // Get current user's tutor profile
   getMyProfile: () => api.get('/api/tutors/me'),
   

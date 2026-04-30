@@ -1,19 +1,19 @@
-version: "3.8"
+version: '3.8'
 
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: academathon-mysql
-    restart: always
+  postgres:
+    image: postgres:16
+    container_name: academathon-postgres
     environment:
-      MYSQL_ROOT_PASSWORD: academathonpass
-      MYSQL_DATABASE: academathon
-      MYSQL_USER: academathon
-      MYSQL_PASSWORD: academathonpass
+      POSTGRES_DB: academathon
+      POSTGRES_USER: academathon
+      POSTGRES_PASSWORD: academathonpass
     ports:
-      - "3306:3306"
+      - "5433:5432"
     volumes:
-      - mysql-data:/var/lib/mysql
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
 
 volumes:
-  mysql-data:
+  postgres_data:
+
