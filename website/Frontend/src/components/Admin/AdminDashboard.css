@@ -469,6 +469,7 @@
   border-bottom: 1px solid var(--admin-border);
   color: var(--admin-text-primary);
   vertical-align: middle;
+  text-align: left;
 }
 
 .admin-table tbody tr:last-child td {
