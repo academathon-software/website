@@ -71,6 +71,13 @@ public class TutorProfile {
     }
 
     public String getDisplayName() {
+        // The display name is always meant to mirror the linked user's
+        // username. Prefer the live value so updates propagate immediately
+        // and the column never drifts out of sync.
+        if (user != null && user.getDisplayUsername() != null
+                && !user.getDisplayUsername().isBlank()) {
+            return user.getDisplayUsername();
+        }
         return displayName;
     }
 

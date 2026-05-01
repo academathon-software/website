@@ -6,15 +6,20 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.academathon.model.User;
+import com.academathon.repository.TutorProfileRepository;
 import com.academathon.repository.UserRepository;
 import com.academathon.dto.UpdateProfileRequest;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final TutorProfileRepository tutorProfileRepository;
 
-    public UserService(UserRepository userRepository, EmailService emailService){
+    public UserService(UserRepository userRepository,
+                       TutorProfileRepository tutorProfileRepository,
+                       EmailService emailService){
         this.userRepository = userRepository;
+        this.tutorProfileRepository = tutorProfileRepository;
     }
 
     public List<User> allUsers(){
@@ -54,6 +59,14 @@ public class UserService {
         // Update fields if they are provided
         if (request.getUsername() != null && !request.getUsername().isEmpty()) {
             user.setUsername(request.getUsername());
+            // Tutors have a denormalized display name on their profile (used in
+            // bookings, search results, etc.). Keep it in sync with the username.
+            if (user.getRole() == User.Role.TUTOR) {
+                tutorProfileRepository.findByUser(user).ifPresent(profile -> {
+                    profile.setDisplayName(request.getUsername());
+                    tutorProfileRepository.save(profile);
+                });
+            }
         }
         if (request.getEmail() != null && !request.getEmail().isEmpty()) {
             // Check if email is already taken by another user
