@@ -309,6 +309,36 @@ const UsersTab = () => {
               </button>
             </div>
             <div className="admin-modal-body">
+              <div
+                className="admin-detail-section"
+                style={{ display: 'flex', justifyContent: 'center' }}
+              >
+                {selectedUser.profilePictureUrl ? (
+                  <img
+                    src={selectedUser.profilePictureUrl}
+                    alt={selectedUser.username || 'User'}
+                    style={{
+                      width: 96,
+                      height: 96,
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      border: '2px solid var(--admin-border, #e5e7eb)',
+                    }}
+                  />
+                ) : (
+                  <span
+                    className="admin-avatar-circle"
+                    style={{
+                      width: 96,
+                      height: 96,
+                      fontSize: '1.75rem',
+                    }}
+                  >
+                    {getInitials(selectedUser.username, selectedUser.email)}
+                  </span>
+                )}
+              </div>
+
               <div className="admin-detail-section">
                 <h3>Profile</h3>
                 <div className="admin-detail-grid">
@@ -335,20 +365,6 @@ const UsersTab = () => {
                   <div className="admin-detail-item">
                     <label>Joined</label>
                     <span>{formatJoinDate(selectedUser.createdAt)}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="admin-detail-section">
-                <h3>Activity</h3>
-                <div className="admin-detail-grid">
-                  <div className="admin-detail-item">
-                    <label>Total bookings</label>
-                    <span>{selectedUser.totalBookings ?? 0}</span>
-                  </div>
-                  <div className="admin-detail-item">
-                    <label>Completed bookings</label>
-                    <span>{selectedUser.completedBookings ?? 0}</span>
                   </div>
                 </div>
               </div>
