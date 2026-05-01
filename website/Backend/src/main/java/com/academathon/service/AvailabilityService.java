@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -307,15 +308,24 @@ public class AvailabilityService {
      */
     private List<TimeSlot> splitIntoBookableSlots(TimeSlot slot, Integer durationMinutes) {
         List<TimeSlot> bookableSlots = new ArrayList<>();
-        
+
+        // Round the first slot start UP to the next full hour so booking
+        // times always land on the hour. e.g. 9:45 -> 10:00, 10:01 -> 11:00,
+        // 10:00 stays 10:00.
         LocalDateTime currentStart = slot.start;
+        if (currentStart.getMinute() > 0
+                || currentStart.getSecond() > 0
+                || currentStart.getNano() > 0) {
+            currentStart = currentStart.truncatedTo(ChronoUnit.HOURS).plusHours(1);
+        }
+
         while (currentStart.plusMinutes(durationMinutes).isBefore(slot.end) ||
                currentStart.plusMinutes(durationMinutes).equals(slot.end)) {
             LocalDateTime currentEnd = currentStart.plusMinutes(durationMinutes);
             bookableSlots.add(new TimeSlot(currentStart, currentEnd));
             currentStart = currentEnd;
         }
-        
+
         return bookableSlots;
     }
     
