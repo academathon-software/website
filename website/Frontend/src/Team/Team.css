@@ -70,6 +70,7 @@
   transition: all 0.3s ease;
   flex: 0 1 480px;
   min-width: 0;
+  box-sizing: border-box;
 }
 
 .team-card:hover {
@@ -300,12 +301,15 @@
 
   .team-grid {
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
   }
 
   .team-card {
     flex: 0 1 auto;
     width: 100%;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .culture-grid {
