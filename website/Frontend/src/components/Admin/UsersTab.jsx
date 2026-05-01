@@ -179,6 +179,7 @@ const UsersTab = () => {
           <table className="admin-table">
             <thead>
               <tr>
+                <th>ID</th>
                 <th>User</th>
                 <th>Email</th>
                 <th>Role</th>
@@ -192,18 +193,28 @@ const UsersTab = () => {
             <tbody>
               {users.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="admin-table-empty">
+                  <td colSpan="9" className="admin-table-empty">
                     No users found
                   </td>
                 </tr>
               ) : (
                 users.map((user) => (
                   <tr key={user.userId}>
+                    <td className="admin-table-cell-muted">{user.userId}</td>
                     <td>
                       <div className="admin-avatar">
-                        <span className="admin-avatar-circle">
-                          {getInitials(user.username, user.email)}
-                        </span>
+                        {user.profilePictureUrl ? (
+                          <img
+                            src={user.profilePictureUrl}
+                            alt={user.username || 'User'}
+                            className="admin-avatar-circle"
+                            style={{ objectFit: 'cover' }}
+                          />
+                        ) : (
+                          <span className="admin-avatar-circle">
+                            {getInitials(user.username, user.email)}
+                          </span>
+                        )}
                         <span className="admin-avatar-name">
                           {user.username || '—'}
                         </span>
