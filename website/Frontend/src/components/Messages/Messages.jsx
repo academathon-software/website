@@ -149,6 +149,24 @@ const Messages = () => {
     }
   };
 
+  const handleMessageKeyDown = (e) => {
+    if (e.key !== 'Enter') return;
+    if (e.nativeEvent.isComposing || e.keyCode === 229) return;
+
+    const isTouchPrimary =
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(pointer: coarse)').matches;
+    if (isTouchPrimary) return;
+
+    if (e.shiftKey) return;
+
+    e.preventDefault();
+    if (newMessage.trim() && selectedConversation) {
+      sendMessage(e);
+    }
+  };
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -410,6 +428,7 @@ const Messages = () => {
                     placeholder="Type a message..."
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyDown={handleMessageKeyDown}
                     rows={1}
                     enterKeyHint="enter"
                   />
