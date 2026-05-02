@@ -18,7 +18,10 @@
   max-width: 600px;
   width: 100%;
   max-height: 90vh;
-  overflow-y: auto;
+  max-height: 90dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
@@ -28,6 +31,7 @@
   align-items: center;
   padding: 24px;
   border-bottom: 1px solid #e0e0e0;
+  flex-shrink: 0;
 }
 
 .booking-action-modal-header h2 {
@@ -57,6 +61,9 @@
 
 .booking-action-modal-body {
   padding: 24px;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .booking-details {
@@ -143,6 +150,8 @@
   gap: 12px;
   padding: 24px;
   border-top: 1px solid #e0e0e0;
+  flex-shrink: 0;
+  background: white;
 }
 
 .booking-action-modal-footer button {
@@ -196,17 +205,78 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .booking-action-modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
   .booking-action-modal {
-    margin: 10px;
-    max-height: calc(100vh - 20px);
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: 95vh;
+    max-height: 95dvh;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .booking-action-modal-header {
+    padding: 16px 20px;
   }
 
   .booking-action-modal-header h2 {
-    font-size: 20px;
+    font-size: 18px;
+  }
+
+  .booking-action-modal-body {
+    padding: 16px 20px;
+  }
+
+  .booking-details {
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+
+  .booking-details h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  .confirm-message {
+    padding: 12px;
+  }
+
+  .confirm-message p {
+    font-size: 14px;
+  }
+
+  .reject-form {
+    margin-top: 14px;
   }
 
   .booking-action-modal-footer {
+    flex-direction: column-reverse;
+    padding: 14px 20px;
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
+    gap: 10px;
+  }
+
+  .booking-action-modal-footer button {
+    padding: 12px 20px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .detail-row {
     flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 6px 0;
+  }
+
+  .detail-value {
+    text-align: left;
+    word-break: break-word;
   }
 }
 

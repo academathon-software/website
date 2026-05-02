@@ -111,7 +111,7 @@ const BookingActionModal = ({ booking, action, onConfirm, onCancel }) => {
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder={`Please provide a reason for rejecting this ${isReschedule ? 'reschedule request' : 'booking'}...`}
-                rows="4"
+                rows="3"
                 className="rejection-textarea"
               />
               <p className="helper-text">This reason will be shared with the student.</p>
