@@ -63,6 +63,7 @@
   padding: 24px;
   flex: 1 1 auto;
   overflow-y: auto;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -125,11 +126,13 @@
 
 .rejection-textarea {
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   padding: 12px;
   border: 1px solid #ddd;
   border-radius: 8px;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 16px;
   resize: vertical;
   transition: border-color 0.2s;
 }
@@ -251,6 +254,10 @@
 
   .reject-form {
     margin-top: 14px;
+  }
+
+  .rejection-textarea {
+    resize: none;
   }
 
   .booking-action-modal-footer {
