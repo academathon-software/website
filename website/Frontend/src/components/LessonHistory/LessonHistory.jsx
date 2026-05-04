@@ -319,7 +319,7 @@ const LessonHistory = () => {
                   Lesson with {isTutor ? booking.studentName : booking.tutorName}
                 </div>
                 <div className="tutor-name">
-                  {isTutor ? booking.studentName : booking.tutorName}
+                  {booking.subject || 'Tutoring Session'}
                 </div>
               </div>
               
