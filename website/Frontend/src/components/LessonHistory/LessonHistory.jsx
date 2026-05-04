@@ -14,7 +14,7 @@ import StudentSidebar from '../Shared/StudentSidebar';
 import TutorSidebar from '../Shared/TutorSidebar';
 import { useUser } from '../../context/UserContext';
 import { bookingAPI, reviewAPI } from '../../services/api';
-//i
+
 const LessonHistory = () => {
   const { isTutor } = useUser();
   const navigate = useNavigate();
