@@ -14,7 +14,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { logout } from '../../services/auth';
 import './StudentSidebar.css';
-s
+
 const StudentSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
