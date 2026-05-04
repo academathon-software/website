@@ -73,7 +73,7 @@ const TutorSidebar = () => {
             role="button"
             tabIndex={0}
             aria-label="Go to home"
-            onClick={() => handleNavigation('/tutor-dashboard')}
+            onClick={() => handleNavigation('/')}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
