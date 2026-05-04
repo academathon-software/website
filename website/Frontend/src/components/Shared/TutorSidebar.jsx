@@ -68,7 +68,21 @@ const TutorSidebar = () => {
       {/* Sidebar */}
       <div className={`sidebar ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-logo">
-          <div className="sidebar-logo-circle">at</div>
+          <div
+            className="sidebar-logo-circle"
+            role="button"
+            tabIndex={0}
+            aria-label="Go to home"
+            onClick={() => handleNavigation('/tutor-dashboard')}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleNavigation('/tutor-dashboard');
+              }
+            }}
+          >
+            at
+          </div>
         </div>
         
         <nav className="sidebar-nav">
