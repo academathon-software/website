@@ -12,7 +12,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { faLinkedin, faTwitter, faGithub } from '@fortawesome/free-brands-svg-icons';
 import sahilImage from '../assets/sahil.avif';
-
+s
 const teamMembers = [
   {
     name: "Sahil Talati",
