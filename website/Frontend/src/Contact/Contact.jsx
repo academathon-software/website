@@ -11,7 +11,7 @@ import { faLinkedin, faFacebook, faInstagram } from '@fortawesome/free-brands-sv
 import emailjs from '@emailjs/browser';
 import Footer from '../components/Footer/Footer';
 import './Contact.css';
-s
+
 // EmailJS configuration - replace with your actual IDs
 const EMAILJS_SERVICE_ID = 'service_r11ndie';
 const EMAILJS_TEMPLATE_ID = 'template_d3c1gsd';
