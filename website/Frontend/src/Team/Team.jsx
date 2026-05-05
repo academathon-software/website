@@ -25,7 +25,7 @@ const teamMembers = [
       email: "sahil@academathon.com"
     },
     expertise: ["Educational Technology", "Strategic Planning", "Leadership"]
-  /*
+  
 },
   {
     name: "Ryan Tang",
@@ -37,7 +37,7 @@ const teamMembers = [
       email: "ryant012015@gmail.com"
     },
     expertise: ["Full-Stack Development", "Cloud Architecture", "AI/ML"]
-  */
+  
   }
 ];
 
