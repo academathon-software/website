@@ -10,7 +10,7 @@ import { paymentAPI } from '../../services/api';
 import './PaymentModal.css';
 
 // Initialize Stripe with your publishable key
-const stripePromise = loadStripe('pk_test_51STUpUFHtMAfRjT28TbDzOjy8vKSt6jYCafrb8gYdfb2IoopYUOl14YkWLdG9fuR4XoSZY12RchXSocdgX5v2bvv00cEPSOs5e');
+const stripePromise = loadStripe('pk_test_51SyIFk1eqTRE9VS7RgNIFVBLxwvQr2BBHTtTmtiFXSkusrXWRdgCj3uVI9P7RrF1ukRVxjj6Dcl9VlqYTmnBOdh500jdKUu7Ha');
 
 const PaymentForm = ({ bookingId, bookingDetails, onSuccess, onCancel }) => {
   const stripe = useStripe();
