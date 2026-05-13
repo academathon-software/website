@@ -30,10 +30,6 @@ const PaymentForm = ({ bookingId, bookingDetails, onSuccess, onCancel }) => {
     setError(null);
 
     try {
-      console.log('Submitting payment to Stripe...');
-      console.log('Elements:', elements);
-      console.log('Stripe:', stripe);
-      
       const { error: submitError } = await stripe.confirmPayment({
         elements,
         confirmParams: {
@@ -41,8 +37,6 @@ const PaymentForm = ({ bookingId, bookingDetails, onSuccess, onCancel }) => {
         },
         redirect: 'if_required',
       });
-
-      console.log('Stripe confirmPayment response:', { submitError });
 
       if (submitError) {
         setError(submitError.message);
@@ -54,12 +48,9 @@ const PaymentForm = ({ bookingId, bookingDetails, onSuccess, onCancel }) => {
           bookingDetails.clientSecret
         );
         
-        console.log('Payment Intent Status:', paymentIntent.paymentIntent.status);
-        
         if (paymentIntent.paymentIntent.status === 'succeeded') {
           try {
             await paymentAPI.confirmPayment(paymentIntent.paymentIntent.id);
-            console.log('Backend confirmation successful');
             onSuccess();
           } catch (confirmError) {
             console.error('Backend confirmation error:', confirmError);
@@ -90,7 +81,6 @@ const PaymentForm = ({ bookingId, bookingDetails, onSuccess, onCancel }) => {
       <PaymentElement 
         id="payment-element"
         onReady={() => {
-          console.log('PaymentElement is ready');
           setIsReady(true);
         }}
       />

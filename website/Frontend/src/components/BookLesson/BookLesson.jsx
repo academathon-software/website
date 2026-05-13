@@ -222,18 +222,11 @@ const BookLesson = () => {
       
       // Use the specific course if selected, otherwise use the subject category
       const searchSubject = selectedCourse || selectedSubject.name;
-      console.log('Searching for tutors with subject:', searchSubject, 'and grade:', studentGradeLabel);
       const response = await tutorAPI.searchTutors({
         subject: searchSubject,
         gradeLevel: studentGradeLabel || undefined,
         size: 500
       });
-      
-      console.log('Found tutors:', response.data.tutors.map(t => ({
-        id: t.id,
-        name: t.displayName,
-        subjects: t.subjects?.map(s => s.name)
-      })));
       
       setTutors(response.data.tutors);
       
@@ -441,13 +434,6 @@ const BookLesson = () => {
       const now = new Date();
       const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000);
       const hoursAway = (selectedDateTime - now) / (1000 * 60 * 60);
-      
-      console.log('Booking validation:');
-      console.log('  Current time:', now);
-      console.log('  Selected slot time:', selectedDateTime);
-      console.log('  Hours away:', hoursAway);
-      console.log('  Min booking time (48h):', minBookingTime);
-      console.log('  Is valid?', selectedDateTime >= minBookingTime);
       
       if (selectedDateTime < minBookingTime) {
         const errorMsg = `Lessons must be booked at least 48 hours in advance. This slot is only ${hoursAway.toFixed(1)} hours away.`;

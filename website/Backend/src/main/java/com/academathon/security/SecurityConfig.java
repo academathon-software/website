@@ -112,8 +112,7 @@ public class SecurityConfig {
             "https://www.academathon.com",
             "https://academathon.ca",
             "https://www.academathon.ca",
-            "https://academathon.vercel.app",
-            "https://*.vercel.app"
+            "https://academathon.vercel.app"
         ));
         // Allow all HTTP methods
         cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));

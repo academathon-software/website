@@ -17,7 +17,6 @@ import com.academathon.dto.VerifyUserDTO;
 import com.academathon.dto.TutorSignupDTO;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -86,25 +85,6 @@ public class AuthenticationController {
         }
     }
 
-    @PostMapping("/enable-user")
-    public ResponseEntity<?> enableUser(@RequestParam String email) {
-        try {
-            authenticationService.enableUser(email);
-            return ResponseEntity.ok("User enabled successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        }
-    }
-
-    @DeleteMapping("/delete-user")
-    public ResponseEntity<?> deleteUser(@RequestParam String email) {
-        try {
-            authenticationService.deleteUser(email);
-            return ResponseEntity.ok("User deleted successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        }
-    }
 
     @PostMapping("/signup/tutor")
     public ResponseEntity<?> registerTutor(@RequestBody TutorSignupDTO tutorSignupDto) {

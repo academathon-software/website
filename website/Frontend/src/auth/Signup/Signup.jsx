@@ -208,7 +208,6 @@ function SignUpPage() {
       const strength = calculatePasswordStrength(value);
       const strengthTexts = ['Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
       const text = strengthTexts[strength] || 'Weak';
-      console.log('Password:', value, 'Strength:', strength, 'Text:', text);
       setPasswordStrength(strength);
     }
   };
@@ -260,9 +259,6 @@ function SignUpPage() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("SUCCESSFULLY SIGNED UP!");
-        console.log("User created:", data);
-        
         // Redirect to verification page with email
         navigate('/verify', { 
           state: { email: formData.email } 

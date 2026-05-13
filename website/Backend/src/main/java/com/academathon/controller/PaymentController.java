@@ -1,5 +1,8 @@
 package com.academathon.controller;
 
+import com.academathon.model.Booking;
+import com.academathon.model.User;
+import com.academathon.repository.BookingRepository;
 import com.academathon.service.PaymentService;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
@@ -23,9 +26,11 @@ public class PaymentController {
     private String webhookSecret;
 
     private final PaymentService paymentService;
+    private final BookingRepository bookingRepository;
 
-    public PaymentController(PaymentService paymentService) {
+    public PaymentController(PaymentService paymentService, BookingRepository bookingRepository) {
         this.paymentService = paymentService;
+        this.bookingRepository = bookingRepository;
     }
 
     /**
@@ -43,6 +48,13 @@ public class PaymentController {
             Long bookingId = request.get("bookingId");
             if (bookingId == null) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Booking ID is required"));
+            }
+
+            User currentUser = (User) authentication.getPrincipal();
+            Booking booking = bookingRepository.findById(bookingId)
+                    .orElseThrow(() -> new RuntimeException("Booking not found"));
+            if (!booking.getStudent().getId().equals(currentUser.getId())) {
+                return ResponseEntity.status(403).body(Map.of("error", "You can only pay for your own bookings"));
             }
 
             Map<String, Object> paymentIntent = paymentService.createPaymentIntent(bookingId);
@@ -64,6 +76,16 @@ public class PaymentController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+            }
+
+            User currentUser = (User) authentication.getPrincipal();
+            Booking booking = bookingRepository.findById(bookingId)
+                    .orElseThrow(() -> new RuntimeException("Booking not found"));
+            boolean isStudent = booking.getStudent().getId().equals(currentUser.getId());
+            boolean isTutor = booking.getTutor().getUser().getId().equals(currentUser.getId());
+            boolean isAdmin = currentUser.getRole() == User.Role.ADMIN;
+            if (!isStudent && !isTutor && !isAdmin) {
+                return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
             }
 
             Map<String, Object> details = paymentService.getPaymentDetails(bookingId);
@@ -159,6 +181,11 @@ public class PaymentController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+            }
+
+            User currentUser = (User) authentication.getPrincipal();
+            if (currentUser.getRole() != User.Role.ADMIN) {
+                return ResponseEntity.status(403).body(Map.of("error", "Admin access required for refunds"));
             }
 
             paymentService.refundPayment(bookingId);
