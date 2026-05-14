@@ -74,11 +74,33 @@
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background-color: #e9ecef;
+  background-color: #f3f4f6;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
+  border: 2px solid #e5e7eb;
+}
+
+.stats-row {
+  margin-top: 10px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.stat-icon {
+  color: #2D6A4F;
+  font-size: 12px;
 }
 
 .welcome-text h2 {
@@ -261,8 +283,8 @@
 }
 
 .view-profile-btn:hover {
-  background-color: #4CAF50;
-  border-color: #4CAF50;
+  background-color: #2D6A4F;
+  border-color: #2D6A4F;
   color: white;
 }
 
@@ -427,7 +449,7 @@
 
 .form-control:focus {
   outline: none;
-  border-color: #4CAF50;
+  border-color: #2D6A4F;
   box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
 }
 
@@ -465,12 +487,12 @@
 }
 
 .btn-primary {
-  background-color: #4CAF50;
+  background-color: #2D6A4F;
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: #45a049;
+  background-color: #1B4332;
 }
 
 .availability-loading {
@@ -522,17 +544,17 @@
 }
 
 .time-slot-btn.available {
-  border-color: #4CAF50;
-  color: #4CAF50;
+  border-color: #2D6A4F;
+  color: #2D6A4F;
 }
 
 .time-slot-btn.available:hover {
-  background-color: #4CAF50;
+  background-color: #2D6A4F;
   color: white;
 }
 
 .time-slot-btn.available.selected {
-  background-color: #4CAF50;
+  background-color: #2D6A4F;
   color: white;
   box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
 }
@@ -683,12 +705,12 @@
 }
 
 .calendar-day.today {
-  background-color: #4CAF50;
+  background-color: #2D6A4F;
   color: white;
 }
 
 .calendar-day.weekend {
-  color: #4CAF50;
+  color: #2D6A4F;
   font-weight: 500;
 }
 
@@ -708,7 +730,7 @@
   transform: translateX(-50%);
   width: 4px;
   height: 4px;
-  background-color: #4CAF50;
+  background-color: #2D6A4F;
   border-radius: 50%;
 }
 
@@ -1039,7 +1061,7 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  background: linear-gradient(135deg, #2D6A4F, #1B4332);
   color: white;
   font-size: 2rem;
   font-weight: 600;
@@ -1056,7 +1078,7 @@
   object-fit: cover;
   margin: 0 auto 1rem;
   display: block;
-  border: 3px solid #4CAF50;
+  border: 3px solid #2D6A4F;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -1105,7 +1127,7 @@
 }
 
 .message-tutor-btn {
-  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  background: linear-gradient(135deg, #2D6A4F, #1B4332);
   color: white;
   border: none;
   padding: 0.75rem 2rem;

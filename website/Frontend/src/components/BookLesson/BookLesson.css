@@ -1024,8 +1024,8 @@
 }
 
 .tutor-card:not(.active) .view-tutor-profile-btn:hover {
-  background-color: #4CAF50;
-  border-color: #4CAF50;
+  background-color: #2D6A4F;
+  border-color: #2D6A4F;
   color: white;
 }
 
@@ -1117,7 +1117,7 @@
   width: 90px;
   height: 90px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  background: linear-gradient(135deg, #2D6A4F, #2E7D32);
   color: white;
   font-size: 2.2rem;
   font-weight: 600;
@@ -1134,7 +1134,7 @@
   object-fit: cover;
   margin: 0 auto 1rem;
   display: block;
-  border: 3px solid #4CAF50;
+  border: 3px solid #2D6A4F;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -1226,7 +1226,7 @@
 }
 
 .select-tutor-btn {
-  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  background: linear-gradient(135deg, #2D6A4F, #2E7D32);
   color: white;
   border: none;
   padding: 0.85rem 2.5rem;

@@ -2,7 +2,7 @@
     background: #ffffff;
     border-bottom: 1px solid #e8e8e8;
     width: 100%; 
-    height: 64px; 
+    height: 85px; 
     position: fixed; 
     top: 0; 
     left: 0;
@@ -45,7 +45,7 @@
             position: relative;
             
             &:hover {
-                color: #10b981;
+                color: #2D6A4F;
             }
             
             span {
@@ -55,10 +55,10 @@
             }
             
             &.active {
-                color: #10b981;
+                color: #2D6A4F;
                 
                 span {
-                    color: #10b981;
+                    color: #2D6A4F;
                     font-weight: 600;
                 }
             }
@@ -82,12 +82,12 @@
         white-space: nowrap;
         
         &:hover {
-            color: #10b981;
+            color: #2D6A4F;
         }
     }
 
     .nav-cta-btn {
-        background: #10b981;
+        background: #2D6A4F;
         color: white;
         padding: 0.5rem 1.5rem;
         border-radius: 50px;
@@ -98,7 +98,7 @@
         white-space: nowrap;
         
         &:hover {
-            background: #059669;
+            background: #1B4332;
             box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
         }
     }
@@ -113,7 +113,7 @@
         
         &:hover {
             transform: scale(1.1);
-            color: #10b981;
+            color: #2D6A4F;
         }
     }
 
@@ -195,12 +195,12 @@
                 transform: translateX(-50%);
                 width: 0;
                 height: 2px;
-                background: #10b981;
+                background: #2D6A4F;
                 transition: width 0.3s ease;
             }
 
             a:hover {
-                color: #10b981;
+                color: #2D6A4F;
             }
 
             a:hover::after {
@@ -208,7 +208,7 @@
             }
 
             a.active {
-                color: #10b981;
+                color: #2D6A4F;
                 font-weight: 600;
             }
 
@@ -229,7 +229,7 @@
 
             .mobile-cta-link {
                 display: flex !important;
-                background: #10b981;
+                background: #2D6A4F;
                 color: white !important;
                 padding: 0.8rem 2.5rem !important;
                 border-radius: 50px;
@@ -240,7 +240,7 @@
             }
 
             .mobile-cta-link:hover {
-                background: #059669;
+                background: #1B4332;
                 color: white !important;
             }
 
@@ -260,7 +260,7 @@
             top: 50%;
             transform: translateY(-50%);
             right: 1.5rem;
-            color: #10b981;
+            color: #2D6A4F;
             cursor: pointer;
             z-index: 1000;
             transition: all 0.3s ease;
@@ -271,19 +271,19 @@
             position: fixed;
             top: 25px;
             right: 25px;
-            color: #10b981;
+            color: #2D6A4F;
             cursor: pointer;
             z-index: 10000;
             transition: all 0.3s ease;
         }
         
         .hamburger-icon:hover {
-            color: #059669;
+            color: #1B4332;
             transform: translateY(-50%) scale(1.1);
         }
         
         .close-icon:hover {
-            color: #059669;
+            color: #1B4332;
             transform: rotate(90deg);
         }
     }
@@ -326,7 +326,7 @@
 }
 
 .nav-bar .logo .logo-img {
-    height: 36px !important;
+    height: 65px !important;
     width: auto !important;
     object-fit: contain !important;
     display: block !important;
@@ -363,7 +363,7 @@
 }
 
 .nav-bar .nav-account-icon {
-    color: #10b981;
+    color: #2D6A4F;
     font-size: 1.1rem;
 }
 

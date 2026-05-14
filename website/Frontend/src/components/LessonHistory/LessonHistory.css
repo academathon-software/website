@@ -105,13 +105,13 @@
 }
 
 .filter-dropdown:hover {
-  border-color: #4CAF50;
+  border-color: #2D6A4F;
   background-color: #f1f8f4;
 }
 
 .filter-dropdown:focus {
   outline: none;
-  border-color: #4CAF50;
+  border-color: #2D6A4F;
   box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
 }
 
@@ -691,7 +691,7 @@
 
 .feedback-modal-comment textarea:focus {
   outline: none;
-  border-color: #4CAF50;
+  border-color: #2D6A4F;
   box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
 }
 
@@ -719,7 +719,7 @@
 
 .feedback-submit-btn {
   padding: 0.65rem 1.5rem;
-  background-color: #4CAF50;
+  background-color: #2D6A4F;
   color: white;
   border: none;
   border-radius: 8px;

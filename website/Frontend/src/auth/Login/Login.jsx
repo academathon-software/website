@@ -86,12 +86,7 @@ function LoginPage() {
 
   return (
     <div className="login-page">
-      <div className="login-card">
-        <div className="login-logo">
-          <FontAwesomeIcon icon={faGraduationCap} />
-          <span>Academathon</span>
-        </div>
-        
+      <div className="login-card"> 
         <form onSubmit={handleLogin} className="login-form">
           <h2 className="login-title">Login</h2>
           <h3 className="login-subtitle">Welcome back! Login into your account</h3>

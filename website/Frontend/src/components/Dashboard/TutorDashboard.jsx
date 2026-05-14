@@ -356,7 +356,7 @@ const TutorDashboard = () => {
               style={{
                 marginTop: '20px',
                 padding: '10px 20px',
-                backgroundColor: '#4CAF50',
+                backgroundColor: '#2D6A4F',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
@@ -464,7 +464,7 @@ const TutorDashboard = () => {
                             </div>
                           </div>
                           <div style={{ marginTop: '10px', padding: '10px', backgroundColor: '#e8f5e9', borderRadius: '4px' }}>
-                            <strong style={{ color: '#4CAF50', fontSize: '13px' }}>Requested New Time:</strong>
+                            <strong style={{ color: '#2D6A4F', fontSize: '13px' }}>Requested New Time:</strong>
                             <div className="detail-item">
                               <span className="detail-label">Date:</span>
                               <span>{formatDate(booking.requestedStartTime)}</span>
@@ -515,7 +515,7 @@ const TutorDashboard = () => {
           <button 
             className="view-full-link" 
             onClick={() => navigate('/lesson-history')}
-            style={{ cursor: 'pointer', background: 'none', border: 'none', color: '#4CAF50' }}
+            style={{ cursor: 'pointer', background: 'none', border: 'none', color: '#2D6A4F' }}
           >
             View Full List
           </button>

@@ -10,7 +10,7 @@ import {
     faGauge,
 } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useRef, useState } from 'react';
-import logoImg from '../../assets/logo.avif';
+import logoImg from '../../assets/academathonLogo.png';
 import { userAPI } from '../../services/api';
 import { logout } from '../../services/auth';
 
@@ -104,7 +104,7 @@ const Sidebar = () => {
                             onClick={handleSignOut}
                             className="mobile-cta-link"
                             style={{
-                                background: '#10b981',
+                                background: '#2D6A4F',
                                 color: 'white',
                                 border: 'none',
                                 cursor: 'pointer',

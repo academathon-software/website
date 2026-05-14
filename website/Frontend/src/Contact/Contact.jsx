@@ -96,18 +96,6 @@ const Contact = () => {
 
   return (
     <div className="contact-page">
-      <section className="contact-hero">
-        <div className="contact-hero-content">
-          <h1>Get in Touch</h1>
-          <p>Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
-        </div>
-        <div className="contact-hero-shapes">
-          <div className="shape shape-1"></div>
-          <div className="shape shape-2"></div>
-          <div className="shape shape-3"></div>
-        </div>
-      </section>
-
       <section className="contact-main">
         <div className="contact-container">
           <div className="contact-info-panel">
@@ -120,7 +108,6 @@ const Contact = () => {
                   <FontAwesomeIcon icon={faEnvelope} />
                 </div>
                 <div className="contact-text">
-                  <span className="contact-label">Email</span>
                   <a href="mailto:academathontutoring@gmail.com">academathontutoring@gmail.com</a>
                 </div>
               </div>
@@ -161,10 +148,7 @@ const Contact = () => {
                 )}
                 
                 <div className={`form-group ${errors.name ? 'has-error' : ''}`}>
-                  <label htmlFor="name">
-                    <FontAwesomeIcon icon={faUser} className="input-icon" />
-                    Your Name
-                  </label>
+                  <label htmlFor="name">Your Name</label>
                   <input
                     type="text"
                     id="name"
@@ -177,10 +161,7 @@ const Contact = () => {
                 </div>
                 
                 <div className={`form-group ${errors.subject ? 'has-error' : ''}`}>
-                  <label htmlFor="subject">
-                    <FontAwesomeIcon icon={faComment} className="input-icon" />
-                    Subject
-                  </label>
+                  <label htmlFor="subject">Subject</label>
                   <input
                     type="text"
                     id="subject"
@@ -193,10 +174,7 @@ const Contact = () => {
                 </div>
                 
                 <div className={`form-group ${errors.message ? 'has-error' : ''}`}>
-                  <label htmlFor="message">
-                    <FontAwesomeIcon icon={faPaperPlane} className="input-icon" />
-                    Message
-                  </label>
+                  <label htmlFor="message">Message</label>
                   <textarea
                     id="message"
                     name="message"
@@ -227,30 +205,6 @@ const Contact = () => {
                 </button>
               </form>
             )}
-          </div>
-        </div>
-      </section>
-
-      <section className="contact-faq">
-        <div className="faq-container">
-          <h2>Frequently Asked Questions</h2>
-          <div className="faq-grid">
-            <div className="faq-item">
-              <h3>How do I book a tutor?</h3>
-              <p>Simply create an account, browse our tutors, and book a session that fits your schedule.</p>
-            </div>
-            <div className="faq-item">
-              <h3>What subjects do you offer?</h3>
-              <p>We offer tutoring in Math, Science, English, and many more subjects for grades 1-12.</p>
-            </div>
-            <div className="faq-item">
-              <h3>How do I become a tutor?</h3>
-              <p>Apply through our tutor registration page. We'll review your qualifications and get back to you.</p>
-            </div>
-            <div className="faq-item">
-              <h3>What are your rates?</h3>
-              <p>Rates vary by tutor and subject. You can view each tutor's hourly rate on their profile.</p>
-            </div>
           </div>
         </div>
       </section>

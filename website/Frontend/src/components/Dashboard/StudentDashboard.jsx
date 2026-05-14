@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './StudentDashboard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
+import {
   faStar,
   faChevronLeft,
   faChevronRight,
@@ -12,7 +12,10 @@ import {
   faDollarSign,
   faCircle,
   faCheck,
-  faUser
+  faUser,
+  faBookOpen,
+  faClock,
+  faCalendarAlt
 } from '@fortawesome/free-solid-svg-icons';
 import StudentSidebar from '../Shared/StudentSidebar';
 import BookingStatusBadge from '../Shared/BookingStatusBadge';
@@ -556,7 +559,7 @@ const StudentDashboard = () => {
               style={{
                 marginTop: '20px',
                 padding: '10px 20px',
-                backgroundColor: '#4CAF50',
+                backgroundColor: '#2D6A4F',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
@@ -584,17 +587,17 @@ const StudentDashboard = () => {
               {typeof studentProfile.profileImage === 'string' && studentProfile.profileImage.startsWith('http') ? (
                 <img src={studentProfile.profileImage} alt="Profile" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
               ) : (
-                studentProfile.profileImage
+                <FontAwesomeIcon icon={faUser} style={{ fontSize: '1.4rem', color: '#6b7280' }} />
               )}
             </div>
           </div>
           <div className="welcome-text">
             <h2>{studentProfile.name}</h2>
             <p>Welcome back to Academathon!</p>
-            <div style={{ marginTop: '10px', display: 'flex', gap: '20px', fontSize: '14px' }}>
-              <span>📚 {stats.totalLessons} Lessons Completed</span>
-              <span>⏱️ {stats.totalHours} Hours</span>
-              <span>📅 {stats.upcomingCount} Upcoming</span>
+            <div className="stats-row">
+              <span className="stat-item"><FontAwesomeIcon icon={faBookOpen} className="stat-icon" /> {stats.totalLessons} Lessons Completed</span>
+              <span className="stat-item"><FontAwesomeIcon icon={faClock} className="stat-icon" /> {stats.totalHours} Hours</span>
+              <span className="stat-item"><FontAwesomeIcon icon={faCalendarAlt} className="stat-icon" /> {stats.upcomingCount} Upcoming</span>
             </div>
           </div>
         </div>
@@ -633,7 +636,7 @@ const StudentDashboard = () => {
           <button 
             className="view-full-link" 
             onClick={() => navigate('/lesson-history')}
-            style={{ cursor: 'pointer', background: 'none', border: 'none', color: '#4CAF50' }}
+            style={{ cursor: 'pointer', background: 'none', border: 'none', color: '#2D6A4F' }}
           >
             View Full List
           </button>
@@ -641,7 +644,7 @@ const StudentDashboard = () => {
           <div className="lessons-table">
             {upcomingLessons.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-                <p>No upcoming lessons. <button onClick={() => navigate('/book-lesson')} style={{ color: '#4CAF50', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>Book your first lesson!</button></p>
+                <p>No upcoming lessons. <button onClick={() => navigate('/book-lesson')} style={{ color: '#2D6A4F', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>Book your first lesson!</button></p>
               </div>
             ) : (
               <>
@@ -653,7 +656,7 @@ const StudentDashboard = () => {
                           <div style={{ color: '#666', marginBottom: '4px' }}>
                             <strong>Original:</strong> {formatDateTime(booking.startTime)}
                           </div>
-                          <div style={{ color: '#4CAF50' }}>
+                          <div style={{ color: '#2D6A4F' }}>
                             <strong>Requested:</strong> {formatDateTime(booking.requestedStartTime)}
                           </div>
                         </div>
@@ -685,7 +688,7 @@ const StudentDashboard = () => {
                         <button 
                           className="action-btn pay-btn" 
                           onClick={() => handlePayNow(booking.id)}
-                          style={{ backgroundColor: '#4CAF50', color: 'white' }}
+                          style={{ backgroundColor: '#2D6A4F', color: 'white' }}
                         >
                           Pay Now
                         </button>

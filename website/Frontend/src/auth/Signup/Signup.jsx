@@ -289,10 +289,6 @@ function SignUpPage() {
     <div className='signup-page'>
       <div className='greenblock'>
         <div className='welcome-content'>
-          <div className='title'>
-            <FontAwesomeIcon icon={faGraduationCap} />
-            Academathon
-          </div>
           <h2>Join Hundreds of Successful Students</h2>
           <p>Connect with expert tutors and accelerate your learning journey</p>
           <div className='features-list'>
@@ -326,11 +322,6 @@ function SignUpPage() {
           <h2 className='starttext'>
             {signupStep === 1 ? 'Create Your Account' : 'Complete Your Profile'}
           </h2>
-          <h3 className='undertext'>
-            {signupStep === 1 
-              ? 'Let\'s start with your basic information' 
-              : 'Tell us more about your learning goals'}
-          </h3>
         </div>
 
         <form onSubmit={signupStep === 2 ? handleSignUp : (e) => { e.preventDefault(); handleNextStep(); }}>

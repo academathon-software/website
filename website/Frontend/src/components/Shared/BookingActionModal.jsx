@@ -75,7 +75,7 @@ const BookingActionModal = ({ booking, action, onConfirm, onCancel }) => {
                   <span className="detail-value">{formatDateTime(booking.originalStartTime)}</span>
                 </div>
                 <div className="detail-row" style={{ marginTop: '10px', paddingTop: '10px', backgroundColor: '#e8f5e9', padding: '10px', borderRadius: '4px' }}>
-                  <span className="detail-label" style={{ color: '#4CAF50', fontWeight: 'bold' }}>Requested New Time:</span>
+                  <span className="detail-label" style={{ color: '#2D6A4F', fontWeight: 'bold' }}>Requested New Time:</span>
                   <span className="detail-value" style={{ fontWeight: 'bold' }}>{formatDateTime(booking.requestedStartTime)}</span>
                 </div>
               </>

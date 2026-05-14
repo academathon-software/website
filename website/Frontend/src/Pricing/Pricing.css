@@ -62,7 +62,7 @@
 }
 
 .pricing-card.popular {
-  border-color: #10b981;
+  border-color: #2D6A4F;
   border-width: 2px;
   box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
 }
@@ -72,7 +72,7 @@
   top: -14px;
   left: 50%;
   transform: translateX(-50%);
-  background: #10b981;
+  background: #2D6A4F;
   color: white;
   padding: 6px 20px;
   border-radius: 20px;
@@ -143,20 +143,20 @@
 }
 
 .plan-btn:hover {
-  border-color: #10b981;
-  color: #10b981;
+  border-color: #2D6A4F;
+  color: #2D6A4F;
   transform: translateY(-2px);
 }
 
 .plan-btn.popular {
-  background: #10b981;
+  background: #2D6A4F;
   color: white;
-  border-color: #10b981;
+  border-color: #2D6A4F;
 }
 
 .plan-btn.popular:hover {
-  background: #059669;
-  border-color: #059669;
+  background: #1B4332;
+  border-color: #1B4332;
   color: white;
   box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
 }
@@ -197,7 +197,7 @@
 }
 
 .faq-item.open {
-  border-color: #10b981;
+  border-color: #2D6A4F;
 }
 
 .faq-question {

@@ -7,7 +7,7 @@
 /* Hero Section */
 .hero-section {
   background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 100%);
-  padding: 120px 20px 80px;
+  padding: 170px 20px 80px;
   text-align: center;
 }
 
@@ -42,7 +42,7 @@
 }
 
 .homepage .hero-buttons .btn-primary {
-  background-color: #10b981 !important;
+  background-color: #2D6A4F !important;
   color: white !important;
   padding: 14px 32px;
   border-radius: 8px;
@@ -50,12 +50,12 @@
   font-weight: 600;
   font-size: 1rem;
   transition: all 0.3s ease;
-  border: 2px solid #10b981;
+  border: 2px solid #2D6A4F;
 }
 
 .homepage .hero-buttons .btn-primary:hover {
-  background-color: #10b981 !important;
-  border-color: #10b981;
+  background-color: #2D6A4F !important;
+  border-color: #2D6A4F;
   color: white !important;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
@@ -63,19 +63,19 @@
 
 .homepage .hero-buttons .btn-outline {
   background-color: white !important;
-  color: #10b981 !important;
+  color: #2D6A4F !important;
   padding: 14px 32px;
   border-radius: 8px;
   text-decoration: none;
   font-weight: 600;
   font-size: 1rem;
   transition: all 0.3s ease;
-  border: 2px solid #10b981;
+  border: 2px solid #2D6A4F;
 }
 
 .homepage .hero-buttons .btn-outline:hover {
   background-color: #f0fdf4 !important;
-  color: #10b981 !important;
+  color: #2D6A4F !important;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.15);
 }
@@ -126,7 +126,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #10b981;
+  color: #2D6A4F;
   font-size: 1.25rem;
   margin-bottom: 18px;
 }
@@ -147,7 +147,7 @@
 /* Universities Section */
 .universities-section {
   padding: 60px 20px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #52B788 0%, #40916C 100%);
   overflow: hidden;
 }
 
@@ -221,7 +221,7 @@
 
 .homepage .cta-btn {
   display: inline-block;
-  background-color: #10b981 !important;
+  background-color: #2D6A4F !important;
   color: white !important;
   padding: 14px 36px;
   border-radius: 8px;
@@ -232,7 +232,7 @@
 }
 
 .homepage .cta-btn:hover {
-  background-color: #10b981 !important;
+  background-color: #2D6A4F !important;
   color: white !important;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);

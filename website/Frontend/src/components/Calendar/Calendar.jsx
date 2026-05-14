@@ -190,7 +190,7 @@ const Calendar = () => {
               onClick={fetchBookings}
               style={{
                 padding: '10px 20px',
-                backgroundColor: '#4CAF50',
+                backgroundColor: '#2D6A4F',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
