@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './TutorSignup.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faArrowRight, 
+import {
+  faArrowRight,
   faArrowLeft,
   faSearch,
   faCheck,
-  faChevronDown
+  faChevronDown,
+  faEye,
+  faEyeSlash
 } from '@fortawesome/free-solid-svg-icons';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -270,6 +272,8 @@ function TutorSignup() {
 
   const [errors, setErrors] = useState({});
   const [subjectSearch, setSubjectSearch] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const pronounOptions = [
     'she/her',
@@ -620,23 +624,33 @@ function TutorSignup() {
 
               <div className="form-group">
                 <label>Password</label>
-                <input
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => handleInputChange('password', e.target.value)}
-                  className={errors.password ? 'error' : ''}
-                />
+                <div className="password-input-wrapper">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={formData.password}
+                    onChange={(e) => handleInputChange('password', e.target.value)}
+                    className={errors.password ? 'error' : ''}
+                  />
+                  <button type="button" className="password-toggle" onClick={() => setShowPassword(p => !p)}>
+                    <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                  </button>
+                </div>
                 {errors.password && <span className="error-text">{errors.password}</span>}
               </div>
 
               <div className="form-group">
                 <label>Confirm Password</label>
-                <input
-                  type="password"
-                  value={formData.confirmPassword}
-                  onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                  className={errors.confirmPassword ? 'error' : ''}
-                />
+                <div className="password-input-wrapper">
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={formData.confirmPassword}
+                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                    className={errors.confirmPassword ? 'error' : ''}
+                  />
+                  <button type="button" className="password-toggle" onClick={() => setShowConfirmPassword(p => !p)}>
+                    <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
+                  </button>
+                </div>
                 {errors.confirmPassword && <span className="error-text">{errors.confirmPassword}</span>}
               </div>
 

@@ -33,7 +33,7 @@ const PaymentForm = ({ bookingId, bookingDetails, onSuccess, onCancel }) => {
       const { error: submitError } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: window.location.origin + '/student-dashboard',
+          return_url: window.location.origin + '/dashboard',
         },
         redirect: 'if_required',
       });

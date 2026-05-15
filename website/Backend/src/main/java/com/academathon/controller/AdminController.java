@@ -61,7 +61,7 @@ public class AdminController {
     
     @Autowired
     private CourseContentRepository courseContentRepository;
-    //dsad
+
     @GetMapping("/statistics")
     public ResponseEntity<PlatformStatisticsDTO> getPlatformStatistics() {
         PlatformStatisticsDTO statistics = adminStatisticsService.getPlatformStatistics();

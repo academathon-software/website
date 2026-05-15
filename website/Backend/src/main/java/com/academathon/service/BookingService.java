@@ -64,10 +64,10 @@ public class BookingService {
             throw new RuntimeException("Cannot book a lesson in the past");
         }
         
-        // Validate 48-hour minimum booking window
-        LocalDateTime minimumBookingTime = now.plusHours(48);
+        // Validate 2-hour minimum booking window
+        LocalDateTime minimumBookingTime = now.plusHours(2);
         if (request.getStartTime().isBefore(minimumBookingTime)) {
-            throw new RuntimeException("Bookings must be made at least 48 hours in advance");
+            throw new RuntimeException("Bookings must be made at least 2 hours in advance");
         }
         
         if (request.getEndTime().isBefore(request.getStartTime())) {
@@ -485,10 +485,10 @@ public class BookingService {
             throw new RuntimeException("Cannot reschedule to a time in the past");
         }
         
-        // Validate 48-hour minimum advance booking for the new time
-        LocalDateTime minimumNewTime = now.plusHours(48);
+        // Validate 2-hour minimum advance booking for the new time
+        LocalDateTime minimumNewTime = now.plusHours(2);
         if (newStartTime.isBefore(minimumNewTime)) {
-            throw new RuntimeException("The new lesson time must be at least 48 hours in advance");
+            throw new RuntimeException("The new lesson time must be at least 2 hours in advance");
         }
         
         if (newEndTime.isBefore(newStartTime)) {

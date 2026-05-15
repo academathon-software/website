@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import './TutorDashboard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
+import {
   faChevronLeft,
   faChevronRight,
   faCheck,
-  faUser
+  faUser,
+  faUsers,
+  faBookOpen,
+  faClock,
+  faStar,
+  faCalendarDays
 } from '@fortawesome/free-solid-svg-icons';
 import TutorSidebar from '../Shared/TutorSidebar';
 import BookingStatusBadge from '../Shared/BookingStatusBadge';
@@ -391,11 +396,11 @@ const TutorDashboard = () => {
           <div className="welcome-text">
             <h2>{tutorProfile.name}</h2>
             <p>Welcome back to Academathon!</p>
-            <div style={{ marginTop: '10px', display: 'flex', gap: '20px', fontSize: '14px' }}>
-              <span>👥 {stats.totalStudents} Students</span>
-              <span>📚 {stats.totalLessons} Lessons</span>
-              <span>⏱️ {stats.totalHours}hrs</span>
-              <span>⭐ {stats.avgRating > 0 ? `${stats.avgRating}/5.0` : 'No ratings yet'}</span>
+            <div className="stats-row">
+              <span className="stat-item"><FontAwesomeIcon icon={faUsers} className="stat-icon" /> {stats.totalStudents} Students</span>
+              <span className="stat-item"><FontAwesomeIcon icon={faBookOpen} className="stat-icon" /> {stats.totalLessons} Lessons</span>
+              <span className="stat-item"><FontAwesomeIcon icon={faClock} className="stat-icon" /> {stats.totalHours}hrs</span>
+              <span className="stat-item"><FontAwesomeIcon icon={faStar} className="stat-icon" /> {stats.avgRating > 0 ? `${stats.avgRating}/5.0` : 'No ratings yet'}</span>
             </div>
           </div>
         </div>
@@ -511,19 +516,25 @@ const TutorDashboard = () => {
 
         {/* Upcoming Lessons Section */}
         <div className="upcoming-lessons-section">
-          <h3>Upcoming Lessons</h3>
-          <button 
-            className="view-full-link" 
-            onClick={() => navigate('/lesson-history')}
-            style={{ cursor: 'pointer', background: 'none', border: 'none', color: '#2D6A4F' }}
-          >
-            View Full List
-          </button>
-          
+          <div className="upcoming-lessons-header">
+            <h3>Upcoming Lessons</h3>
+            <button
+              className="view-full-link"
+              onClick={() => navigate('/lesson-history')}
+              style={{ cursor: 'pointer', background: 'none', border: 'none' }}
+            >
+              View Full List <FontAwesomeIcon icon={faChevronRight} style={{ fontSize: '0.75rem' }} />
+            </button>
+          </div>
+
           <div className="lessons-table">
             {upcomingBookings.filter(b => b.status === 'SCHEDULED' || b.status === 'CONFIRMED').length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-                No upcoming lessons scheduled. Your confirmed lessons will appear here.
+              <div className="empty-state">
+                <div className="empty-state-icon-wrap">
+                  <FontAwesomeIcon icon={faCalendarDays} />
+                </div>
+                <p className="empty-state-title">No upcoming lessons scheduled.</p>
+                <p className="empty-state-subtitle">Your confirmed lessons will appear here.</p>
               </div>
             ) : (
               <>
@@ -647,8 +658,9 @@ const TutorDashboard = () => {
           
           <div className="upcoming-list">
             {upcomingSessions.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
-                <p>No upcoming sessions</p>
+              <div className="empty-state-small">
+                <FontAwesomeIcon icon={faCalendarDays} />
+                <span>No upcoming sessions</span>
               </div>
             ) : (
               upcomingSessions.map(session => (

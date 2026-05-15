@@ -125,7 +125,7 @@ public class TutorInvitationService {
                         <p>You've been invited to join Academathon as a tutor! We're excited to have you on our platform.</p>
                         <p>Click the button below to complete your registration:</p>
                         <div style="text-align: center;">
-                            <a href="%s" class="button">Complete Your Registration</a>
+                            <a href="%s" class="button" style="color: white; text-decoration: none;">Complete Your Registration</a>
                         </div>
                         <p>Or copy and paste this link into your browser:</p>
                         <p style="word-break: break-all; color: #1A803D;">%s</p>

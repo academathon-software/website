@@ -58,9 +58,9 @@ public class TutorSignupService {
             throw new RuntimeException("Pronouns are required.");
         }
         
-        // 3. Check if user already exists
+        // 3. Check if any account already exists with this email
         if (userRepository.findByEmail(dto.email()).isPresent()) {
-            throw new RuntimeException("An account with this email already exists");
+            throw new RuntimeException("An account with this email already exists. Please use a different email.");
         }
         
         // 4. Create User with TUTOR role

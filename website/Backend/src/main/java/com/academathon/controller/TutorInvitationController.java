@@ -8,6 +8,7 @@ import com.academathon.service.TutorInvitationService;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,6 +19,7 @@ public class TutorInvitationController {
     private TutorInvitationService invitationService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createInvitation(@RequestBody TutorInvitationDTO dto) {
         try {
             TutorInvitation invitation = invitationService.createInvitation(dto.email());
@@ -54,6 +56,7 @@ public class TutorInvitationController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getAllInvitations() {
         try {
             var invitations = invitationService.getAllInvitations();
@@ -65,6 +68,7 @@ public class TutorInvitationController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteInvitation(@PathVariable Long id) {
         try {
             invitationService.deleteInvitation(id);
@@ -76,6 +80,7 @@ public class TutorInvitationController {
     }
 
     @PostMapping("/{id}/resend")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> resendInvitation(@PathVariable Long id) {
         try {
             invitationService.resendInvitation(id);

@@ -270,15 +270,15 @@ const BookLesson = () => {
       const slotsResponses = await Promise.all(slotsPromises);
       
       // Map tutor IDs to their available slots
-      // Filter out slots that are less than 48 hours from now
+      // Filter out slots that are less than 2 hours from now
       const now = new Date();
-      const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000); // 48 hours from now
+      const minBookingTime = new Date(now.getTime() + 2 * 60 * 60 * 1000); // 2 hours from now
       
       const slotsMap = {};
       tutorsList.forEach((tutor, index) => {
         const allSlots = slotsResponses[index].data || [];
         
-        // Only include slots that are 48+ hours in the future
+        // Only include slots that are 2+ hours in the future
         const filteredSlots = allSlots.filter(slot => {
           const slotDateTime = new Date(slot.startTime);
           return slotDateTime >= minBookingTime;
@@ -379,14 +379,14 @@ const BookLesson = () => {
       return;
     }
     
-    // Validate 48-hour minimum at selection time
+    // Validate 2-hour minimum at selection time
     const slotDateTime = new Date(slotData.startTime);
     const now = new Date();
-    const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+    const minBookingTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
     
     if (slotDateTime < minBookingTime) {
       const hoursAway = (slotDateTime - now) / (1000 * 60 * 60);
-      alert(`This slot is only ${hoursAway.toFixed(1)} hours away. Lessons must be booked at least 48 hours in advance.`);
+      alert(`This slot is only ${hoursAway.toFixed(1)} hours away. Lessons must be booked at least 2 hours in advance.`);
       return;
     }
     
@@ -429,14 +429,14 @@ const BookLesson = () => {
         throw new Error('Invalid slot data - please select a different time slot');
       }
 
-      // Validate 48-hour minimum booking window
+      // Validate 2-hour minimum booking window
       const selectedDateTime = new Date(slotData.startTime);
       const now = new Date();
-      const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+      const minBookingTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
       const hoursAway = (selectedDateTime - now) / (1000 * 60 * 60);
       
       if (selectedDateTime < minBookingTime) {
-        const errorMsg = `Lessons must be booked at least 48 hours in advance. This slot is only ${hoursAway.toFixed(1)} hours away.`;
+        const errorMsg = `Lessons must be booked at least 2 hours in advance. This slot is only ${hoursAway.toFixed(1)} hours away.`;
         setError(errorMsg);
         alert(errorMsg);
         setBookingLoading(false);
@@ -494,18 +494,19 @@ const BookLesson = () => {
               <>
                 <div style={{
                   display: 'flex',
+                  flexDirection: 'column',
                   alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '1.25rem 1.5rem',
+                  gap: '1rem',
+                  padding: '1.5rem',
                   border: '1px solid #d1d5db',
                   borderRadius: '12px',
                   backgroundColor: '#f0fdf4'
                 }}>
-                  <div>
+                  <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: '0.85rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                       Booking as
                     </div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1A803D', marginTop: '4px' }}>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#2D6A4F', marginTop: '4px' }}>
                       {studentGradeLabel}
                     </div>
                   </div>
@@ -513,13 +514,13 @@ const BookLesson = () => {
                     type="button"
                     onClick={() => navigate('/profile')}
                     style={{
-                      padding: '0.5rem 1rem',
-                      border: '1px solid #1A803D',
+                      padding: '0.4rem 1rem',
+                      border: '1px solid #2D6A4F',
                       borderRadius: '6px',
                       backgroundColor: 'white',
-                      color: '#1A803D',
+                      color: '#2D6A4F',
                       cursor: 'pointer',
-                      fontSize: '0.9rem',
+                      fontSize: '0.875rem',
                       fontWeight: 500
                     }}
                   >
@@ -532,17 +533,17 @@ const BookLesson = () => {
 
                 <div style={{
                   display: 'flex',
-                  justifyContent: 'flex-end',
+                  justifyContent: 'center',
                   marginTop: '1.5rem',
                   width: '100%'
                 }}>
                   <button
                     onClick={handleNext}
                     style={{
-                      padding: '0.75rem 1.5rem',
+                      padding: '0.75rem 2.5rem',
                       border: 'none',
-                      borderRadius: '6px',
-                      backgroundColor: '#1A803D',
+                      borderRadius: '8px',
+                      backgroundColor: '#2D6A4F',
                       color: 'white',
                       cursor: 'pointer',
                       fontSize: '1rem',
@@ -715,12 +716,12 @@ const BookLesson = () => {
         const groupSlotsByDateTime = () => {
           const grouped = {};
           const now = new Date();
-          const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000); // 48 hours from now
+          const minBookingTime = new Date(now.getTime() + 2 * 60 * 60 * 1000); // 2 hours from now
           
           currentTutorSlots.forEach(slot => {
             const slotDate = new Date(slot.startTime);
             
-            // Only include slots that are at least 48 hours in advance
+            // Only include slots that are at least 2 hours in advance
             if (slotDate >= minBookingTime) {
               const dateKey = slotDate.toISOString().split('T')[0];
               const timeKey = slotDate.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
@@ -856,15 +857,15 @@ const BookLesson = () => {
                                     let unavailableReason = 'Tutor has not set availability for this time';
                                     
                                     if (slotData && slotData.startTime) {
-                                      // Check if slot is at least 48 hours in advance
+                                      // Check if slot is at least 2 hours in advance
                                       const slotDateTime = new Date(slotData.startTime);
                                       const now = new Date();
-                                      const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000); // 48 hours from now
+                                      const minBookingTime = new Date(now.getTime() + 2 * 60 * 60 * 1000); // 2 hours from now
                                       
                                       if (slotDateTime >= minBookingTime) {
                                         isAvailable = true;
                                       } else {
-                                        unavailableReason = 'Must book at least 48 hours in advance';
+                                        unavailableReason = 'Must book at least 2 hours in advance';
                                       }
                                     }
                                     

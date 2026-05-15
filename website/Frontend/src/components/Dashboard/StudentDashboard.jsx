@@ -172,14 +172,14 @@ const StudentDashboard = () => {
       );
 
       // Convert the API response to the format expected by the UI
-      // Filter out slots that are less than 48 hours from now
+      // Filter out slots that are less than 2 hours from now
       const now = new Date();
-      const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000); // 48 hours from now
+      const minBookingTime = new Date(now.getTime() + 2 * 60 * 60 * 1000); // 2 hours from now
       
       const slots = response.data
         .filter(slot => {
           const startTime = new Date(slot.startTime);
-          return startTime >= minBookingTime; // Only include slots 48+ hours in advance
+          return startTime >= minBookingTime; // Only include slots 2+ hours in advance
         })
         .map(slot => {
           const startTime = new Date(slot.startTime);
@@ -266,10 +266,10 @@ const StudentDashboard = () => {
         return;
       }
       
-      // Validate 48-hour minimum advance booking for the new time
-      const minimumNewTime = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+      // Validate 2-hour minimum advance booking for the new time
+      const minimumNewTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
       if (newStartTime < minimumNewTime) {
-        alert('The new lesson time must be at least 48 hours in advance from now.');
+        alert('The new lesson time must be at least 2 hours in advance from now.');
         setRescheduleLoading(false);
         return;
       }
@@ -609,20 +609,14 @@ const StudentDashboard = () => {
           
           <div className="pending-lessons-grid">
             {pendingLessons.map(lesson => (
-              <div key={lesson.id} className="lesson-card" style={{ backgroundColor: lesson.color }}>
-                <div className="lesson-header">
-                  <div className="lesson-icon">
-                    <FontAwesomeIcon icon={lesson.icon} />
-                  </div>
-                  <div className="lesson-datetime">{lesson.dateTime}</div>
+              <div key={lesson.id} className="pending-lesson-row">
+                <div className="pending-lesson-left">
+                  <span className="pending-lesson-title">{lesson.title || `${lesson.subject} ${lesson.grade}`}</span>
+                  <span className="pending-lesson-tutor">{lesson.dateTime}</span>
                 </div>
-                <div className="lesson-info">
-                  <div className="lesson-subject">{lesson.subject} {lesson.grade}</div>
-                  <div className="lesson-title">{lesson.title}</div>
-                  <div className="lesson-status">
-                    <FontAwesomeIcon icon={lesson.statusIcon} />
-                    <span>{lesson.status}</span>
-                  </div>
+                <div className="pending-lesson-status">
+                  <FontAwesomeIcon icon={lesson.statusIcon} />
+                  <span>{lesson.status}</span>
                 </div>
               </div>
             ))}
@@ -632,19 +626,21 @@ const StudentDashboard = () => {
 
         {/* Upcoming Lessons Section */}
         <div className="upcoming-lessons-section">
-          <h3>Upcoming Lessons</h3>
-          <button 
-            className="view-full-link" 
-            onClick={() => navigate('/lesson-history')}
-            style={{ cursor: 'pointer', background: 'none', border: 'none', color: '#2D6A4F' }}
-          >
-            View Full List
-          </button>
-          
+          <div className="upcoming-lessons-header">
+            <h3>Upcoming Lessons</h3>
+            <button className="view-full-link" onClick={() => navigate('/lesson-history')}>
+              View Full List <FontAwesomeIcon icon={faChevronRight} style={{ fontSize: '0.75rem' }} />
+            </button>
+          </div>
+
           <div className="lessons-table">
             {upcomingLessons.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-                <p>No upcoming lessons. <button onClick={() => navigate('/book-lesson')} style={{ color: '#2D6A4F', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>Book your first lesson!</button></p>
+              <div className="empty-state">
+                <div className="empty-state-icon-wrap">
+                  <FontAwesomeIcon icon={faCalendarAlt} />
+                </div>
+                <p className="empty-state-title">No upcoming lessons scheduled.</p>
+                <p className="empty-state-subtitle">Your confirmed lessons will appear here.</p>
               </div>
             ) : (
               <>
@@ -771,8 +767,9 @@ const StudentDashboard = () => {
           
           <div className="upcoming-list">
             {upcomingSessions.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
-                <p>No upcoming sessions</p>
+              <div className="empty-state-small">
+                <FontAwesomeIcon icon={faCalendarAlt} />
+                <span>No upcoming sessions</span>
               </div>
             ) : (
               upcomingSessions.map(session => (

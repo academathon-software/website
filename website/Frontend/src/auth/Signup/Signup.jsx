@@ -526,10 +526,6 @@ function SignUpPage() {
           </div>
         )}
         
-        <h4 className='underbutton'>
-          Already have an account?
-          <strong> <a href="/login">Login</a></strong>
-        </h4>
       </div>
     </div>
   );
