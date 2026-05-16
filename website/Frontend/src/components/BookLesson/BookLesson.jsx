@@ -448,7 +448,8 @@ const BookLesson = () => {
         tutorProfileId: tutor.id,
         startTime: slotData.startTime,
         endTime: slotData.endTime,
-        notes: `${studentGradeLabel || selectedGrade?.name || ''} ${selectedCourse}`.trim()
+        notes: `${studentGradeLabel || selectedGrade?.name || ''} ${selectedCourse}`.trim(),
+        gradeLevel: studentGradeLabel || selectedGrade?.name || ''
       };
 
       await bookingAPI.createBooking(bookingData);

@@ -30,6 +30,9 @@ public class Booking {
     @Column(name = "subject")
     private String subject;
 
+    @Column(name = "grade_level")
+    private String gradeLevel;
+
     @Column(name = "payment_intent_id")
     private String paymentIntentId;
 
@@ -147,6 +150,14 @@ public class Booking {
 
     public void setSubject(String subject) {
         this.subject = subject;
+    }
+
+    public String getGradeLevel() {
+        return gradeLevel;
+    }
+
+    public void setGradeLevel(String gradeLevel) {
+        this.gradeLevel = gradeLevel;
     }
 
     public String getPaymentIntentId() {

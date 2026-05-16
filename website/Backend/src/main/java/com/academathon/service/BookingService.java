@@ -115,6 +115,7 @@ public class BookingService {
         booking.setEndTime(request.getEndTime());
         booking.setStatus(BookingStatus.PENDING); // Changed from CONFIRMED to PENDING
         booking.setSubject(request.getNotes()); // Store the subject from notes field
+        booking.setGradeLevel(request.getGradeLevel());
         
         // Set tutor response deadline (24 hours from now)
         booking.setTutorResponseDeadline(now.plusHours(24));

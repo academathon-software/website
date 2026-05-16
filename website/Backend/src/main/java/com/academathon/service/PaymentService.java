@@ -76,11 +76,17 @@ public class PaymentService {
             throw new RuntimeException("Payment already completed for this booking");
         }
         
-        // Calculate amount based on tutor's hourly rate and lesson duration
+        // Calculate amount based on grade level pricing
+        String gradeLevel = booking.getGradeLevel();
+        double amount;
+        if (gradeLevel != null && (gradeLevel.contains("11") || gradeLevel.contains("12") || gradeLevel.contains("College") || gradeLevel.contains("Adult"))) {
+            amount = 35.00; // Grade 11-12, College, Adult Learner
+        } else if (gradeLevel != null && (gradeLevel.contains("9") || gradeLevel.contains("10"))) {
+            amount = 30.00; // Grade 9-10
+        } else {
+            amount = 25.00; // Grades 1-8
+        }
         TutorProfile tutor = booking.getTutor();
-        Duration duration = Duration.between(booking.getStartTime(), booking.getEndTime());
-        double hours = duration.toMinutes() / 60.0;
-        double amount = tutor.getHourlyRate().doubleValue() * hours;
         
         // Stripe expects amount in cents
         long amountInCents = Math.round(amount * 100);
@@ -217,11 +223,17 @@ public class PaymentService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        // Calculate amount based on tutor's hourly rate
+        // Calculate amount based on grade level pricing
+        String gradeLevel = booking.getGradeLevel();
+        double amount;
+        if (gradeLevel != null && (gradeLevel.contains("11") || gradeLevel.contains("12") || gradeLevel.contains("College") || gradeLevel.contains("Adult"))) {
+            amount = 35.00;
+        } else if (gradeLevel != null && (gradeLevel.contains("9") || gradeLevel.contains("10"))) {
+            amount = 30.00;
+        } else {
+            amount = 25.00;
+        }
         TutorProfile tutor = booking.getTutor();
-        Duration duration = Duration.between(booking.getStartTime(), booking.getEndTime());
-        double hours = duration.toMinutes() / 60.0;
-        double amount = tutor.getHourlyRate().doubleValue() * hours;
 
         Map<String, Object> details = new HashMap<>();
         details.put("bookingId", bookingId);

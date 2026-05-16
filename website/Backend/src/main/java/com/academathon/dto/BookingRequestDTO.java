@@ -7,15 +7,17 @@ public class BookingRequestDTO {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String notes;
+    private String gradeLevel;
 
     public BookingRequestDTO() {
     }
 
-    public BookingRequestDTO(Long tutorProfileId, LocalDateTime startTime, LocalDateTime endTime, String notes) {
+    public BookingRequestDTO(Long tutorProfileId, LocalDateTime startTime, LocalDateTime endTime, String notes, String gradeLevel) {
         this.tutorProfileId = tutorProfileId;
         this.startTime = startTime;
         this.endTime = endTime;
         this.notes = notes;
+        this.gradeLevel = gradeLevel;
     }
 
     public Long getTutorProfileId() {
@@ -48,6 +50,14 @@ public class BookingRequestDTO {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public String getGradeLevel() {
+        return gradeLevel;
+    }
+
+    public void setGradeLevel(String gradeLevel) {
+        this.gradeLevel = gradeLevel;
     }
 }
 
