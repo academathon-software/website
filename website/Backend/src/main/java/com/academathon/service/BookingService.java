@@ -1,5 +1,6 @@
 package com.academathon.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,9 @@ public class BookingService {
     private final UserRepository userRepository;
     private final AvailabilityService availabilityService;
     private final EmailService emailService;
+
+    @Value("${app.frontend.url:http://localhost:5173}")
+    private String frontendUrl;
     
     public BookingService(BookingRepository bookingRepository, 
                          TutorProfileRepository tutorProfileRepository,
@@ -320,6 +324,8 @@ public class BookingService {
         try {
             String studentEmail = booking.getStudent().getEmail();
             String subject = "Booking Confirmed - Payment Required - Academathon";
+            String baseUrl = frontendUrl == null ? "" : frontendUrl.replaceAll("/+$", "");
+            String paymentLink = baseUrl + "/dashboard?pay=" + booking.getId();
             String body = String.format(
                 "Hello %s,\n\n" +
                 "Great news! %s has confirmed your booking request.\n\n" +
@@ -328,8 +334,8 @@ public class BookingService {
                 "- Subject: %s\n" +
                 "- Date & Time: %s\n" +
                 "- Duration: %d minutes\n\n" +
-                "ACTION REQUIRED: Please complete the payment to finalize your lesson.\n" +
-                "Log in to your dashboard to pay now.\n\n" +
+                "ACTION REQUIRED: Please complete the payment to finalize your lesson.\n\n" +
+                "Pay now: %s\n\n" +
                 "Note: If payment is not received within 24 hours of the lesson start time, " +
                 "the booking will be automatically cancelled.\n\n" +
                 "Best regards,\n" +
@@ -339,7 +345,8 @@ public class BookingService {
                 booking.getTutor().getDisplayName(),
                 booking.getSubject(),
                 booking.getStartTime().format(EMAIL_DATE_FORMAT),
-                java.time.Duration.between(booking.getStartTime(), booking.getEndTime()).toMinutes()
+                java.time.Duration.between(booking.getStartTime(), booking.getEndTime()).toMinutes(),
+                paymentLink
             );
             emailService.sendEmail(studentEmail, subject, body);
         } catch (Exception e) {

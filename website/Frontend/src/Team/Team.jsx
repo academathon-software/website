@@ -22,7 +22,7 @@ const teamMembers = [
     social: {
       linkedin: "https://www.linkedin.com/in/sahil-talati/",
       twitter: "https://twitter.com/sarahjohnson",
-      email: "sahil@academathon.com"
+      email: "sahil@academathon.ca"
     },
     expertise: ["Educational Technology", "Strategic Planning", "Leadership"]
   

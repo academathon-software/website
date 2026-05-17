@@ -179,7 +179,7 @@
 }
 
 /* Upcoming Lessons Section */
-.upcoming-lessons-section {
+.student-dashboard .upcoming-lessons-section {
   margin-bottom: 1.5rem;
   background: white;
   border: 1px solid #e9ecef;
@@ -198,7 +198,7 @@
   margin-bottom: 1.25rem;
 }
 
-.upcoming-lessons-section h3 {
+.student-dashboard .upcoming-lessons-section h3 {
   margin: 0;
   font-size: 1.1rem;
   font-weight: 700;
@@ -282,7 +282,7 @@
   gap: 0;
 }
 
-.upcoming-lessons-section .lesson-row {
+.student-dashboard .upcoming-lessons-section .lesson-row {
   display: flex !important;
   align-items: center;
   gap: 0.75rem;
@@ -304,11 +304,11 @@
   font-weight: 500;
 }
 
-.upcoming-lessons-section .lesson-row:last-child {
+.student-dashboard .upcoming-lessons-section .lesson-row:last-child {
   border-bottom: none;
 }
 
-.upcoming-lessons-section .lesson-datetime {
+.student-dashboard .upcoming-lessons-section .lesson-datetime {
   font-size: 0.85rem;
   color: #999;
   font-weight: 400;
@@ -318,7 +318,7 @@
   white-space: nowrap;
 }
 
-.upcoming-lessons-section .lesson-name {
+.student-dashboard .upcoming-lessons-section .lesson-name {
   font-size: 0.9rem;
   color: #333;
   font-weight: 600;
@@ -329,7 +329,7 @@
   white-space: nowrap;
 }
 
-.upcoming-lessons-section .tutor-name {
+.student-dashboard .upcoming-lessons-section .tutor-name {
   font-size: 0.9rem;
   color: #333;
   font-weight: 500;
@@ -362,7 +362,7 @@
   color: white;
 }
 
-.upcoming-lessons-section .status-indicator {
+.student-dashboard .upcoming-lessons-section .status-indicator {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -382,7 +382,7 @@
   white-space: nowrap;
 }
 
-.upcoming-lessons-section .lesson-actions {
+.student-dashboard .upcoming-lessons-section .lesson-actions {
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
@@ -943,35 +943,53 @@
     display: none;
   }
 
-  .lesson-row {
-    grid-template-columns: 1fr 1fr;
+  .student-dashboard .upcoming-lessons-section .lesson-row {
+    flex-wrap: wrap;
     gap: 0.4rem 0.75rem;
   }
 
-  .lesson-datetime {
-    grid-column: 1 / -1;
+  .student-dashboard .upcoming-lessons-section .lesson-datetime {
+    flex: 0 0 100%;
   }
 
-  .lesson-name {
-    grid-column: 1 / -1;
+  .student-dashboard .upcoming-lessons-section .lesson-name {
+    flex: 0 0 100%;
   }
 
-  .tutor-name {
-    grid-column: 1;
+  .student-dashboard .upcoming-lessons-section .tutor-name {
+    flex: 1 1 auto;
   }
 
-  .status-indicator {
-    grid-column: 2;
-    justify-self: end;
+  .student-dashboard .upcoming-lessons-section .status-indicator {
+    flex: 0 0 auto;
+    margin-left: auto;
   }
 
-  .lesson-actions {
-    grid-column: 1 / -1;
+  .student-dashboard .upcoming-lessons-section .lesson-actions {
+    flex: 0 0 100%;
     justify-content: flex-start;
+    margin-left: 0;
+    flex-wrap: wrap;
   }
 
   .reschedule-blocked {
     max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .student-dashboard .upcoming-lessons-section .lesson-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .student-dashboard .upcoming-lessons-section .lesson-actions .action-btn,
+  .student-dashboard .upcoming-lessons-section .lesson-actions .reschedule-btn,
+  .student-dashboard .upcoming-lessons-section .lesson-actions .cancel-btn,
+  .student-dashboard .upcoming-lessons-section .lesson-actions .pay-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 

@@ -17,7 +17,7 @@ public class TutorInvitationService {
     @Autowired
     private EmailService emailService;
 
-    @Value("${app.frontend.url:http://localhost:3000}")
+    @Value("${app.frontend.url:http://localhost:5173}")
     private String frontendUrl;
 
     public TutorInvitation createInvitation(String email) throws MessagingException {
@@ -90,7 +90,8 @@ public class TutorInvitationService {
     }
 
     private void sendInvitationEmail(TutorInvitation invitation) throws MessagingException {
-        String signupLink = frontendUrl + "/signup/tutor/" + invitation.getToken();
+        String baseUrl = frontendUrl == null ? "" : frontendUrl.replaceAll("/+$", "");
+        String signupLink = baseUrl + "/signup/tutor/" + invitation.getToken();
         
         String subject = "Invitation to Join Academathon as a Tutor";
         

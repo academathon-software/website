@@ -22,11 +22,12 @@ import BookingStatusBadge from '../Shared/BookingStatusBadge';
 import PaymentModal from '../Payment/PaymentModal';
 import { useUser } from '../../context/UserContext';
 import { bookingAPI, userAPI, availabilityAPI, tutorAPI } from '../../services/api';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const StudentDashboard = () => {
   const { setUserType } = useUser();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [studentProfile, setStudentProfile] = useState(null);
   const [upcomingBookings, setUpcomingBookings] = useState([]);
@@ -57,6 +58,25 @@ const StudentDashboard = () => {
     fetchDashboardData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setUserType]);
+
+  // Auto-open payment modal when arriving via "Pay Now" email link (?pay=<bookingId>)
+  useEffect(() => {
+    const payId = searchParams.get('pay');
+    if (!payId || loading || showPaymentModal) return;
+
+    const bookingIdNum = Number(payId);
+    const booking = upcomingBookings.find(b => b.id === bookingIdNum);
+
+    if (booking && booking.status === 'CONFIRMED' && booking.paymentStatus !== 'SUCCEEDED') {
+      setPaymentBookingId(bookingIdNum);
+      setShowPaymentModal(true);
+    }
+
+    // Always clear the param so refreshes don't keep retriggering this
+    searchParams.delete('pay');
+    setSearchParams(searchParams, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, upcomingBookings]);
 
   const fetchDashboardData = async () => {
     try {
@@ -129,6 +149,8 @@ const StudentDashboard = () => {
     
     return now < minRescheduleTime;
   };
+
+  const isPastLesson = (booking) => new Date(booking.endTime) < new Date();
 
   const handleOpenReschedule = (booking) => {
     setSelectedBooking(booking);
@@ -689,16 +711,20 @@ const StudentDashboard = () => {
                           Pay Now
                         </button>
                       )}
-                      {(booking.status === 'PENDING' || booking.status === 'SCHEDULED') && (
-                        canReschedule(booking) ? (
-                          <button className="action-btn reschedule-btn" onClick={() => handleOpenReschedule(booking)}>
-                            {booking.status === 'PENDING' ? 'Update Request' : 'Reschedule'}
-                          </button>
-                        ) : (
-                          <p className="reschedule-blocked">Updates/reschedules must be requested at least 24 hours before the lesson</p>
-                        )
+                      {!isPastLesson(booking) && (
+                        <>
+                          {(booking.status === 'PENDING' || booking.status === 'SCHEDULED') && (
+                            canReschedule(booking) ? (
+                              <button className="action-btn reschedule-btn" onClick={() => handleOpenReschedule(booking)}>
+                                {booking.status === 'PENDING' ? 'Update Request' : 'Reschedule'}
+                              </button>
+                            ) : (
+                              <p className="reschedule-blocked">Updates/reschedules must be requested at least 24 hours before the lesson</p>
+                            )
+                          )}
+                          <button className="action-btn cancel-btn" onClick={() => handleCancelBooking(booking.id)}>Cancel</button>
+                        </>
                       )}
-                      <button className="action-btn cancel-btn" onClick={() => handleCancelBooking(booking.id)}>Cancel</button>
                     </div>
                   </div>
                 ))}

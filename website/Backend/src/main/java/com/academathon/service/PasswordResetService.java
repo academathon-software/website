@@ -84,7 +84,8 @@ public class PasswordResetService {
     }
     
     private void sendPasswordResetEmail(User user, String token) {
-        String resetLink = frontendUrl + "/reset-password?token=" + token;
+        String baseUrl = frontendUrl == null ? "" : frontendUrl.replaceAll("/+$", "");
+        String resetLink = baseUrl + "/reset-password?token=" + token;
         String subject = "Password Reset Request - Academathon";
         String body = String.format(
             "Hello %s,\n\n" +

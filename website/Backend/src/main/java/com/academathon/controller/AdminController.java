@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ADMIN')")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174", "https://academathon.com", "https://www.academathon.com", "https://academathon.ca", "https://www.academathon.ca", "https://academathon.vercel.app", "https://*.vercel.app"})
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174", "https://academathon.ca", "https://www.academathon.ca", "https://academathon.vercel.app", "https://*.vercel.app"})
 public class AdminController {
     
     @Autowired
