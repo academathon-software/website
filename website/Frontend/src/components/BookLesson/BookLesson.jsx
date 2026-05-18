@@ -80,138 +80,27 @@ const BookLesson = () => {
     return { id: 12, name: label };
   };
 
-  // Grade-specific subject and course structure
-  const getSubjectsForGrade = (gradeId) => {
-    const allSubjects = [
-      { id: 'math', name: 'Math', icon: faCalculator, color: '#e74c3c' },
-      { id: 'english', name: 'English / Language Arts', icon: faGlobe, color: '#f1c40f' },
-      { id: 'science', name: 'Science', icon: faFlask, color: '#2ecc71' },
-      { id: 'social', name: 'Social Studies', icon: faGlobeAmericas, color: '#9b59b6' },
-      { id: 'french', name: 'French', icon: faGlobe, color: '#e67e22' },
-      { id: 'technology', name: 'Technology / CS', icon: faCog, color: '#3498db' },
-      { id: 'business', name: 'Business', icon: faBriefcase, color: '#8B4513' }
-    ];
-
-    // Grades 1-3 (Primary)
-    if (gradeId >= 1 && gradeId <= 3) {
-      return allSubjects.filter(s => ['math', 'english', 'science', 'french'].includes(s.id));
-    }
-    // Grades 4-6 (Junior)
-    if (gradeId >= 4 && gradeId <= 6) {
-      return allSubjects.filter(s => ['math', 'english', 'science', 'social', 'french'].includes(s.id));
-    }
-    // Grades 7-8 (Intermediate)
-    if (gradeId >= 7 && gradeId <= 8) {
-      return allSubjects.filter(s => ['math', 'english', 'science', 'social', 'french', 'technology'].includes(s.id));
-    }
-    // Grade 9
-    if (gradeId === 9) {
-      return allSubjects.filter(s => !['business'].includes(s.id) || s.id === 'business'); // All except explicitly disallowed
-    }
-    // Grades 10-12
-    return allSubjects; // All subjects available
-  };
-
-  const getCoursesForGradeAndSubject = (gradeId, subjectId) => {
-    // Grades 1-3 (Primary)
-    if (gradeId >= 1 && gradeId <= 3) {
-      const courses = {
-        math: ['Addition & Subtraction', 'Place Value', 'Patterns', 'Basic Geometry', 'Time & Money'],
-        english: ['Reading', 'Phonics', 'Writing', 'Spelling', 'Basic Grammar'],
-        science: ['Life Systems', 'Materials', 'Weather & Seasons', 'Simple Machines'],
-        french: ['French Basics', 'French Reading', 'French Writing']
-      };
-      return courses[subjectId] || [];
-    }
-
-    // Grades 4-6 (Junior)
-    if (gradeId >= 4 && gradeId <= 6) {
-      const courses = {
-        math: ['Multiplication & Division', 'Fractions', 'Decimals', 'Intro Algebra (Patterns)', 'Geometry', 'Measurement'],
-        english: ['Reading Comprehension', 'Paragraph Writing', 'Grammar', 'Vocabulary'],
-        science: ['Life Systems', 'Electricity', 'Space', 'Biodiversity'],
-        social: ['Heritage & Identity', 'People & Environments', 'History Basics', 'Geography Basics'],
-        french: ['French Intermediate', 'French Conversation', 'French Grammar']
-      };
-      return courses[subjectId] || [];
-    }
-
-    // Grades 7-8 (Intermediate)
-    if (gradeId >= 7 && gradeId <= 8) {
-      const courses = {
-        math: ['Integers', 'Ratios & Rates', 'Equations (Intro)', 'Pythagorean Theorem', 'Graphing Basics', 'Probability'],
-        english: ['English Language Arts', 'Reading & Analysis', 'Essay Writing', 'Grammar & Composition'],
-        science: ['Cells & Systems', 'Fluids', 'Heat & Energy', 'Ecology'],
-        social: ['History', 'Geography', 'World Cultures', 'Canadian Studies'],
-        french: ['French Advanced', 'French Literature', 'French Communication'],
-        technology: ['Coding Fundamentals', 'Robotics Basics', 'Digital Literacy']
-      };
-      return courses[subjectId] || [];
-    }
-
-    // Grade 9
-    if (gradeId === 9) {
-      const courses = {
-        math: ['Foundations of Algebra', 'Linear Relations', 'Analytic Geometry (Intro)'],
-        science: ['General Science', 'Biology Intro', 'Chemistry Intro', 'Physics Intro'],
-        english: ['English 9', 'Reading & Writing', 'Literature Analysis'],
-        social: ['Geography 9', 'World Geography'],
-        french: ['French 9', 'Core French', 'French Immersion'],
-        technology: ['Intro to Coding (Python)', 'Intro to Coding (Java)', 'Digital Literacy', 'Web Basics'],
-        business: ['Intro to Business (optional)', 'Entrepreneurship Basics']
-      };
-      return courses[subjectId] || [];
-    }
-
-    // Grade 10
-    if (gradeId === 10) {
-      const courses = {
-        math: ['Quadratics', 'Trigonometry Basics', 'Systems of Equations', 'Linear Relations'],
-        science: ['Biology', 'Chemistry', 'Physics', 'General Science'],
-        english: ['English 10', 'Literature & Composition', 'Media Studies'],
-        social: ['History 10', 'Canadian History', 'Civics & Career Studies'],
-        french: ['French 10', 'Core French', 'French Immersion'],
-        technology: ['Programming Fundamentals', 'Web Development Basics', 'Computer Science'],
-        business: ['Intro to Business', 'Entrepreneurship', 'Marketing Basics']
-      };
-      return courses[subjectId] || [];
-    }
-
-    // Grade 11
-    if (gradeId === 11) {
-      const courses = {
-        math: ['Functions', 'College Math', 'Workplace Math'],
-        science: ['Biology', 'Chemistry', 'Physics'],
-        english: ['English 11', 'Literature', 'Writing & Rhetoric'],
-        social: ['Social Sciences', 'World History', 'Law & Politics'],
-        french: ['French 11', 'Core French', 'French Immersion'],
-        technology: ['Programming (Intermediate)', 'Data Structures', 'Web Development', 'App Development'],
-        business: ['Marketing', 'Accounting (Intro)', 'Entrepreneurship', 'Business Management']
-      };
-      return courses[subjectId] || [];
-    }
-
-    // Grade 12
-    if (gradeId === 12) {
-      const courses = {
-        math: ['Advanced Functions', 'Calculus & Vectors', 'Data Management', 'Statistics'],
-        science: ['Biology', 'Chemistry', 'Physics'],
-        english: ['English 12', 'Literature', 'University Preparation'],
-        social: ['Social Sciences', 'World Issues', 'Philosophy'],
-        french: ['French 12', 'Core French', 'French Immersion'],
-        technology: ['Software Engineering', 'OOP', 'Algorithms', 'Databases', 'Web Applications'],
-        business: ['Financial Accounting', 'Finance & Investing', 'Marketing & Management', 'Business Leadership']
-      };
-      return courses[subjectId] || [];
-    }
-
-    return [];
-  };
-
-  const subjects = selectedGrade ? getSubjectsForGrade(selectedGrade.id) : [];
-  const courses = (selectedGrade && selectedSubject) 
-    ? getCoursesForGradeAndSubject(selectedGrade.id, selectedSubject.id) 
-    : [];
+  // All available subjects — same for every student regardless of grade
+  const ALL_SUBJECTS = [
+    'Math',
+    'English',
+    'Science',
+    'French',
+    'History',
+    'Computer Science',
+    'Business',
+    'Advanced Functions',
+    'Functions',
+    'Calculus & Vectors',
+    'Chemistry',
+    'Social Studies',
+    'Physics',
+    'Biology',
+    'Accounting',
+    'Data Management',
+    'Stats & Probability',
+    'Economics'
+  ];
 
   const fetchTutors = async () => {
     if (!selectedSubject) return;
@@ -220,8 +109,7 @@ const BookLesson = () => {
       setLoading(true);
       setError(null);
       
-      // Use the specific course if selected, otherwise use the subject category
-      const searchSubject = selectedCourse || selectedSubject.name;
+      const searchSubject = selectedSubject;
       const response = await tutorAPI.searchTutors({
         subject: searchSubject,
         gradeLevel: studentGradeLabel || undefined,
@@ -294,13 +182,13 @@ const BookLesson = () => {
     }
   };
 
-  // Fetch tutors when course is selected
+  // Fetch tutors when subject is selected
   useEffect(() => {
-    if (selectedCourse && selectedSubject) {
+    if (selectedSubject) {
       fetchTutors();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCourse, selectedSubject]);
+  }, [selectedSubject]);
 
   // Auto-select first tutor when tutors are loaded
   useEffect(() => {
@@ -348,7 +236,7 @@ const BookLesson = () => {
   };
 
   const handleNext = () => {
-    if (currentStep < 4) {
+    if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -361,12 +249,6 @@ const BookLesson = () => {
 
   const handleSubjectSelect = (subject) => {
     setSelectedSubject(subject);
-    // Reset course when subject changes
-    setSelectedCourse(null);
-  };
-
-  const handleCourseSelect = (course) => {
-    setSelectedCourse(course);
   };
 
   const handleTimeSlotSelect = async (tutorId, timeSlot, day, date, slotData) => {
@@ -448,7 +330,7 @@ const BookLesson = () => {
         tutorProfileId: tutor.id,
         startTime: slotData.startTime,
         endTime: slotData.endTime,
-        notes: `${studentGradeLabel || selectedGrade?.name || ''} ${selectedCourse}`.trim(),
+        notes: `${studentGradeLabel || selectedGrade?.name || ''} ${selectedSubject}`.trim(),
         gradeLevel: studentGradeLabel || selectedGrade?.name || ''
       };
 
@@ -470,7 +352,6 @@ const BookLesson = () => {
     // Keep selectedGrade in place — it's locked to the student's profile and
     // resolveGradeFromLabel(studentGradeLabel) is the source of truth.
     setSelectedSubject(null);
-    setSelectedCourse(null);
     setSelectedTutor(null);
     setSelectedTimeSlot(null);
     setShowSuccessModal(false);
@@ -593,33 +474,31 @@ const BookLesson = () => {
         return (
           <div className="booking-card">
             <h3>Choose your subject:</h3>
-            <div className="subject-grid">
-              {subjects.map(subject => (
+            <div className="course-grid">
+              {ALL_SUBJECTS.map((subject, index) => (
                 <button
-                  key={subject.id}
-                  className={`subject-button ${selectedSubject?.id === subject.id ? 'selected' : ''}`}
+                  key={index}
+                  className={`course-button ${selectedSubject === subject ? 'selected' : ''}`}
                   onClick={() => handleSubjectSelect(subject)}
-                  style={{ backgroundColor: subject.color }}
                 >
-                  <FontAwesomeIcon icon={subject.icon} />
-                  <span>{subject.name}</span>
+                  {subject}
                 </button>
               ))}
             </div>
-            <div style={{ 
-              display: 'flex', 
-              gap: '1rem', 
-              justifyContent: 'flex-end', 
+            <div style={{
+              display: 'flex',
+              gap: '1rem',
+              justifyContent: 'flex-end',
               marginTop: '1.5rem',
               width: '100%'
             }}>
-              <button 
+              <button
                 onClick={handleBack}
-                style={{ 
-                  padding: '0.75rem 1.5rem', 
-                  border: '1px solid #ddd', 
-                  borderRadius: '6px', 
-                  backgroundColor: 'white', 
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '6px',
+                  backgroundColor: 'white',
                   color: '#333',
                   cursor: 'pointer',
                   fontSize: '1rem',
@@ -628,14 +507,14 @@ const BookLesson = () => {
               >
                 Back
               </button>
-              <button 
+              <button
                 onClick={handleNext}
                 disabled={!selectedSubject}
-                style={{ 
-                  padding: '0.75rem 1.5rem', 
-                  border: 'none', 
-                  borderRadius: '6px', 
-                  backgroundColor: selectedSubject ? '#1A803D' : '#ccc', 
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  border: 'none',
+                  borderRadius: '6px',
+                  backgroundColor: selectedSubject ? '#1A803D' : '#ccc',
                   color: 'white',
                   cursor: selectedSubject ? 'pointer' : 'not-allowed',
                   fontSize: '1rem',
@@ -649,66 +528,6 @@ const BookLesson = () => {
         );
 
       case 3:
-        return (
-          <div className="booking-card">
-            <h3>Choose a course:</h3>
-            {courses.length === 0 && selectedSubject && (
-              <p className="no-courses-message">No courses available for this grade and subject combination.</p>
-            )}
-            <div className="course-grid">
-              {courses.map((course, index) => (
-                <button
-                  key={index}
-                  className={`course-button ${selectedCourse === course ? 'selected' : ''}`}
-                  onClick={() => handleCourseSelect(course)}
-                >
-                  {course}
-                </button>
-              ))}
-            </div>
-            <div style={{ 
-              display: 'flex', 
-              gap: '1rem', 
-              justifyContent: 'flex-end', 
-              marginTop: '1.5rem',
-              width: '100%'
-            }}>
-              <button 
-                onClick={handleBack}
-                style={{ 
-                  padding: '0.75rem 1.5rem', 
-                  border: '1px solid #ddd', 
-                  borderRadius: '6px', 
-                  backgroundColor: 'white', 
-                  color: '#333',
-                  cursor: 'pointer',
-                  fontSize: '1rem',
-                  fontWeight: '500'
-                }}
-              >
-                Back
-              </button>
-              <button 
-                onClick={handleNext}
-                disabled={!selectedCourse}
-                style={{ 
-                  padding: '0.75rem 1.5rem', 
-                  border: 'none', 
-                  borderRadius: '6px', 
-                  backgroundColor: selectedCourse ? '#1A803D' : '#ccc', 
-                  color: 'white',
-                  cursor: selectedCourse ? 'pointer' : 'not-allowed',
-                  fontSize: '1rem',
-                  fontWeight: '600'
-                }}
-              >
-                Continue
-              </button>
-            </div>
-          </div>
-        );
-
-      case 4:
         const weekDates = getWeekDates();
         const currentTutor = tutors.find(t => t.id === selectedTutor) || tutors[0];
         const currentTutorSlots = availableSlots[selectedTutor] || [];
@@ -944,7 +763,7 @@ const BookLesson = () => {
         <div className="page-header">
           <h1>Book Lesson</h1>
           <div className="progress-indicator">
-            {[1, 2, 3, 4].map(step => (
+            {[1, 2, 3].map(step => (
               <React.Fragment key={step}>
                 <div className={`progress-circle ${step <= currentStep ? 'active' : ''}`}></div>
                 {step < 4 && <div className="progress-line"></div>}
@@ -971,7 +790,7 @@ const BookLesson = () => {
               const weekDates = getWeekDates();
               return (
                 <>
-                  <p>Book {studentGradeLabel || selectedGrade?.name} {selectedCourse} with {currentTutor?.displayName || currentTutor?.name} on {weekDays[weekDates[selectedTimeSlot.day]?.getDay()]}, {weekDates[selectedTimeSlot.day]?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at {selectedTimeSlot.timeSlot} - {new Date(selectedTimeSlot.slotData.endTime).toLocaleTimeString('en-US', { hour: 'numeric', hour12: true })}</p>
+                  <p>Book {studentGradeLabel || selectedGrade?.name} {selectedSubject} with {currentTutor?.displayName || currentTutor?.name} on {weekDays[weekDates[selectedTimeSlot.day]?.getDay()]}, {weekDates[selectedTimeSlot.day]?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at {selectedTimeSlot.timeSlot} - {new Date(selectedTimeSlot.slotData.endTime).toLocaleTimeString('en-US', { hour: 'numeric', hour12: true })}</p>
                   <div className="booking-confirmation-buttons">
                     <button 
                       className="confirm-book-button" 

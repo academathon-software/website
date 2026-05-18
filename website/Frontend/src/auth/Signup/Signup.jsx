@@ -518,7 +518,7 @@ function SignUpPage() {
             </div>
           )}
         </form>
-        
+
         {errors.general && (
           <div className="error-general">
             <FontAwesomeIcon icon={faTimes} />
