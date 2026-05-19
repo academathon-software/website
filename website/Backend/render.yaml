@@ -26,10 +26,15 @@ services:
       - key: JWT_SECRET_KEY
         generateValue: true
       
-      # Email Configuration
-      - key: MAIL_USERNAME
+      # Email Configuration (Resend SMTP)
+      - key: RESEND_API_KEY
+        sync: false  # Set manually in Render dashboard
+      # Sender identity (optional - EmailService falls back to sane defaults if unset)
+      - key: EMAIL_FROM_ADDRESS
         sync: false
-      - key: MAIL_PASSWORD
+      - key: EMAIL_FROM_NAME
+        sync: false
+      - key: EMAIL_REPLY_TO
         sync: false
       
       # AWS S3 Configuration

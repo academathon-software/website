@@ -143,11 +143,23 @@ export const bookingAPI = {
   // Reject a reschedule request (tutor only)
   rejectReschedule: (bookingId, reason) => 
     api.put(`/api/bookings/${bookingId}/reschedule/reject`, { reason }),
+
+  // Get booking timing config (advance/response/payment/reschedule hours)
+  getTimingConfig: () => api.get('/api/bookings/timing-config'),
 };
 
 // Payment API
 export const paymentAPI = {
-  // Create a payment intent for a booking
+  // Look up the price for a given grade level so the booking UI can disclose
+  // the amount before the student saves their card.
+  getQuote: (gradeLevel) =>
+    api.get('/api/payments/quote', { params: gradeLevel ? { gradeLevel } : {} }),
+
+  // Create a SetupIntent so the student can save a card at booking time.
+  // The card is auto-charged when the tutor confirms.
+  createSetupIntent: () => api.post('/api/payments/setup-intent'),
+
+  // Create a payment intent for a booking (legacy manual-pay flow)
   createPaymentIntent: (bookingId) => 
     api.post('/api/payments/create-intent', { bookingId }),
   

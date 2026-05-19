@@ -34,7 +34,50 @@ public class PaymentController {
     }
 
     /**
-     * Create a payment intent for a booking
+     * Look up the price for a given grade level. The frontend uses this to display the
+     * amount on the SetupIntent step so the student knows what they're authorizing.
+     * GET /api/payments/quote?gradeLevel=...
+     */
+    @GetMapping("/quote")
+    public ResponseEntity<?> getQuote(@RequestParam(required = false) String gradeLevel) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+            }
+            return ResponseEntity.ok(paymentService.getQuote(gradeLevel));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * Create a Stripe SetupIntent so the student can save a card at booking time.
+     * The card is then auto-charged off-session when the tutor confirms.
+     * POST /api/payments/setup-intent
+     */
+    @PostMapping("/setup-intent")
+    public ResponseEntity<?> createSetupIntent() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+            }
+
+            User currentUser = (User) authentication.getPrincipal();
+            Map<String, Object> setupIntent = paymentService.createSetupIntent(currentUser.getId());
+            return ResponseEntity.ok(setupIntent);
+        } catch (StripeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Stripe error: " + e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * Create a payment intent for a booking (legacy manual flow).
+     * Kept for backward compatibility; the new workflow auto-charges the saved card
+     * at tutor-confirm time and does not call this endpoint.
      * POST /api/payments/create-intent
      */
     @PostMapping("/create-intent")

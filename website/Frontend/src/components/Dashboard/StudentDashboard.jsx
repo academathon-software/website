@@ -19,15 +19,13 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import StudentSidebar from '../Shared/StudentSidebar';
 import BookingStatusBadge from '../Shared/BookingStatusBadge';
-import PaymentModal from '../Payment/PaymentModal';
 import { useUser } from '../../context/UserContext';
 import { bookingAPI, userAPI, availabilityAPI, tutorAPI } from '../../services/api';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const StudentDashboard = () => {
   const { setUserType } = useUser();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [studentProfile, setStudentProfile] = useState(null);
   const [upcomingBookings, setUpcomingBookings] = useState([]);
@@ -46,11 +44,17 @@ const StudentDashboard = () => {
   const [rescheduleLoading, setRescheduleLoading] = useState(false);
   const [availableSlots, setAvailableSlots] = useState([]);
   const [checkingAvailability, setCheckingAvailability] = useState(false);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [paymentBookingId, setPaymentBookingId] = useState(null);
   const [showTutorProfile, setShowTutorProfile] = useState(false);
   const [selectedTutorProfile, setSelectedTutorProfile] = useState(null);
   const [loadingTutorProfile, setLoadingTutorProfile] = useState(false);
+  // Booking timing config (loaded from backend; defaults match application.properties)
+  const [bookingTiming, setBookingTiming] = useState({
+    minimumAdvanceHours: 5,
+    tutorResponseBeforeLessonHours: 3,
+    rescheduleRequestBeforeLessonHours: 2,
+    rescheduleResponseBeforeLessonHours: 1,
+    cancellationBeforeLessonHours: 1,
+  });
   
   // Set user type and fetch data when component mounts
   useEffect(() => {
@@ -59,36 +63,22 @@ const StudentDashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setUserType]);
 
-  // Auto-open payment modal when arriving via "Pay Now" email link (?pay=<bookingId>)
-  useEffect(() => {
-    const payId = searchParams.get('pay');
-    if (!payId || loading || showPaymentModal) return;
-
-    const bookingIdNum = Number(payId);
-    const booking = upcomingBookings.find(b => b.id === bookingIdNum);
-
-    if (booking && booking.status === 'CONFIRMED' && booking.paymentStatus !== 'SUCCEEDED') {
-      setPaymentBookingId(bookingIdNum);
-      setShowPaymentModal(true);
-    }
-
-    // Always clear the param so refreshes don't keep retriggering this
-    searchParams.delete('pay');
-    setSearchParams(searchParams, { replace: true });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, upcomingBookings]);
-
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Fetch user profile and bookings in parallel
-      const [profileResponse, upcomingResponse, allBookingsResponse] = await Promise.all([
+      // Fetch user profile, bookings, and timing config in parallel
+      const [profileResponse, upcomingResponse, allBookingsResponse, timingResponse] = await Promise.all([
         userAPI.getCurrentUser(),
         bookingAPI.getUpcomingBookings(),
-        bookingAPI.getUserBookings()
+        bookingAPI.getUserBookings(),
+        bookingAPI.getTimingConfig().catch(() => null)
       ]);
+
+      if (timingResponse?.data) {
+        setBookingTiming(timingResponse.data);
+      }
 
       // Set profile data
       setStudentProfile({
@@ -142,12 +132,34 @@ const StudentDashboard = () => {
     }
   };
 
+  // Reschedule is only allowed for SCHEDULED (paid) bookings, and only until
+  // lesson - rescheduleRequestBeforeLessonHours. PENDING bookings can't be rescheduled;
+  // the student must cancel and re-book.
   const canReschedule = (booking) => {
+    if (booking.status !== 'SCHEDULED') return false;
     const now = new Date();
     const lessonStart = new Date(booking.startTime);
-    const minRescheduleTime = new Date(lessonStart.getTime() - 24 * 60 * 60 * 1000);
-    
-    return now < minRescheduleTime;
+    const cutoff = new Date(
+      lessonStart.getTime() - bookingTiming.rescheduleRequestBeforeLessonHours * 60 * 60 * 1000
+    );
+    return now < cutoff;
+  };
+
+  // PENDING: cancellable any time before the lesson starts (no payment captured).
+  // SCHEDULED: cancellable until lesson - cancellationBeforeLessonHours (refund issued).
+  const canCancel = (booking) => {
+    const now = new Date();
+    const lessonStart = new Date(booking.startTime);
+    if (booking.status === 'PENDING') {
+      return now < lessonStart;
+    }
+    if (booking.status === 'SCHEDULED') {
+      const cutoff = new Date(
+        lessonStart.getTime() - bookingTiming.cancellationBeforeLessonHours * 60 * 60 * 1000
+      );
+      return now < cutoff;
+    }
+    return false;
   };
 
   const isPastLesson = (booking) => new Date(booking.endTime) < new Date();
@@ -194,14 +206,15 @@ const StudentDashboard = () => {
       );
 
       // Convert the API response to the format expected by the UI
-      // Filter out slots that are less than 2 hours from now
+      // Filter out slots that are less than the configured advance booking window from now
       const now = new Date();
-      const minBookingTime = new Date(now.getTime() + 2 * 60 * 60 * 1000); // 2 hours from now
+      const advanceHours = bookingTiming.minimumAdvanceHours;
+      const minBookingTime = new Date(now.getTime() + advanceHours * 60 * 60 * 1000);
       
       const slots = response.data
         .filter(slot => {
           const startTime = new Date(slot.startTime);
-          return startTime >= minBookingTime; // Only include slots 2+ hours in advance
+          return startTime >= minBookingTime;
         })
         .map(slot => {
           const startTime = new Date(slot.startTime);
@@ -276,22 +289,26 @@ const StudentDashboard = () => {
         return;
       }
 
-      // Validate 24-hour minimum reschedule window before original lesson
+      // Reschedule requests must be submitted at least N hours before the original lesson.
       const originalStartTime = new Date(selectedBooking.startTime);
       const now = new Date();
-      const minimumRescheduleTime = new Date(originalStartTime.getTime() - 24 * 60 * 60 * 1000);
-      
-      if (now >= minimumRescheduleTime) {
+      const rescheduleCutoffHours = bookingTiming.rescheduleRequestBeforeLessonHours;
+      const requestCutoff = new Date(
+        originalStartTime.getTime() - rescheduleCutoffHours * 60 * 60 * 1000
+      );
+
+      if (now >= requestCutoff) {
         const hoursUntilLesson = Math.floor((originalStartTime.getTime() - now.getTime()) / (1000 * 60 * 60));
-        alert(`Cannot update or reschedule within 24 hours of lesson start. Your lesson is in ${hoursUntilLesson} hours. Please contact your tutor directly.`);
+        alert(`Reschedule requests must be submitted at least ${rescheduleCutoffHours} hour(s) before the lesson. Your lesson is in ${hoursUntilLesson} hour(s).`);
         setRescheduleLoading(false);
         return;
       }
-      
-      // Validate 2-hour minimum advance booking for the new time
-      const minimumNewTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+
+      // The new time must satisfy the same advance booking rule used for new bookings.
+      const advanceHours = bookingTiming.minimumAdvanceHours;
+      const minimumNewTime = new Date(now.getTime() + advanceHours * 60 * 60 * 1000);
       if (newStartTime < minimumNewTime) {
-        alert('The new lesson time must be at least 2 hours in advance from now.');
+        alert(`The new lesson time must be at least ${advanceHours} hours in advance from now.`);
         setRescheduleLoading(false);
         return;
       }
@@ -316,16 +333,9 @@ const StudentDashboard = () => {
         formatLocalDateTime(newEndTime)
       );
 
-      // Refresh dashboard data
       await fetchDashboardData();
       handleCloseReschedule();
-      
-      // Show appropriate success message based on booking status
-      if (selectedBooking.status === 'PENDING') {
-        alert('Booking request updated successfully! The tutor will review your updated request.');
-      } else {
-        alert('Reschedule request sent successfully! Waiting for tutor approval.');
-      }
+      alert('Reschedule request sent successfully! Waiting for tutor approval.');
     } catch (err) {
       console.error('Error rescheduling booking:', err);
       alert('Failed to reschedule: ' + (err.response?.data?.error || err.message));
@@ -378,36 +388,15 @@ const StudentDashboard = () => {
   };
 
   const getStatusText = (booking) => {
-    const { status, paymentStatus } = booking;
-    
-    // Check if booking is confirmed but payment not succeeded
-    if (status === 'CONFIRMED' && paymentStatus !== 'SUCCEEDED') {
-      return 'Payment Required';
-    }
-    
+    const { status } = booking;
     const statusText = {
       'PENDING': 'Pending Confirmation',
-      'CONFIRMED': 'Confirmed',
       'SCHEDULED': 'Scheduled',
-      'PAID': 'Payment Complete',
       'REJECTED': 'Rejected',
       'CANCELLED': 'Cancelled',
       'COMPLETED': 'Completed'
     };
     return statusText[status] || status;
-  };
-
-  const handlePayNow = (bookingId) => {
-    setPaymentBookingId(bookingId);
-    setShowPaymentModal(true);
-  };
-
-  const handlePaymentSuccess = async () => {
-    setShowPaymentModal(false);
-    setPaymentBookingId(null);
-    // Refresh dashboard to show updated status
-    await fetchDashboardData();
-    alert('Payment successful! Your lesson is now confirmed.');
   };
 
   const handleViewTutorProfile = async (booking) => {
@@ -447,11 +436,6 @@ const StudentDashboard = () => {
     } finally {
       setLoadingTutorProfile(false);
     }
-  };
-
-  const handlePaymentCancel = () => {
-    setShowPaymentModal(false);
-    setPaymentBookingId(null);
   };
 
   // Get pending (PENDING status) bookings
@@ -702,27 +686,26 @@ const StudentDashboard = () => {
                       />
                     </div>
                     <div className="lesson-actions">
-                      {booking.status === 'CONFIRMED' && (
-                        <button 
-                          className="action-btn pay-btn" 
-                          onClick={() => handlePayNow(booking.id)}
-                          style={{ backgroundColor: '#2D6A4F', color: 'white' }}
-                        >
-                          Pay Now
-                        </button>
-                      )}
                       {!isPastLesson(booking) && (
                         <>
-                          {(booking.status === 'PENDING' || booking.status === 'SCHEDULED') && (
+                          {booking.status === 'SCHEDULED' && (
                             canReschedule(booking) ? (
                               <button className="action-btn reschedule-btn" onClick={() => handleOpenReschedule(booking)}>
-                                {booking.status === 'PENDING' ? 'Update Request' : 'Reschedule'}
+                                Reschedule
                               </button>
                             ) : (
-                              <p className="reschedule-blocked">Updates/reschedules must be requested at least 24 hours before the lesson</p>
+                              <p className="reschedule-blocked">
+                                Reschedule requests must be made at least {bookingTiming.rescheduleRequestBeforeLessonHours} hour(s) before the lesson.
+                              </p>
                             )
                           )}
-                          <button className="action-btn cancel-btn" onClick={() => handleCancelBooking(booking.id)}>Cancel</button>
+                          {canCancel(booking) ? (
+                            <button className="action-btn cancel-btn" onClick={() => handleCancelBooking(booking.id)}>Cancel</button>
+                          ) : booking.status === 'SCHEDULED' ? (
+                            <p className="reschedule-blocked">
+                              Cancellations are not allowed within {bookingTiming.cancellationBeforeLessonHours} hour(s) of the lesson.
+                            </p>
+                          ) : null}
                         </>
                       )}
                     </div>
@@ -816,21 +799,12 @@ const StudentDashboard = () => {
         </div>
       </div>
 
-      {/* Payment Modal */}
-      {showPaymentModal && paymentBookingId && (
-        <PaymentModal
-          bookingId={paymentBookingId}
-          onSuccess={handlePaymentSuccess}
-          onCancel={handlePaymentCancel}
-        />
-      )}
-
       {/* Reschedule Modal */}
       {showRescheduleModal && selectedBooking && (
         <div className="modal-overlay" onClick={handleCloseReschedule}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>{selectedBooking.status === 'PENDING' ? 'Update Booking Request' : 'Reschedule Lesson'}</h3>
+              <h3>Reschedule Lesson</h3>
               <button className="modal-close" onClick={handleCloseReschedule}>&times;</button>
             </div>
             
@@ -839,11 +813,9 @@ const StudentDashboard = () => {
                 <p><strong>Lesson:</strong> {selectedBooking.subject || 'Lesson'}</p>
                 <p><strong>Tutor:</strong> {selectedBooking.tutorName}</p>
                 <p><strong>Current Time:</strong> {formatDateTime(selectedBooking.startTime)}</p>
-                {selectedBooking.status === 'PENDING' && (
-                  <p style={{ color: '#3498db', fontSize: '14px', marginTop: '10px' }}>
-                    <em>Note: This will update your booking request to the new time. The tutor will review the updated request.</em>
-                  </p>
-                )}
+                <p style={{ color: '#6b7280', fontSize: '14px', marginTop: '10px' }}>
+                  <em>Your tutor must accept the new time at least {bookingTiming.rescheduleResponseBeforeLessonHours} hour(s) before the lesson. If they don't respond or decline, your original lesson stays as scheduled.</em>
+                </p>
               </div>
 
               <div className="form-group">
@@ -902,9 +874,7 @@ const StudentDashboard = () => {
                 onClick={handleRescheduleSubmit}
                 disabled={rescheduleLoading}
               >
-                {rescheduleLoading 
-                  ? (selectedBooking.status === 'PENDING' ? 'Updating...' : 'Rescheduling...') 
-                  : (selectedBooking.status === 'PENDING' ? 'Update Request' : 'Confirm Reschedule')}
+                {rescheduleLoading ? 'Rescheduling...' : 'Confirm Reschedule'}
               </button>
             </div>
           </div>

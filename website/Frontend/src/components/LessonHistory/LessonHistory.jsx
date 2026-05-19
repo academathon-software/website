@@ -356,7 +356,7 @@ const LessonHistory = () => {
                     {isTutor ? 'Message Student' : 'Message Tutor'}
                   </button>
 
-                  {(booking.status === 'CONFIRMED' || booking.status === 'PENDING') && (
+                  {(booking.status === 'SCHEDULED' || booking.status === 'PENDING') && (
                     <button 
                       className="cancel-button"
                       onClick={() => handleCancelBooking(booking.id)}

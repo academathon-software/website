@@ -44,6 +44,14 @@ const TutorDashboard = () => {
     totalHours: 0,
     avgRating: 0
   });
+  // Booking timing config (loaded from backend; defaults match application.properties)
+  const [bookingTiming, setBookingTiming] = useState({
+    minimumAdvanceHours: 5,
+    tutorResponseBeforeLessonHours: 3,
+    rescheduleRequestBeforeLessonHours: 2,
+    rescheduleResponseBeforeLessonHours: 1,
+    cancellationBeforeLessonHours: 1,
+  });
   
   // Set user type and fetch data when component mounts
   useEffect(() => {
@@ -57,14 +65,19 @@ const TutorDashboard = () => {
       setLoading(true);
       setError(null);
 
-      // Fetch user profile, tutor profile, and bookings in parallel
-      const [userResponse, upcomingResponse, pastResponse, allBookingsResponse, pendingResponse] = await Promise.all([
+      // Fetch user profile, tutor profile, bookings, and timing config in parallel
+      const [userResponse, upcomingResponse, pastResponse, allBookingsResponse, pendingResponse, timingResponse] = await Promise.all([
         userAPI.getCurrentUser(),
         bookingAPI.getUpcomingBookings(),
         bookingAPI.getPastBookings(),
         bookingAPI.getUserBookings(),
-        bookingAPI.getPendingBookings()
+        bookingAPI.getPendingBookings(),
+        bookingAPI.getTimingConfig().catch(() => null)
       ]);
+
+      if (timingResponse?.data) {
+        setBookingTiming(timingResponse.data);
+      }
 
       // Try to fetch tutor profile (might not exist yet)
       let tutorProfileData = null;
@@ -205,6 +218,31 @@ const TutorDashboard = () => {
       console.error('Error rejecting reschedule:', err);
       alert('Failed to reject reschedule: ' + (err.response?.data?.error || err.message));
     }
+  };
+
+  // Tutor can only accept/decline a PENDING booking up to the cutoff
+  // (lesson - tutorResponseBeforeLessonHours). After that the cleanup job auto-declines it.
+  const canRespondToPending = (booking) => {
+    if (!booking || !booking.startTime) return false;
+    const lessonStart = new Date(booking.startTime);
+    const cutoff = new Date(
+      lessonStart.getTime() - bookingTiming.tutorResponseBeforeLessonHours * 60 * 60 * 1000
+    );
+    return new Date() < cutoff;
+  };
+
+  // Reschedule responses are tighter - tutor must reply by lesson - rescheduleResponseBeforeLessonHours.
+  const canRespondToReschedule = (booking) => {
+    if (!booking) return false;
+    // Reschedule decisions are tied to the earlier of the original / requested time so
+    // we mirror the backend rule.
+    const baseTime = booking.requestedStartTime && new Date(booking.requestedStartTime) < new Date(booking.startTime)
+      ? new Date(booking.requestedStartTime)
+      : new Date(booking.startTime);
+    const cutoff = new Date(
+      baseTime.getTime() - bookingTiming.rescheduleResponseBeforeLessonHours * 60 * 60 * 1000
+    );
+    return new Date() < cutoff;
   };
 
   const openActionModal = (booking, action) => {
@@ -495,18 +533,41 @@ const TutorDashboard = () => {
                     </div>
                   </div>
                   <div className="pending-booking-actions">
-                    <button 
-                      className="btn-accept" 
-                      onClick={() => openActionModal(booking, 'confirm')}
-                    >
-                      <FontAwesomeIcon icon={faCheck} /> Accept
-                    </button>
-                    <button 
-                      className="btn-decline" 
-                      onClick={() => openActionModal(booking, booking.hasRescheduleRequest ? 'reject-reschedule' : 'reject')}
-                    >
-                      &times; Decline
-                    </button>
+                    {(() => {
+                      const isReschedule = booking.hasRescheduleRequest;
+                      const allowed = isReschedule
+                        ? canRespondToReschedule(booking)
+                        : canRespondToPending(booking);
+                      if (!allowed) {
+                        const cutoffHours = isReschedule
+                          ? bookingTiming.rescheduleResponseBeforeLessonHours
+                          : bookingTiming.tutorResponseBeforeLessonHours;
+                        return (
+                          <p style={{ color: '#9ca3af', fontSize: '13px', margin: 0 }}>
+                            Response window closed (must reply at least {cutoffHours} hour(s) before the lesson). This will be auto-declined.
+                          </p>
+                        );
+                      }
+                      return (
+                        <>
+                          <button
+                            className="btn-accept"
+                            onClick={() => openActionModal(booking, 'confirm')}
+                            title={isReschedule
+                              ? 'Accept the requested new time'
+                              : 'Accepting will automatically charge the student\'s saved card'}
+                          >
+                            <FontAwesomeIcon icon={faCheck} /> Accept
+                          </button>
+                          <button
+                            className="btn-decline"
+                            onClick={() => openActionModal(booking, isReschedule ? 'reject-reschedule' : 'reject')}
+                          >
+                            &times; Decline
+                          </button>
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
               ))}

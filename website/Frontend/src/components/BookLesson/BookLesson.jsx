@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import './BookLesson.css';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -15,9 +15,120 @@ import {
   faUser,
   faStar
 } from '@fortawesome/free-solid-svg-icons';
+import {
+  Elements,
+  PaymentElement,
+  useStripe,
+  useElements
+} from '@stripe/react-stripe-js';
 import StudentSidebar from '../Shared/StudentSidebar';
 import { useUser } from '../../context/UserContext';
-import { tutorAPI, bookingAPI, availabilityAPI, userAPI } from '../../services/api';
+import { tutorAPI, bookingAPI, availabilityAPI, userAPI, paymentAPI } from '../../services/api';
+import { stripePromise } from '../../services/stripe';
+
+/**
+ * Format a numeric amount + ISO currency code as a localized string, e.g. "$35.00 CAD".
+ * Falls back to a plain "$X.XX" if the currency code is missing or unusable.
+ */
+const formatPrice = (amount, currency) => {
+  if (typeof amount !== 'number' || Number.isNaN(amount)) return null;
+  try {
+    return new Intl.NumberFormat('en-CA', {
+      style: 'currency',
+      currency: currency || 'CAD',
+      currencyDisplay: 'code',
+    }).format(amount);
+  } catch {
+    return `$${amount.toFixed(2)}${currency ? ` ${currency}` : ''}`;
+  }
+};
+
+/**
+ * Renders the Stripe PaymentElement inside an Elements provider so the student can
+ * save a card. Confirms the SetupIntent and surfaces the resulting payment method id
+ * to the parent via onPaymentMethod(paymentMethodId).
+ */
+const SaveCardForm = ({ onPaymentMethod, onCancel, summary, submitting, pricing }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [error, setError] = useState(null);
+  const [isReady, setIsReady] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+
+    setError(null);
+    setConfirming(true);
+
+    try {
+      const { error: submitError, setupIntent } = await stripe.confirmSetup({
+        elements,
+        confirmParams: {
+          return_url: window.location.origin + '/book-lesson',
+        },
+        redirect: 'if_required',
+      });
+
+      if (submitError) {
+        setError(submitError.message);
+        setConfirming(false);
+        return;
+      }
+
+      if (setupIntent && setupIntent.status === 'succeeded' && setupIntent.payment_method) {
+        await onPaymentMethod(setupIntent.payment_method);
+      } else {
+        setError('Could not save your card. Please try again.');
+      }
+    } catch (err) {
+      setError(err.message || 'Could not save your card. Please try again.');
+    } finally {
+      setConfirming(false);
+    }
+  };
+
+  const busy = confirming || submitting;
+
+  const priceLabel = formatPrice(pricing?.amount, pricing?.currency);
+
+  return (
+    <form onSubmit={handleSubmit} className="save-card-form">
+      {priceLabel && (
+        <p className="save-card-total" style={{ fontWeight: 700, fontSize: '1.05rem', margin: '0 0 0.4rem' }}>
+          Total: {priceLabel}
+        </p>
+      )}
+      <p className="save-card-subtitle">
+        Your card will be saved now and only charged {priceLabel ? `(${priceLabel}) ` : ''}
+        if {summary?.tutorName || 'your tutor'} confirms the booking.
+      </p>
+      <PaymentElement
+        id="setup-payment-element"
+        onReady={() => setIsReady(true)}
+      />
+      {error && <p className="error-text">{error}</p>}
+      <div className="booking-confirmation-buttons">
+        <button
+          type="submit"
+          className="confirm-book-button"
+          disabled={!stripe || !elements || !isReady || busy}
+        >
+          {busy ? 'Saving…' : 'Save card & book'}
+        </button>
+        <button
+          type="button"
+          className="cancel-book-button"
+          onClick={onCancel}
+          disabled={busy}
+        >
+          Back
+        </button>
+      </div>
+    </form>
+  );
+};
 
 const BookLesson = () => {
   const navigate = useNavigate();
@@ -66,6 +177,51 @@ const BookLesson = () => {
   const [availableSlots, setAvailableSlots] = useState({});
   const [showTutorProfile, setShowTutorProfile] = useState(false);
   const [selectedTutorProfile, setSelectedTutorProfile] = useState(null);
+  // Booking timing config (loaded from backend; defaults match application.properties)
+  const [bookingTiming, setBookingTiming] = useState({
+    minimumAdvanceHours: 5,
+    tutorResponseBeforeLessonHours: 3,
+    rescheduleRequestBeforeLessonHours: 2,
+    rescheduleResponseBeforeLessonHours: 1,
+    cancellationBeforeLessonHours: 1,
+  });
+
+  // SetupIntent state for the "save card" sub-step that runs after the user clicks Book.
+  const [setupClientSecret, setSetupClientSecret] = useState(null);
+  const [setupLoading, setSetupLoading] = useState(false);
+
+  // Backend-driven price quote so the SetupIntent step can disclose the amount
+  // before the student saves their card. Refetched any time the grade changes
+  // (today it's locked to the profile but keeping the dep is cheap insurance).
+  const [pricing, setPricing] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    bookingAPI.getTimingConfig()
+      .then(response => {
+        if (!cancelled && response?.data) {
+          setBookingTiming(response.data);
+        }
+      })
+      .catch(() => { /* fall back to defaults */ });
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    if (!studentGradeLabel) return;
+    let cancelled = false;
+    paymentAPI.getQuote(studentGradeLabel)
+      .then(response => {
+        if (!cancelled && response?.data) {
+          setPricing(response.data);
+        }
+      })
+      .catch((err) => {
+        // Non-fatal: the popup just won't show a price.
+        console.error('Failed to load price quote:', err);
+      });
+    return () => { cancelled = true; };
+  }, [studentGradeLabel]);
 
   // Map a stored profile grade label (e.g. "8th Grade", "College/University")
   // back onto our internal grade object so getSubjectsForGrade keeps working.
@@ -158,15 +314,16 @@ const BookLesson = () => {
       const slotsResponses = await Promise.all(slotsPromises);
       
       // Map tutor IDs to their available slots
-      // Filter out slots that are less than 2 hours from now
+      // Filter out slots that are less than the configured advance booking window from now
       const now = new Date();
-      const minBookingTime = new Date(now.getTime() + 2 * 60 * 60 * 1000); // 2 hours from now
+      const advanceHours = bookingTiming.minimumAdvanceHours;
+      const minBookingTime = new Date(now.getTime() + advanceHours * 60 * 60 * 1000);
       
       const slotsMap = {};
       tutorsList.forEach((tutor, index) => {
         const allSlots = slotsResponses[index].data || [];
         
-        // Only include slots that are 2+ hours in the future
+        // Only include slots far enough in the future
         const filteredSlots = allSlots.filter(slot => {
           const slotDateTime = new Date(slot.startTime);
           return slotDateTime >= minBookingTime;
@@ -261,14 +418,15 @@ const BookLesson = () => {
       return;
     }
     
-    // Validate 2-hour minimum at selection time
+    // Validate minimum advance booking window at selection time
     const slotDateTime = new Date(slotData.startTime);
     const now = new Date();
-    const minBookingTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+    const advanceHours = bookingTiming.minimumAdvanceHours;
+    const minBookingTime = new Date(now.getTime() + advanceHours * 60 * 60 * 1000);
     
     if (slotDateTime < minBookingTime) {
       const hoursAway = (slotDateTime - now) / (1000 * 60 * 60);
-      alert(`This slot is only ${hoursAway.toFixed(1)} hours away. Lessons must be booked at least 2 hours in advance.`);
+      alert(`This slot is only ${hoursAway.toFixed(1)} hours away. Lessons must be booked at least ${advanceHours} hours in advance.`);
       return;
     }
     
@@ -294,58 +452,101 @@ const BookLesson = () => {
     setSelectedTimeSlot({ timeSlot, day, date, slotData });
   };
 
+  // Step 1: validate the slot and request a Stripe SetupIntent so the student can save
+  // a card. This transitions the confirmation popup into the "save card" sub-step.
   const handleBookLesson = async () => {
     try {
       setBookingLoading(true);
       setError(null);
 
-      // Find the selected tutor
       const tutor = tutors.find(t => t.id === selectedTutor);
       if (!tutor) {
         throw new Error('Selected tutor not found');
       }
 
-      // Use the slot data from the availability API
       const slotData = selectedTimeSlot.slotData;
       if (!slotData || !slotData.startTime) {
         throw new Error('Invalid slot data - please select a different time slot');
       }
 
-      // Validate 2-hour minimum booking window
       const selectedDateTime = new Date(slotData.startTime);
       const now = new Date();
-      const minBookingTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+      const advanceHours = bookingTiming.minimumAdvanceHours;
+      const minBookingTime = new Date(now.getTime() + advanceHours * 60 * 60 * 1000);
       const hoursAway = (selectedDateTime - now) / (1000 * 60 * 60);
-      
+
       if (selectedDateTime < minBookingTime) {
-        const errorMsg = `Lessons must be booked at least 2 hours in advance. This slot is only ${hoursAway.toFixed(1)} hours away.`;
+        const errorMsg = `Lessons must be booked at least ${advanceHours} hours in advance. This slot is only ${hoursAway.toFixed(1)} hours away.`;
         setError(errorMsg);
         alert(errorMsg);
         setBookingLoading(false);
         return;
       }
 
-      // Format for backend - use the exact times from the availability slot
+      setSetupLoading(true);
+      const setupResponse = await paymentAPI.createSetupIntent();
+      const clientSecret = setupResponse?.data?.clientSecret;
+      if (!clientSecret) {
+        throw new Error('Could not start payment setup. Please try again.');
+      }
+      setSetupClientSecret(clientSecret);
+    } catch (err) {
+      console.error('Error preparing booking:', err);
+      setError(err.response?.data?.error || err.message || 'Failed to start booking. Please try again.');
+    } finally {
+      setBookingLoading(false);
+      setSetupLoading(false);
+    }
+  };
+
+  // Step 2: after Stripe confirms the SetupIntent and gives us a payment method id,
+  // submit the actual booking. The backend auto-charges this method when the tutor confirms.
+  const submitBookingWithPaymentMethod = async (paymentMethodId) => {
+    try {
+      setBookingLoading(true);
+      setError(null);
+
+      const tutor = tutors.find(t => t.id === selectedTutor);
+      const slotData = selectedTimeSlot?.slotData;
+      if (!tutor || !slotData?.startTime) {
+        throw new Error('Booking details are incomplete. Please pick a slot again.');
+      }
+
       const bookingData = {
         tutorProfileId: tutor.id,
         startTime: slotData.startTime,
         endTime: slotData.endTime,
         notes: `${studentGradeLabel || selectedGrade?.name || ''} ${selectedSubject}`.trim(),
-        gradeLevel: studentGradeLabel || selectedGrade?.name || ''
+        gradeLevel: studentGradeLabel || selectedGrade?.name || '',
+        paymentMethodId,
       };
 
       await bookingAPI.createBooking(bookingData);
-      
-      // Close the booking confirmation popup and show success modal
+
+      setSetupClientSecret(null);
       setSelectedTimeSlot(null);
       setShowSuccessModal(true);
     } catch (err) {
       console.error('Error creating booking:', err);
-      setError(err.response?.data?.error || 'Failed to book lesson. Please try again.');
+      setError(err.response?.data?.error || err.message || 'Failed to book lesson. Please try again.');
     } finally {
       setBookingLoading(false);
     }
   };
+
+  const cancelBookingFlow = () => {
+    setSetupClientSecret(null);
+    setSelectedTimeSlot(null);
+    setError(null);
+  };
+
+  const stripeElementsOptions = useMemo(() => ({
+    clientSecret: setupClientSecret,
+    appearance: {
+      theme: 'stripe',
+      variables: { colorPrimary: '#1A803D' },
+    },
+  }), [setupClientSecret]);
 
   const handleBookNewLesson = () => {
     setCurrentStep(1);
@@ -536,12 +737,13 @@ const BookLesson = () => {
         const groupSlotsByDateTime = () => {
           const grouped = {};
           const now = new Date();
-          const minBookingTime = new Date(now.getTime() + 2 * 60 * 60 * 1000); // 2 hours from now
+          const advanceHours = bookingTiming.minimumAdvanceHours;
+          const minBookingTime = new Date(now.getTime() + advanceHours * 60 * 60 * 1000);
           
           currentTutorSlots.forEach(slot => {
             const slotDate = new Date(slot.startTime);
             
-            // Only include slots that are at least 2 hours in advance
+            // Only include slots far enough in advance
             if (slotDate >= minBookingTime) {
               const dateKey = slotDate.toISOString().split('T')[0];
               const timeKey = slotDate.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
@@ -677,15 +879,16 @@ const BookLesson = () => {
                                     let unavailableReason = 'Tutor has not set availability for this time';
                                     
                                     if (slotData && slotData.startTime) {
-                                      // Check if slot is at least 2 hours in advance
+                                      // Check if slot is far enough in advance
                                       const slotDateTime = new Date(slotData.startTime);
                                       const now = new Date();
-                                      const minBookingTime = new Date(now.getTime() + 2 * 60 * 60 * 1000); // 2 hours from now
+                                      const advanceHours = bookingTiming.minimumAdvanceHours;
+                                      const minBookingTime = new Date(now.getTime() + advanceHours * 60 * 60 * 1000);
                                       
                                       if (slotDateTime >= minBookingTime) {
                                         isAvailable = true;
                                       } else {
-                                        unavailableReason = 'Must book at least 2 hours in advance';
+                                        unavailableReason = `Must book at least ${advanceHours} hours in advance`;
                                       }
                                     }
                                     
@@ -779,7 +982,7 @@ const BookLesson = () => {
       {selectedTimeSlot && selectedTutor && (
         <div 
           className="booking-confirmation-overlay" 
-          onClick={() => setSelectedTimeSlot(null)}
+          onClick={cancelBookingFlow}
         >
           <div 
             className="booking-confirmation-popup"
@@ -788,21 +991,54 @@ const BookLesson = () => {
             {(() => {
               const currentTutor = tutors.find(t => t.id === selectedTutor);
               const weekDates = getWeekDates();
+              const priceLabel = formatPrice(pricing?.amount, pricing?.currency);
+              const summaryLine = (
+                <p>
+                  Book {studentGradeLabel || selectedGrade?.name} {selectedSubject} with {currentTutor?.displayName || currentTutor?.name} on {weekDays[weekDates[selectedTimeSlot.day]?.getDay()]}, {weekDates[selectedTimeSlot.day]?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at {selectedTimeSlot.timeSlot} - {new Date(selectedTimeSlot.slotData.endTime).toLocaleTimeString('en-US', { hour: 'numeric', hour12: true })}
+                </p>
+              );
+
+              if (setupClientSecret) {
+                return (
+                  <>
+                    {summaryLine}
+                    <Elements key={setupClientSecret} stripe={stripePromise} options={stripeElementsOptions}>
+                      <SaveCardForm
+                        summary={{ tutorName: currentTutor?.displayName || currentTutor?.name }}
+                        pricing={pricing}
+                        onPaymentMethod={submitBookingWithPaymentMethod}
+                        onCancel={cancelBookingFlow}
+                        submitting={bookingLoading}
+                      />
+                    </Elements>
+                    {error && <p className="error-text">{error}</p>}
+                  </>
+                );
+              }
+
               return (
                 <>
-                  <p>Book {studentGradeLabel || selectedGrade?.name} {selectedSubject} with {currentTutor?.displayName || currentTutor?.name} on {weekDays[weekDates[selectedTimeSlot.day]?.getDay()]}, {weekDates[selectedTimeSlot.day]?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at {selectedTimeSlot.timeSlot} - {new Date(selectedTimeSlot.slotData.endTime).toLocaleTimeString('en-US', { hour: 'numeric', hour12: true })}</p>
+                  {summaryLine}
+                  {priceLabel && (
+                    <p style={{ fontWeight: 700, fontSize: '1.05rem', margin: '0 0 0.4rem' }}>
+                      Total: {priceLabel}
+                    </p>
+                  )}
+                  <p style={{ fontSize: '0.85rem', color: '#6b7280', margin: '0 0 0.75rem' }}>
+                    You'll save a card next. We only charge {priceLabel ? `${priceLabel} ` : 'it '}once your tutor confirms the booking.
+                  </p>
                   <div className="booking-confirmation-buttons">
-                    <button 
-                      className="confirm-book-button" 
+                    <button
+                      className="confirm-book-button"
                       onClick={handleBookLesson}
-                      disabled={bookingLoading}
+                      disabled={bookingLoading || setupLoading}
                     >
-                      {bookingLoading ? 'Booking...' : 'Book'}
+                      {bookingLoading || setupLoading ? 'Preparing…' : 'Continue to payment'}
                     </button>
-                    <button 
-                      className="cancel-book-button" 
-                      onClick={() => setSelectedTimeSlot(null)}
-                      disabled={bookingLoading}
+                    <button
+                      className="cancel-book-button"
+                      onClick={cancelBookingFlow}
+                      disabled={bookingLoading || setupLoading}
                     >
                       Cancel
                     </button>

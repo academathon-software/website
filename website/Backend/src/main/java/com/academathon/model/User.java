@@ -53,6 +53,10 @@ public class User implements UserDetails{
     @Column(name = "student_grade")
     private String studentGrade;
 
+    @JsonIgnore
+    @Column(name = "stripe_customer_id")
+    private String stripeCustomerId;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
@@ -228,6 +232,14 @@ public class User implements UserDetails{
 
     public void setStudentGrade(String studentGrade) {
         this.studentGrade = studentGrade;
+    }
+
+    public String getStripeCustomerId() {
+        return stripeCustomerId;
+    }
+
+    public void setStripeCustomerId(String stripeCustomerId) {
+        this.stripeCustomerId = stripeCustomerId;
     }
 }
 

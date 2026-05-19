@@ -69,8 +69,10 @@ Go to **Environment** tab and add these variables:
 | `DATABASE_USERNAME` | `postgres.[project-ref]` |
 | `DATABASE_PASSWORD` | Your Supabase password |
 | `JWT_SECRET_KEY` | Generate: `openssl rand -base64 64` (must be 256+ bits) |
-| `MAIL_USERNAME` | `ryant012015@gmail.com` |
-| `MAIL_PASSWORD` | Your Gmail app password |
+| `RESEND_API_KEY` | Your Resend API key (starts with `re_`) |
+| `EMAIL_FROM_ADDRESS` | _(optional)_ defaults to `noreply@academathon.ca` — must be on a domain verified in Resend |
+| `EMAIL_FROM_NAME` | _(optional)_ defaults to `Academathon` |
+| `EMAIL_REPLY_TO` | _(optional)_ defaults to `academathontutoring@gmail.com` |
 | `AWS_S3_BUCKET_NAME` | `academathon-user-uploads` |
 | `AWS_S3_REGION` | `ca-central-1` |
 | `AWS_S3_ACCESS_KEY` | Your AWS access key |
@@ -138,8 +140,11 @@ DATABASE_URL=jdbc:postgresql://...
 DATABASE_USERNAME=postgres.xxxxx
 DATABASE_PASSWORD=your-password
 JWT_SECRET_KEY=your-256-bit-secret-key
-MAIL_USERNAME=ryant012015@gmail.com
-MAIL_PASSWORD=your-app-password
+RESEND_API_KEY=re_your_resend_api_key
+# Optional: only set these if you want to override the defaults in application-prod.properties
+# EMAIL_FROM_ADDRESS=noreply@academathon.ca
+# EMAIL_FROM_NAME=Academathon
+# EMAIL_REPLY_TO=academathontutoring@gmail.com
 AWS_S3_BUCKET_NAME=academathon-user-uploads
 AWS_S3_REGION=ca-central-1
 AWS_S3_ACCESS_KEY=your-access-key

@@ -36,6 +36,9 @@ public class Booking {
     @Column(name = "payment_intent_id")
     private String paymentIntentId;
 
+    @Column(name = "payment_method_id")
+    private String paymentMethodId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status")
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;
@@ -166,6 +169,14 @@ public class Booking {
 
     public void setPaymentIntentId(String paymentIntentId) {
         this.paymentIntentId = paymentIntentId;
+    }
+
+    public String getPaymentMethodId() {
+        return paymentMethodId;
+    }
+
+    public void setPaymentMethodId(String paymentMethodId) {
+        this.paymentMethodId = paymentMethodId;
     }
 
     public PaymentStatus getPaymentStatus() {

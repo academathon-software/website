@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
 import {
   Elements,
   PaymentElement,
@@ -7,10 +6,8 @@ import {
   useElements
 } from '@stripe/react-stripe-js';
 import { paymentAPI } from '../../services/api';
+import { stripePromise } from '../../services/stripe';
 import './PaymentModal.css';
-
-// Initialize Stripe with your publishable key
-const stripePromise = loadStripe('pk_test_51SyIFk1eqTRE9VS7RgNIFVBLxwvQr2BBHTtTmtiFXSkusrXWRdgCj3uVI9P7RrF1ukRVxjj6Dcl9VlqYTmnBOdh500jdKUu7Ha');
 
 const PaymentForm = ({ bookingId, bookingDetails, onSuccess, onCancel }) => {
   const stripe = useStripe();

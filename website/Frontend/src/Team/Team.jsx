@@ -25,19 +25,17 @@ const teamMembers = [
       email: "sahil@academathon.ca"
     },
     expertise: ["Educational Technology", "Strategic Planning", "Leadership"]
-  
-},
+  },
   {
     name: "Ryan Tang",
     role: "CTO",
     bio: "Ryan is currently a computer science student at Wilfrid Laurier University with a concentration in AI, and a full-stack developer focused on building scalable technology solutions. He leads platform architecture, backend systems, and product development, with expertise in cloud infrastructure, modern web technologies, and AI-powered features. Ryan is driven by creating reliable, high-performance systems that enhance learning experiences.",
     social: {
       linkedin: "https://www.linkedin.com/in/ryan-tng/",
-      github: "https://github.com/ryantng05",
+      github: "https://github.com/ryan-tng",
       email: "ryant012015@gmail.com"
     },
     expertise: ["Full-Stack Development", "Cloud Architecture", "AI/ML"]
-  
   }
 ];
 

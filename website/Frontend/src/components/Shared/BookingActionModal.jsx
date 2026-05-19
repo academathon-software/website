@@ -97,8 +97,10 @@ const BookingActionModal = ({ booking, action, onConfirm, onCancel }) => {
           {isConfirm && (
             <div className="confirm-message">
               <p>
-                By confirming this booking, you're committing to teach this lesson at the scheduled time. 
-                The student will be notified{isReschedule ? '.' : ' and required to complete payment before the lesson is finalized.'}
+                By confirming this booking, you're committing to teach this lesson at the scheduled time.
+                {isReschedule
+                  ? ' The student will be notified that you accepted their new time.'
+                  : ' The student\'s saved card will be charged immediately and they\'ll receive a confirmation email.'}
               </p>
             </div>
           )}

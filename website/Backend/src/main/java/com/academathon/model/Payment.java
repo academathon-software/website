@@ -21,7 +21,7 @@ public class Payment {
     private Double amount;
 
     @Column(nullable = false, length = 3)
-    private String currency = "USD";
+    private String currency = "CAD";
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

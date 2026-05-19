@@ -653,6 +653,10 @@
   padding: 1.5rem 2rem;
   width: 90%;
   max-width: 600px;
+  /* Cap height to viewport so the SetupIntent step (Stripe card form) doesn't
+     grow off the top. Anything taller scrolls inside the popup. */
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   cursor: default;
   z-index: 10000 !important;
@@ -897,6 +901,8 @@
     max-width: 92%;
     padding: 1rem;
     bottom: 1rem !important;
+    left: 50% !important;
+    max-height: calc(100vh - 2rem);
   }
   
   .booking-confirmation-popup p {

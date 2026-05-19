@@ -8,6 +8,11 @@ public class BookingRequestDTO {
     private LocalDateTime endTime;
     private String notes;
     private String gradeLevel;
+    /**
+     * Stripe payment method id collected via SetupIntent on the booking page.
+     * The backend uses this to auto-charge the moment the tutor confirms.
+     */
+    private String paymentMethodId;
 
     public BookingRequestDTO() {
     }
@@ -58,6 +63,14 @@ public class BookingRequestDTO {
 
     public void setGradeLevel(String gradeLevel) {
         this.gradeLevel = gradeLevel;
+    }
+
+    public String getPaymentMethodId() {
+        return paymentMethodId;
+    }
+
+    public void setPaymentMethodId(String paymentMethodId) {
+        this.paymentMethodId = paymentMethodId;
     }
 }
 
