@@ -27,6 +27,21 @@ import { tutorAPI, bookingAPI, availabilityAPI, userAPI, paymentAPI } from '../.
 import { stripePromise } from '../../services/stripe';
 
 /**
+ * Build a YYYY-MM-DD key based on the date's LOCAL components, not its UTC ones.
+ * We can't use `date.toISOString().split('T')[0]` because that returns the UTC date,
+ * which silently shifts forward by a day in negative-offset timezones once it's late
+ * enough in the evening (e.g. 10 PM EDT on the 18th is already the 19th in UTC).
+ * Using local components keeps slot timestamps and week-grid dates in the same frame
+ * of reference so the calendar lines up regardless of the user's timezone.
+ */
+const toLocalDateKey = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+/**
  * Format a numeric amount + ISO currency code as a localized string, e.g. "$35.00 CAD".
  * Falls back to a plain "$X.XX" if the currency code is missing or unusable.
  */
@@ -745,7 +760,10 @@ const BookLesson = () => {
             
             // Only include slots far enough in advance
             if (slotDate >= minBookingTime) {
-              const dateKey = slotDate.toISOString().split('T')[0];
+              // Local date key so the week-grid columns line up with the slot day in the
+              // user's timezone (see comment on toLocalDateKey for why we don't use
+              // .toISOString().split('T')[0] here).
+              const dateKey = toLocalDateKey(slotDate);
               const timeKey = slotDate.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
               
               if (!grouped[dateKey]) {
@@ -866,7 +884,11 @@ const BookLesson = () => {
                           
                           <div className="availability-grid-new">
                             {weekDates.map((date, dayIndex) => {
-                              const dateKey = date.toISOString().split('T')[0];
+                              // Local date key (matches the one in groupSlotsByDateTime).
+                              // Using toISOString here was the source of an off-by-one-day
+                              // bug: late-evening weekDates rolled over to the next day in
+                              // UTC and ended up showing the *next* day's availability.
+                              const dateKey = toLocalDateKey(date);
                               const daySlots = slotsGrouped[dateKey] || {};
                               
                               return (
