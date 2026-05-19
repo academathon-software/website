@@ -15,19 +15,22 @@
   background-color: white;
   min-width: 0;
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Welcome Section */
 .welcome-section {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.25rem;
   margin-bottom: 2rem;
 }
 
 .profile-pic {
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
 }
 
 .avatar {
@@ -38,20 +41,47 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
+}
+
+.welcome-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .welcome-text h2 {
   margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #333;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1a1a1a;
 }
 
 .welcome-text p {
-  margin: 0.25rem 0 0 0;
+  margin: 0.2rem 0 0.6rem 0;
   color: #666;
   font-size: 0.9rem;
+}
+
+/* Stats row */
+.stats-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  color: #444;
+  font-weight: 500;
+}
+
+.stat-icon {
+  color: #2D6A4F;
+  font-size: 0.85rem;
 }
 
 /* Courses Section */
@@ -68,14 +98,67 @@
 }
 
 .view-full-link {
-  margin-left: 1rem;
-  color: #28a745;
+  color: #2D6A4F;
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .view-full-link:hover {
   text-decoration: underline;
+}
+
+/* Empty states */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  gap: 0.75rem;
+}
+
+.empty-state-icon-wrap {
+  width: 64px;
+  height: 64px;
+  background: #f0f2f5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #adb5bd;
+  font-size: 1.5rem;
+}
+
+.empty-state-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.empty-state-subtitle {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.empty-state-small {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.empty-state-small svg {
+  font-size: 1.5rem;
+  color: #adb5bd;
 }
 
 .courses-grid {
@@ -167,15 +250,29 @@
 
 /* Upcoming Lessons Section */
 .upcoming-lessons-section {
-  margin-bottom: 3rem;
+  margin-bottom: 1.5rem;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.upcoming-lessons-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
 }
 
 .upcoming-lessons-section h3 {
-  margin: 0 0 1rem 0;
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #333;
-  display: inline-block;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a2e;
 }
 
 /* Table-based layout for Upcoming Lessons */
@@ -250,8 +347,8 @@
 }
 
 .view-profile-btn:hover {
-  background-color: #4CAF50;
-  border-color: #4CAF50;
+  background-color: #2D6A4F;
+  border-color: #2D6A4F;
   color: white;
 }
 
@@ -339,7 +436,7 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  background: linear-gradient(135deg, #2D6A4F, #2E7D32);
   color: white;
   font-size: 2rem;
   font-weight: 600;
@@ -356,7 +453,7 @@
   object-fit: cover;
   display: block;
   margin: 0 auto 1rem;
-  border: 3px solid #4CAF50;
+  border: 3px solid #2D6A4F;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -404,7 +501,7 @@
 }
 
 .profile-actions .message-btn {
-  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  background: linear-gradient(135deg, #2D6A4F, #2E7D32);
   color: white;
   border: none;
   padding: 0.75rem 2rem;
@@ -560,9 +657,14 @@
 
 /* Calendar Section */
 .calendar-section {
-  margin-bottom: 3rem;
+  margin-bottom: 1rem;
   width: 100%;
   box-sizing: border-box;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
 
 .calendar-header {
@@ -570,13 +672,16 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+  background: #2D6A4F;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
 }
 
 .calendar-header h3 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
-  color: #333;
+  color: white;
 }
 
 .calendar-nav {
@@ -585,16 +690,17 @@
 }
 
 .calendar-nav button {
-  background: none;
+  background: rgba(255,255,255,0.15);
   border: none;
   cursor: pointer;
-  padding: 0.25rem;
-  color: #666;
-  transition: color 0.2s;
+  padding: 0.3rem 0.5rem;
+  color: white;
+  border-radius: 6px;
+  transition: background 0.2s;
 }
 
 .calendar-nav button:hover {
-  color: #333;
+  background: rgba(255,255,255,0.3);
 }
 
 .calendar {
@@ -642,12 +748,14 @@
 }
 
 .calendar-day.today {
-  background-color: #28a745;
+  background-color: #2D6A4F;
   color: white;
+  border-radius: 50%;
+  font-weight: 700;
 }
 
 .calendar-day.weekend {
-  color: #00ff66;
+  color: #2D6A4F;
   font-weight: 500;
 }
 
@@ -667,7 +775,7 @@
   transform: translateX(-50%);
   width: 4px;
   height: 4px;
-  background-color: #00ff3c;
+  background-color: #2D6A4F;
   border-radius: 50%;
 }
 
@@ -678,6 +786,16 @@
 /* Upcoming Section */
 .upcoming-section {
   width: 100%;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  /* Adjust this value to line up with the left card bottom */
+  max-height: 317px;
 }
 
 .upcoming-header {
@@ -791,6 +909,40 @@
   .courses-grid {
     flex-direction: column;
   }
+
+  .lesson-header-row {
+    display: none;
+  }
+
+  .lesson-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem 0.75rem;
+  }
+
+  .lesson-datetime {
+    grid-column: 1 / -1;
+  }
+
+  .lesson-name {
+    grid-column: 1 / -1;
+    font-size: 0.95rem;
+  }
+
+  .tutor-name {
+    grid-column: 1;
+  }
+
+  .status-indicator {
+    grid-column: 2;
+    justify-self: end;
+  }
+
+  .lesson-actions {
+    grid-column: 1 / -1;
+    min-width: unset;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
 }
 
 @media (max-width: 900px) {
@@ -825,38 +977,20 @@
   .upcoming-section {
     margin-bottom: 2rem;
   }
+}
 
-  .lesson-header-row {
-    display: none;
-  }
-
-  .lesson-row {
-    grid-template-columns: 1fr 1fr;
-    gap: 0.4rem 0.75rem;
-  }
-
-  .lesson-datetime {
-    grid-column: 1 / -1;
-  }
-
-  .lesson-name {
-    grid-column: 1 / -1;
-    font-size: 0.95rem;
-  }
-
-  .tutor-name {
-    grid-column: 1;
-  }
-
-  .status-indicator {
-    grid-column: 2;
-    justify-self: end;
-  }
-
+@media (max-width: 480px) {
   .lesson-actions {
-    grid-column: 1 / -1;
-    min-width: unset;
-    justify-content: flex-start;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .lesson-actions .action-btn,
+  .lesson-actions .message-btn,
+  .lesson-actions .mark-complete-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 

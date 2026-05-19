@@ -1,8 +1,10 @@
 package com.academathon.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.academathon.config.BookingTimingProperties;
 import com.academathon.dto.BookingRequestDTO;
 import com.academathon.dto.BookingResponseDTO;
 import com.academathon.model.Booking;
@@ -31,17 +33,26 @@ public class BookingService {
     private final UserRepository userRepository;
     private final AvailabilityService availabilityService;
     private final EmailService emailService;
+    private final BookingTimingProperties timing;
+    private final PaymentService paymentService;
+
+    @Value("${app.frontend.url:http://localhost:5173}")
+    private String frontendUrl;
     
     public BookingService(BookingRepository bookingRepository, 
                          TutorProfileRepository tutorProfileRepository,
                          UserRepository userRepository,
                          AvailabilityService availabilityService,
-                         EmailService emailService) {
+                         EmailService emailService,
+                         BookingTimingProperties timing,
+                         PaymentService paymentService) {
         this.bookingRepository = bookingRepository;
         this.tutorProfileRepository = tutorProfileRepository;
         this.userRepository = userRepository;
         this.availabilityService = availabilityService;
         this.emailService = emailService;
+        this.timing = timing;
+        this.paymentService = paymentService;
     }
     
     /**
@@ -64,14 +75,21 @@ public class BookingService {
             throw new RuntimeException("Cannot book a lesson in the past");
         }
         
-        // Validate 48-hour minimum booking window
-        LocalDateTime minimumBookingTime = now.plusHours(48);
+        // Validate minimum advance booking window (configured in application.properties)
+        LocalDateTime minimumBookingTime = now.plusHours(timing.getMinimumAdvanceHours());
         if (request.getStartTime().isBefore(minimumBookingTime)) {
-            throw new RuntimeException("Bookings must be made at least 48 hours in advance");
+            throw new RuntimeException(
+                "Bookings must be made at least " + timing.getMinimumAdvanceHours() + " hours in advance"
+            );
         }
         
         if (request.getEndTime().isBefore(request.getStartTime())) {
             throw new RuntimeException("End time must be after start time");
+        }
+
+        // Require a saved payment method - we auto-charge when the tutor confirms.
+        if (request.getPaymentMethodId() == null || request.getPaymentMethodId().isBlank()) {
+            throw new RuntimeException("A saved payment method is required to book a lesson");
         }
         
         // Check if tutor is available based on their availability schedule
@@ -113,11 +131,20 @@ public class BookingService {
         booking.setStudent(student);
         booking.setStartTime(request.getStartTime());
         booking.setEndTime(request.getEndTime());
-        booking.setStatus(BookingStatus.PENDING); // Changed from CONFIRMED to PENDING
+        booking.setStatus(BookingStatus.PENDING);
         booking.setSubject(request.getNotes()); // Store the subject from notes field
+        booking.setGradeLevel(request.getGradeLevel());
+        booking.setPaymentMethodId(request.getPaymentMethodId());
         
-        // Set tutor response deadline (24 hours from now)
-        booking.setTutorResponseDeadline(now.plusHours(24));
+        // Tutor must respond at least N hours before the lesson; if that deadline
+        // is already in the past (shouldn't happen given the 5h advance rule) we
+        // fall back to "now" to avoid an instantly-stale booking.
+        LocalDateTime tutorDeadline = request.getStartTime()
+                .minusHours(timing.getTutorResponseBeforeLessonHours());
+        if (tutorDeadline.isBefore(now)) {
+            tutorDeadline = now;
+        }
+        booking.setTutorResponseDeadline(tutorDeadline);
         
         Booking savedBooking = bookingRepository.save(booking);
         
@@ -132,14 +159,18 @@ public class BookingService {
                 "- Subject: %s\n" +
                 "- Date & Time: %s\n" +
                 "- Duration: %d minutes\n\n" +
-                "Please log in to your dashboard to accept or decline this booking request.\n\n" +
+                "Please respond by %s (at least %d hour(s) before the lesson).\n" +
+                "Accepting this booking will automatically charge the student's saved card.\n" +
+                "If you do not respond by the deadline the booking is auto-declined and the student is not charged.\n\n" +
                 "Best regards,\n" +
                 "Academathon Team",
                 tutor.getDisplayName(),
                 student.getUsername(),
                 booking.getSubject(),
                 booking.getStartTime().format(EMAIL_DATE_FORMAT),
-                java.time.Duration.between(booking.getStartTime(), booking.getEndTime()).toMinutes()
+                java.time.Duration.between(booking.getStartTime(), booking.getEndTime()).toMinutes(),
+                booking.getTutorResponseDeadline().format(EMAIL_DATE_FORMAT),
+                timing.getTutorResponseBeforeLessonHours()
             );
             emailService.sendEmail(tutorEmail, subject, body);
         } catch (Exception e) {
@@ -264,20 +295,23 @@ public class BookingService {
     }
     
     /**
-     * Cancel a booking
+     * Cancel a booking.
+     *
+     * - PENDING: anyone (student/tutor) can cancel, no payment was captured so no refund.
+     * - SCHEDULED: must be cancelled before lesson - cancellationBeforeLessonHours.
+     *   The captured payment is refunded via Stripe.
+     * - CANCELLED / COMPLETED: terminal, cannot be cancelled again.
      */
     @Transactional
     public BookingResponseDTO cancelBooking(Long bookingId, Long userId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
         
-        // Verify user has access to this booking
         if (!booking.getStudent().getId().equals(userId) && 
             !booking.getTutor().getUser().getId().equals(userId)) {
             throw new RuntimeException("Access denied");
         }
         
-        // Check if booking can be cancelled
         if (booking.getStatus() == BookingStatus.CANCELLED) {
             throw new RuntimeException("Booking is already cancelled");
         }
@@ -285,24 +319,75 @@ public class BookingService {
         if (booking.getStatus() == BookingStatus.COMPLETED) {
             throw new RuntimeException("Cannot cancel a completed booking");
         }
+
+        // Enforce the no-changes cutoff for SCHEDULED (paid) bookings.
+        if (booking.getStatus() == BookingStatus.SCHEDULED) {
+            LocalDateTime now = LocalDateTime.now(ZoneId.of("America/New_York"));
+            LocalDateTime cutoff = booking.getStartTime()
+                    .minusHours(timing.getCancellationBeforeLessonHours());
+            if (!now.isBefore(cutoff)) {
+                throw new RuntimeException(
+                    "Cancellation is no longer available. Bookings cannot be cancelled within " +
+                    timing.getCancellationBeforeLessonHours() + " hour(s) of lesson start."
+                );
+            }
+
+            // Refund the captured payment.
+            try {
+                paymentService.refundPayment(bookingId);
+            } catch (Exception e) {
+                System.err.println("Failed to refund payment for booking " + bookingId + ": " + e.getMessage());
+                throw new RuntimeException("Could not process refund: " + e.getMessage(), e);
+            }
+        }
         
-        // Cancel the booking
         booking.setStatus(BookingStatus.CANCELLED);
         Booking updatedBooking = bookingRepository.save(booking);
+
+        // Notify the other party
+        try {
+            boolean cancelledByStudent = booking.getStudent().getId().equals(userId);
+            String recipientEmail = cancelledByStudent
+                    ? booking.getTutor().getUser().getEmail()
+                    : booking.getStudent().getEmail();
+            String recipientName = cancelledByStudent
+                    ? booking.getTutor().getDisplayName()
+                    : booking.getStudent().getUsername();
+            String otherPartyName = cancelledByStudent
+                    ? booking.getStudent().getUsername()
+                    : booking.getTutor().getDisplayName();
+            String refundLine = booking.getPaymentStatus() == Booking.PaymentStatus.REFUNDED
+                    ? "The payment has been refunded to the student.\n"
+                    : "No payment was captured for this booking.\n";
+            String subject = "Booking Cancelled - Academathon";
+            String body = String.format(
+                "Hello %s,\n\n" +
+                "%s cancelled the booking originally scheduled for %s.\n" +
+                "%s\n" +
+                "Best regards,\nAcademathon Team",
+                recipientName,
+                otherPartyName,
+                booking.getStartTime().format(EMAIL_DATE_FORMAT),
+                refundLine
+            );
+            emailService.sendEmail(recipientEmail, subject, body);
+        } catch (Exception ignored) { /* best-effort */ }
         
         return new BookingResponseDTO(updatedBooking);
     }
     
     /**
-     * Confirm a booking (tutor confirms a pending booking)
-     * After confirmation, student needs to pay
+     * Confirm a booking (tutor confirms a pending booking).
+     *
+     * New workflow: confirmation auto-charges the student's saved card. On success the
+     * booking goes straight to SCHEDULED. On charge failure the booking stays PENDING
+     * and a RuntimeException is thrown so the tutor sees the error.
      */
     @Transactional
     public BookingResponseDTO confirmBooking(Long bookingId, Long tutorUserId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
         
-        // Verify this is the tutor
         if (!booking.getTutor().getUser().getId().equals(tutorUserId)) {
             throw new RuntimeException("Access denied");
         }
@@ -310,35 +395,76 @@ public class BookingService {
         if (booking.getStatus() != BookingStatus.PENDING) {
             throw new RuntimeException("Only pending bookings can be confirmed");
         }
+
+        // Enforce tutor-response cutoff: at least N hours before the lesson.
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("America/New_York"));
+        LocalDateTime cutoff = booking.getStartTime()
+                .minusHours(timing.getTutorResponseBeforeLessonHours());
+        if (now.isAfter(cutoff)) {
+            throw new RuntimeException(
+                "The response window has closed. Bookings must be confirmed at least " +
+                timing.getTutorResponseBeforeLessonHours() + " hour(s) before the lesson."
+            );
+        }
         
-        // Set status to CONFIRMED - awaiting payment from student
-        booking.setStatus(BookingStatus.CONFIRMED);
+        // Auto-charge the student's saved card before transitioning. On failure the
+        // booking stays PENDING (no status change) and the exception bubbles up.
+        try {
+            paymentService.chargeBookingOffSession(booking);
+        } catch (RuntimeException chargeError) {
+            // Send the student a note asking them to update their payment method.
+            try {
+                String studentEmail = booking.getStudent().getEmail();
+                String subject = "Action required: payment method declined - Academathon";
+                String body = String.format(
+                    "Hello %s,\n\n" +
+                    "Your tutor %s tried to confirm your booking for %s, but your saved card was declined.\n" +
+                    "Please update your payment method or re-book to keep the lesson.\n\n" +
+                    "Reason: %s\n\n" +
+                    "Best regards,\n" +
+                    "Academathon Team",
+                    booking.getStudent().getUsername(),
+                    booking.getTutor().getDisplayName(),
+                    booking.getStartTime().format(EMAIL_DATE_FORMAT),
+                    chargeError.getMessage()
+                );
+                emailService.sendEmail(studentEmail, subject, body);
+            } catch (Exception ignored) { /* best-effort */ }
+            throw chargeError;
+        }
+
+        // Payment captured - go straight to SCHEDULED (skip CONFIRMED).
+        booking.setStatus(BookingStatus.SCHEDULED);
         Booking updatedBooking = bookingRepository.save(booking);
         
-        // Send email notification to student with payment reminder
+        // Notify the student
         try {
             String studentEmail = booking.getStudent().getEmail();
-            String subject = "Booking Confirmed - Payment Required - Academathon";
+            String subject = "Lesson Confirmed - Payment Captured - Academathon";
+            long rescheduleCutoffHours = timing.getRescheduleRequestBeforeLessonHours();
+            long cancelCutoffHours = timing.getCancellationBeforeLessonHours();
             String body = String.format(
                 "Hello %s,\n\n" +
-                "Great news! %s has confirmed your booking request.\n\n" +
-                "Details:\n" +
+                "%s has confirmed your booking. Your saved card has been charged $%.2f.\n\n" +
+                "Lesson Details:\n" +
                 "- Tutor: %s\n" +
                 "- Subject: %s\n" +
                 "- Date & Time: %s\n" +
                 "- Duration: %d minutes\n\n" +
-                "ACTION REQUIRED: Please complete the payment to finalize your lesson.\n" +
-                "Log in to your dashboard to pay now.\n\n" +
-                "Note: If payment is not received within 24 hours of the lesson start time, " +
-                "the booking will be automatically cancelled.\n\n" +
+                "You can request a reschedule until %d hour(s) before the lesson,\n" +
+                "or cancel for a full refund until %d hour(s) before the lesson.\n" +
+                "After that, no changes can be made and the lesson is non-refundable.\n\n" +
                 "Best regards,\n" +
                 "Academathon Team",
                 booking.getStudent().getUsername(),
                 booking.getTutor().getDisplayName(),
+                booking.getAmount() != null ? booking.getAmount() : 0.0,
                 booking.getTutor().getDisplayName(),
                 booking.getSubject(),
                 booking.getStartTime().format(EMAIL_DATE_FORMAT),
-                java.time.Duration.between(booking.getStartTime(), booking.getEndTime()).toMinutes()
+                Duration.between(booking.getStartTime(), booking.getEndTime()).toMinutes(),
+                rescheduleCutoffHours,
+                cancelCutoffHours
             );
             emailService.sendEmail(studentEmail, subject, body);
         } catch (Exception e) {
@@ -376,12 +502,12 @@ public class BookingService {
             String subject = "Booking Request Declined - Academathon";
             String body = String.format(
                 "Hello %s,\n\n" +
-                "Unfortunately, %s has declined your booking request.\n\n" +
+                "Unfortunately, %s has declined your booking request. Your card was not charged.\n\n" +
                 "Booking Details:\n" +
                 "- Subject: %s\n" +
                 "- Date & Time: %s\n\n" +
                 "Reason: %s\n\n" +
-                "Don't worry! You can book another lesson with a different tutor or choose a different time slot.\n\n" +
+                "Feel free to book another tutor or pick a different time.\n\n" +
                 "Best regards,\n" +
                 "Academathon Team",
                 booking.getStudent().getUsername(),
@@ -459,7 +585,11 @@ public class BookingService {
     }
     
     /**
-     * Request a reschedule for a booking (student requests reschedule)
+     * Request a reschedule for a booking (student requests reschedule).
+     *
+     * Only SCHEDULED (paid) bookings are eligible. The student window closes
+     * rescheduleRequestBeforeLessonHours before the original lesson; the tutor must
+     * then accept/reject by rescheduleResponseBeforeLessonHours.
      */
     @Transactional
     public BookingResponseDTO requestReschedule(Long bookingId, Long studentId, 
@@ -467,51 +597,53 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
         
-        // Verify this is the student's booking
         if (!booking.getStudent().getId().equals(studentId)) {
             throw new RuntimeException("Access denied");
         }
         
-        // Can only reschedule PENDING or SCHEDULED bookings
-        if (booking.getStatus() != BookingStatus.PENDING && 
-            booking.getStatus() != BookingStatus.SCHEDULED) {
-            throw new RuntimeException("This booking cannot be rescheduled");
+        // Only SCHEDULED bookings can be rescheduled - PENDING bookings must be
+        // cancelled and re-booked since the tutor hasn't agreed to a time yet.
+        if (booking.getStatus() != BookingStatus.SCHEDULED) {
+            throw new RuntimeException("Only scheduled lessons can be rescheduled");
         }
         
-        // Validate new times
         LocalDateTime now = LocalDateTime.now(ZoneId.of("America/New_York"));
         
         if (newStartTime.isBefore(now)) {
             throw new RuntimeException("Cannot reschedule to a time in the past");
         }
         
-        // Validate 48-hour minimum advance booking for the new time
-        LocalDateTime minimumNewTime = now.plusHours(48);
+        // The new time must satisfy the same advance booking rule.
+        LocalDateTime minimumNewTime = now.plusHours(timing.getMinimumAdvanceHours());
         if (newStartTime.isBefore(minimumNewTime)) {
-            throw new RuntimeException("The new lesson time must be at least 48 hours in advance");
+            throw new RuntimeException(
+                "The new lesson time must be at least " + timing.getMinimumAdvanceHours() + " hours in advance"
+            );
         }
         
         if (newEndTime.isBefore(newStartTime)) {
             throw new RuntimeException("End time must be after start time");
         }
         
-        // Validate 24-hour minimum reschedule window before original lesson
-        LocalDateTime minimumRescheduleTime = booking.getStartTime().minusHours(24);
-        if (now.isAfter(minimumRescheduleTime)) {
-            long hoursUntilLesson = Duration.between(now, booking.getStartTime()).toHours();
+        // Student must request the reschedule at least N hours before the original lesson.
+        LocalDateTime studentRequestCutoff = booking.getStartTime()
+                .minusHours(timing.getRescheduleRequestBeforeLessonHours());
+        if (!now.isBefore(studentRequestCutoff)) {
             throw new RuntimeException(
-                "Cannot update or reschedule within 24 hours of lesson start. " +
-                "Current time is " + hoursUntilLesson + " hours before the lesson."
+                "Reschedule requests must be submitted at least " +
+                timing.getRescheduleRequestBeforeLessonHours() + " hour(s) before the lesson."
             );
         }
         
-        // Calculate reschedule response deadline based on EARLIEST lesson time
-        // This handles cases where student requests an earlier time
+        // Tutor must accept/reject by lesson - rescheduleResponseBeforeLessonHours. Compute
+        // based on the EARLIER of original and requested times so an earlier requested time
+        // tightens the deadline.
         LocalDateTime originalStartTime = booking.getStartTime();
         LocalDateTime earliestTime = originalStartTime.isBefore(newStartTime) 
             ? originalStartTime 
             : newStartTime;
-        LocalDateTime rescheduleResponseDeadline = earliestTime.minusHours(12);
+        LocalDateTime rescheduleResponseDeadline = earliestTime
+                .minusHours(timing.getRescheduleResponseBeforeLessonHours());
         
         // Validate that tutor will have at least some time to respond
         if (now.isAfter(rescheduleResponseDeadline)) {
@@ -559,54 +691,6 @@ public class BookingService {
             throw new RuntimeException("You have another booking at this time");
         }
         
-        // Handle PENDING bookings differently - just update the booking request
-        if (booking.getStatus() == BookingStatus.PENDING) {
-            // Store original times for email notification
-            LocalDateTime oldStartTime = booking.getStartTime();
-            LocalDateTime oldEndTime = booking.getEndTime();
-            
-            // For PENDING bookings, simply update the booking request
-            // No need for reschedule request since tutor hasn't confirmed yet
-            booking.setStartTime(newStartTime);
-            booking.setEndTime(newEndTime);
-            
-            // Recalculate tutor response deadline (24 hours from now)
-            booking.setTutorResponseDeadline(now.plusHours(24));
-            
-            Booking updatedBooking = bookingRepository.save(booking);
-            
-            // Send email to tutor about the updated request
-            try {
-                String tutorEmail = booking.getTutor().getUser().getEmail();
-                String subject = "Booking Request Updated - Academathon";
-                String body = String.format(
-                    "Hello %s,\n\n" +
-                    "The student %s has updated their booking request.\n\n" +
-                    "Previous requested time: %s to %s\n" +
-                    "New requested time: %s to %s\n\n" +
-                    "Subject: %s\n" +
-                    "Duration: %d minutes\n\n" +
-                    "Please log in to your dashboard to accept or decline this booking request.\n\n" +
-                    "Best regards,\n" +
-                    "Academathon Team",
-                    booking.getTutor().getDisplayName(),
-                    booking.getStudent().getUsername(),
-                    oldStartTime.format(EMAIL_DATE_FORMAT),
-                    oldEndTime.format(EMAIL_DATE_FORMAT),
-                    newStartTime.format(EMAIL_DATE_FORMAT),
-                    newEndTime.format(EMAIL_DATE_FORMAT),
-                    booking.getSubject(),
-                    Duration.between(newStartTime, newEndTime).toMinutes()
-                );
-                emailService.sendEmail(tutorEmail, subject, body);
-            } catch (Exception e) {
-                System.err.println("Failed to send updated booking request email: " + e.getMessage());
-            }
-            
-            return new BookingResponseDTO(updatedBooking);
-        }
-        
-        // For SCHEDULED bookings, use the reschedule request flow
         // Store original times if not already stored
         if (booking.getOriginalStartTime() == null) {
             booking.setOriginalStartTime(booking.getStartTime());
@@ -640,7 +724,8 @@ public class BookingService {
                 "Requested New Details:\n" +
                 "- Date & Time: %s to %s\n" +
                 "- Duration: %d minutes\n\n" +
-                "Please log in to your dashboard to accept or decline this reschedule request.\n\n" +
+                "Please respond by %s.\n" +
+                "If you decline or don't respond by the deadline, the original lesson time will be kept as scheduled.\n\n" +
                 "Best regards,\n" +
                 "Academathon Team",
                 booking.getTutor().getDisplayName(),
@@ -650,7 +735,8 @@ public class BookingService {
                 booking.getOriginalEndTime().format(EMAIL_DATE_FORMAT),
                 newStartTime.format(EMAIL_DATE_FORMAT),
                 newEndTime.format(EMAIL_DATE_FORMAT),
-                java.time.Duration.between(newStartTime, newEndTime).toMinutes()
+                Duration.between(newStartTime, newEndTime).toMinutes(),
+                rescheduleResponseDeadline.format(EMAIL_DATE_FORMAT)
             );
             emailService.sendEmail(tutorEmail, subject, body);
         } catch (Exception e) {
@@ -767,8 +853,9 @@ public class BookingService {
                 "Requested Date & Time:\n" +
                 "- %s to %s\n\n" +
                 "Reason: %s\n\n" +
-                "Your lesson remains scheduled at the original time. " +
-                "If you need to reschedule, you can submit another reschedule request or cancel this booking.\n\n" +
+                "Your lesson stays at the original time. You can submit a new reschedule request (up to " +
+                timing.getRescheduleRequestBeforeLessonHours() + " hour(s) before the lesson) or cancel for a refund " +
+                "(up to " + timing.getCancellationBeforeLessonHours() + " hour(s) before the lesson).\n\n" +
                 "Best regards,\n" +
                 "Academathon Team",
                 booking.getStudent().getUsername(),

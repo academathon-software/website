@@ -7,6 +7,8 @@
 -- tutor_profiles.bio into users.bio when the user has none, then drop the
 -- duplicate column.
 
+ALTER TABLE users ADD COLUMN IF NOT EXISTS bio TEXT;
+
 UPDATE users u
 SET bio = tp.bio
 FROM tutor_profiles tp

@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import './TutorDashboard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
+import {
   faChevronLeft,
   faChevronRight,
   faCheck,
-  faUser
+  faUser,
+  faUsers,
+  faBookOpen,
+  faClock,
+  faStar,
+  faCalendarDays
 } from '@fortawesome/free-solid-svg-icons';
 import TutorSidebar from '../Shared/TutorSidebar';
 import BookingStatusBadge from '../Shared/BookingStatusBadge';
@@ -39,6 +44,14 @@ const TutorDashboard = () => {
     totalHours: 0,
     avgRating: 0
   });
+  // Booking timing config (loaded from backend; defaults match application.properties)
+  const [bookingTiming, setBookingTiming] = useState({
+    minimumAdvanceHours: 5,
+    tutorResponseBeforeLessonHours: 3,
+    rescheduleRequestBeforeLessonHours: 2,
+    rescheduleResponseBeforeLessonHours: 1,
+    cancellationBeforeLessonHours: 1,
+  });
   
   // Set user type and fetch data when component mounts
   useEffect(() => {
@@ -52,14 +65,19 @@ const TutorDashboard = () => {
       setLoading(true);
       setError(null);
 
-      // Fetch user profile, tutor profile, and bookings in parallel
-      const [userResponse, upcomingResponse, pastResponse, allBookingsResponse, pendingResponse] = await Promise.all([
+      // Fetch user profile, tutor profile, bookings, and timing config in parallel
+      const [userResponse, upcomingResponse, pastResponse, allBookingsResponse, pendingResponse, timingResponse] = await Promise.all([
         userAPI.getCurrentUser(),
         bookingAPI.getUpcomingBookings(),
         bookingAPI.getPastBookings(),
         bookingAPI.getUserBookings(),
-        bookingAPI.getPendingBookings()
+        bookingAPI.getPendingBookings(),
+        bookingAPI.getTimingConfig().catch(() => null)
       ]);
+
+      if (timingResponse?.data) {
+        setBookingTiming(timingResponse.data);
+      }
 
       // Try to fetch tutor profile (might not exist yet)
       let tutorProfileData = null;
@@ -200,6 +218,31 @@ const TutorDashboard = () => {
       console.error('Error rejecting reschedule:', err);
       alert('Failed to reject reschedule: ' + (err.response?.data?.error || err.message));
     }
+  };
+
+  // Tutor can only accept/decline a PENDING booking up to the cutoff
+  // (lesson - tutorResponseBeforeLessonHours). After that the cleanup job auto-declines it.
+  const canRespondToPending = (booking) => {
+    if (!booking || !booking.startTime) return false;
+    const lessonStart = new Date(booking.startTime);
+    const cutoff = new Date(
+      lessonStart.getTime() - bookingTiming.tutorResponseBeforeLessonHours * 60 * 60 * 1000
+    );
+    return new Date() < cutoff;
+  };
+
+  // Reschedule responses are tighter - tutor must reply by lesson - rescheduleResponseBeforeLessonHours.
+  const canRespondToReschedule = (booking) => {
+    if (!booking) return false;
+    // Reschedule decisions are tied to the earlier of the original / requested time so
+    // we mirror the backend rule.
+    const baseTime = booking.requestedStartTime && new Date(booking.requestedStartTime) < new Date(booking.startTime)
+      ? new Date(booking.requestedStartTime)
+      : new Date(booking.startTime);
+    const cutoff = new Date(
+      baseTime.getTime() - bookingTiming.rescheduleResponseBeforeLessonHours * 60 * 60 * 1000
+    );
+    return new Date() < cutoff;
   };
 
   const openActionModal = (booking, action) => {
@@ -356,7 +399,7 @@ const TutorDashboard = () => {
               style={{
                 marginTop: '20px',
                 padding: '10px 20px',
-                backgroundColor: '#4CAF50',
+                backgroundColor: '#2D6A4F',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
@@ -391,11 +434,11 @@ const TutorDashboard = () => {
           <div className="welcome-text">
             <h2>{tutorProfile.name}</h2>
             <p>Welcome back to Academathon!</p>
-            <div style={{ marginTop: '10px', display: 'flex', gap: '20px', fontSize: '14px' }}>
-              <span>👥 {stats.totalStudents} Students</span>
-              <span>📚 {stats.totalLessons} Lessons</span>
-              <span>⏱️ {stats.totalHours}hrs</span>
-              <span>⭐ {stats.avgRating > 0 ? `${stats.avgRating}/5.0` : 'No ratings yet'}</span>
+            <div className="stats-row">
+              <span className="stat-item"><FontAwesomeIcon icon={faUsers} className="stat-icon" /> {stats.totalStudents} Students</span>
+              <span className="stat-item"><FontAwesomeIcon icon={faBookOpen} className="stat-icon" /> {stats.totalLessons} Lessons</span>
+              <span className="stat-item"><FontAwesomeIcon icon={faClock} className="stat-icon" /> {stats.totalHours}hrs</span>
+              <span className="stat-item"><FontAwesomeIcon icon={faStar} className="stat-icon" /> {stats.avgRating > 0 ? `${stats.avgRating}/5.0` : 'No ratings yet'}</span>
             </div>
           </div>
         </div>
@@ -464,7 +507,7 @@ const TutorDashboard = () => {
                             </div>
                           </div>
                           <div style={{ marginTop: '10px', padding: '10px', backgroundColor: '#e8f5e9', borderRadius: '4px' }}>
-                            <strong style={{ color: '#4CAF50', fontSize: '13px' }}>Requested New Time:</strong>
+                            <strong style={{ color: '#2D6A4F', fontSize: '13px' }}>Requested New Time:</strong>
                             <div className="detail-item">
                               <span className="detail-label">Date:</span>
                               <span>{formatDate(booking.requestedStartTime)}</span>
@@ -490,18 +533,41 @@ const TutorDashboard = () => {
                     </div>
                   </div>
                   <div className="pending-booking-actions">
-                    <button 
-                      className="btn-accept" 
-                      onClick={() => openActionModal(booking, 'confirm')}
-                    >
-                      <FontAwesomeIcon icon={faCheck} /> Accept
-                    </button>
-                    <button 
-                      className="btn-decline" 
-                      onClick={() => openActionModal(booking, booking.hasRescheduleRequest ? 'reject-reschedule' : 'reject')}
-                    >
-                      &times; Decline
-                    </button>
+                    {(() => {
+                      const isReschedule = booking.hasRescheduleRequest;
+                      const allowed = isReschedule
+                        ? canRespondToReschedule(booking)
+                        : canRespondToPending(booking);
+                      if (!allowed) {
+                        const cutoffHours = isReschedule
+                          ? bookingTiming.rescheduleResponseBeforeLessonHours
+                          : bookingTiming.tutorResponseBeforeLessonHours;
+                        return (
+                          <p style={{ color: '#9ca3af', fontSize: '13px', margin: 0 }}>
+                            Response window closed (must reply at least {cutoffHours} hour(s) before the lesson). This will be auto-declined.
+                          </p>
+                        );
+                      }
+                      return (
+                        <>
+                          <button
+                            className="btn-accept"
+                            onClick={() => openActionModal(booking, 'confirm')}
+                            title={isReschedule
+                              ? 'Accept the requested new time'
+                              : 'Accepting will automatically charge the student\'s saved card'}
+                          >
+                            <FontAwesomeIcon icon={faCheck} /> Accept
+                          </button>
+                          <button
+                            className="btn-decline"
+                            onClick={() => openActionModal(booking, isReschedule ? 'reject-reschedule' : 'reject')}
+                          >
+                            &times; Decline
+                          </button>
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
               ))}
@@ -511,19 +577,25 @@ const TutorDashboard = () => {
 
         {/* Upcoming Lessons Section */}
         <div className="upcoming-lessons-section">
-          <h3>Upcoming Lessons</h3>
-          <button 
-            className="view-full-link" 
-            onClick={() => navigate('/lesson-history')}
-            style={{ cursor: 'pointer', background: 'none', border: 'none', color: '#4CAF50' }}
-          >
-            View Full List
-          </button>
-          
+          <div className="upcoming-lessons-header">
+            <h3>Upcoming Lessons</h3>
+            <button
+              className="view-full-link"
+              onClick={() => navigate('/lesson-history')}
+              style={{ cursor: 'pointer', background: 'none', border: 'none' }}
+            >
+              View Full List <FontAwesomeIcon icon={faChevronRight} style={{ fontSize: '0.75rem' }} />
+            </button>
+          </div>
+
           <div className="lessons-table">
             {upcomingBookings.filter(b => b.status === 'SCHEDULED' || b.status === 'CONFIRMED').length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-                No upcoming lessons scheduled. Your confirmed lessons will appear here.
+              <div className="empty-state">
+                <div className="empty-state-icon-wrap">
+                  <FontAwesomeIcon icon={faCalendarDays} />
+                </div>
+                <p className="empty-state-title">No upcoming lessons scheduled.</p>
+                <p className="empty-state-subtitle">Your confirmed lessons will appear here.</p>
               </div>
             ) : (
               <>
@@ -647,8 +719,9 @@ const TutorDashboard = () => {
           
           <div className="upcoming-list">
             {upcomingSessions.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
-                <p>No upcoming sessions</p>
+              <div className="empty-state-small">
+                <FontAwesomeIcon icon={faCalendarDays} />
+                <span>No upcoming sessions</span>
               </div>
             ) : (
               upcomingSessions.map(session => (

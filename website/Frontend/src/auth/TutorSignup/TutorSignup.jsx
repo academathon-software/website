@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './TutorSignup.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faArrowRight, 
+import {
+  faArrowRight,
   faArrowLeft,
   faSearch,
   faCheck,
-  faChevronDown
+  faChevronDown,
+  faEye,
+  faEyeSlash
 } from '@fortawesome/free-solid-svg-icons';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -270,6 +272,8 @@ function TutorSignup() {
 
   const [errors, setErrors] = useState({});
   const [subjectSearch, setSubjectSearch] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const pronounOptions = [
     'she/her',
@@ -298,62 +302,29 @@ function TutorSignup() {
   ];
 
   // Comprehensive subject list organized by category
-  const subjectsByCategory = {
-    'Math': [
-      'Addition & Subtraction', 'Place Value', 'Patterns', 'Basic Geometry', 'Time & Money',
-      'Multiplication & Division', 'Fractions', 'Decimals', 'Intro Algebra', 'Geometry', 'Measurement',
-      'Integers', 'Ratios & Rates', 'Equations', 'Pythagorean Theorem', 'Graphing', 'Probability',
-      'Foundations of Algebra', 'Linear Relations', 'Analytic Geometry',
-      'Quadratics', 'Trigonometry', 'Systems of Equations',
-      'Functions', 'College Math', 'Workplace Math',
-      'Advanced Functions', 'Calculus & Vectors', 'Data Management', 'Statistics'
-    ],
-    'English / Language Arts': [
-      'Reading', 'Phonics', 'Writing', 'Spelling', 'Basic Grammar',
-      'Reading Comprehension', 'Paragraph Writing', 'Grammar', 'Vocabulary',
-      'English Language Arts', 'Essay Writing', 'Grammar & Composition',
-      'English 9', 'English 10', 'English 11', 'English 12',
-      'Literature', 'Literature Analysis', 'Writing & Rhetoric', 'Media Studies'
-    ],
-    'Science': [
-      'Life Systems', 'Materials', 'Weather & Seasons', 'Simple Machines',
-      'Electricity', 'Space', 'Biodiversity',
-      'Cells & Systems', 'Fluids', 'Heat & Energy', 'Ecology',
-      'General Science', 'Biology Intro', 'Chemistry Intro', 'Physics Intro',
-      'Biology', 'Chemistry', 'Physics'
-    ],
-    'Social Studies': [
-      'Heritage & Identity', 'People & Environments', 'History Basics', 'Geography Basics',
-      'History', 'Geography', 'World Cultures', 'Canadian Studies',
-      'World Geography', 'Canadian History', 'Civics & Career Studies',
-      'Social Sciences', 'World History', 'Law & Politics', 'World Issues', 'Philosophy'
-    ],
-    'French': [
-      'French Basics', 'French Reading', 'French Writing', 'French Intermediate',
-      'French Conversation', 'French Grammar', 'French Advanced', 'French Literature',
-      'Core French', 'French Immersion'
-    ],
-    'Technology / Computer Science': [
-      'Coding Fundamentals', 'Robotics', 'Digital Literacy',
-      'Python', 'Java', 'Web Basics',
-      'Programming Fundamentals', 'Web Development', 'Computer Science',
-      'Data Structures', 'App Development',
-      'Software Engineering', 'OOP', 'Algorithms', 'Databases', 'Web Applications'
-    ],
-    'Business': [
-      'Intro to Business', 'Entrepreneurship', 'Marketing Basics',
-      'Marketing', 'Accounting', 'Business Management',
-      'Financial Accounting', 'Finance & Investing', 'Business Leadership'
-    ]
-  };
+  // Same subjects available to students — tutors pick which ones they teach
+  const ALL_SUBJECTS = [
+    'Math',
+    'English',
+    'Science',
+    'French',
+    'History',
+    'Computer Science',
+    'Business',
+    'Advanced Functions',
+    'Functions',
+    'Calculus & Vectors',
+    'Chemistry',
+    'Social Studies',
+    'Physics',
+    'Biology',
+    'Accounting',
+    'Data Management',
+    'Stats & Probability',
+    'Economics'
+  ];
 
-  // Flatten all subjects into a single array
-  const availableSubjects = Object.values(subjectsByCategory).flat();
-
-  // Get unique subjects and sort alphabetically
-  const uniqueSubjects = [...new Set(availableSubjects)].sort();
-
-  const filteredSubjects = uniqueSubjects.filter(subject =>
+  const filteredSubjects = ALL_SUBJECTS.filter(subject =>
     subject.toLowerCase().includes(subjectSearch.toLowerCase())
   );
 
@@ -620,23 +591,33 @@ function TutorSignup() {
 
               <div className="form-group">
                 <label>Password</label>
-                <input
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => handleInputChange('password', e.target.value)}
-                  className={errors.password ? 'error' : ''}
-                />
+                <div className="password-input-wrapper">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={formData.password}
+                    onChange={(e) => handleInputChange('password', e.target.value)}
+                    className={errors.password ? 'error' : ''}
+                  />
+                  <button type="button" className="password-toggle" onClick={() => setShowPassword(p => !p)}>
+                    <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                  </button>
+                </div>
                 {errors.password && <span className="error-text">{errors.password}</span>}
               </div>
 
               <div className="form-group">
                 <label>Confirm Password</label>
-                <input
-                  type="password"
-                  value={formData.confirmPassword}
-                  onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                  className={errors.confirmPassword ? 'error' : ''}
-                />
+                <div className="password-input-wrapper">
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={formData.confirmPassword}
+                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                    className={errors.confirmPassword ? 'error' : ''}
+                  />
+                  <button type="button" className="password-toggle" onClick={() => setShowConfirmPassword(p => !p)}>
+                    <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
+                  </button>
+                </div>
                 {errors.confirmPassword && <span className="error-text">{errors.confirmPassword}</span>}
               </div>
 
@@ -752,14 +733,14 @@ function TutorSignup() {
                   type="button"
                   className="select-all-btn"
                   onClick={() => {
-                    if (formData.subjects.length === uniqueSubjects.length) {
+                    if (formData.subjects.length === ALL_SUBJECTS.length) {
                       setFormData(prev => ({ ...prev, subjects: [] }));
                     } else {
-                      setFormData(prev => ({ ...prev, subjects: [...uniqueSubjects] }));
+                      setFormData(prev => ({ ...prev, subjects: [...ALL_SUBJECTS] }));
                     }
                   }}
                 >
-                  {formData.subjects.length === uniqueSubjects.length ? 'Deselect All' : 'Select All'}
+                  {formData.subjects.length === ALL_SUBJECTS.length ? 'Deselect All' : 'Select All'}
                 </button>
               </div>
 

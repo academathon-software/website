@@ -104,11 +104,11 @@ jwt.secret=your_jwt_secret_key_here
 stripe.api.key=sk_test_your_stripe_secret_key
 stripe.publishable.key=pk_test_your_stripe_publishable_key
 
-# Email Configuration (Gmail example)
-spring.mail.host=smtp.gmail.com
+# Email Configuration (Resend SMTP - matches what the app uses in dev & prod)
+spring.mail.host=smtp.resend.com
 spring.mail.port=587
-spring.mail.username=your_email@gmail.com
-spring.mail.password=your_app_password
+spring.mail.username=resend
+spring.mail.password=${RESEND_API_KEY}
 spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
 

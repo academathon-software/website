@@ -5,7 +5,6 @@
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: white;
   width: 100%;
-  overflow-x: hidden;
 }
 
 
@@ -18,6 +17,8 @@
   min-height: 100vh;
   box-sizing: border-box;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 @media screen and (max-width: 1199px) {
@@ -74,11 +75,33 @@
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background-color: #e9ecef;
+  background-color: #f3f4f6;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
+  border: 2px solid #e5e7eb;
+}
+
+.stats-row {
+  margin-top: 10px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.stat-icon {
+  color: #2D6A4F;
+  font-size: 12px;
 }
 
 .welcome-text h2 {
@@ -96,97 +119,158 @@
 
 /* Pending Lessons Section */
 .pending-lessons-section {
-  margin-bottom: 3rem;
+  margin-bottom: 1.5rem;
 }
 
 .pending-lessons-section h3 {
-  margin: 0 0 1.5rem 0;
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #333;
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a2e;
 }
 
 .pending-lessons-grid {
   display: flex;
-  gap: 1.5rem;
-}
-
-.lesson-card {
-  flex: 1;
-  padding: 1.5rem;
-  border-radius: 12px;
-  color: white;
-  display: flex;
   flex-direction: column;
-  gap: 1rem;
-  min-height: 150px;
-  position: relative;
+  gap: 0.5rem;
 }
 
-.lesson-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.lesson-icon {
-  font-size: 2rem;
-  opacity: 0.9;
-}
-
-.lesson-datetime {
-  font-size: 0.8rem;
-  opacity: 0.8;
-}
-
-.lesson-info {
-  flex: 1;
-}
-
-.lesson-subject {
-  font-size: 0.85rem;
-  opacity: 0.9;
-  margin-bottom: 0.5rem;
-}
-
-.lesson-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-}
-
-.lesson-status {
+.pending-lesson-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  background-color: rgba(255, 255, 255, 0.2);
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+  justify-content: space-between;
+  padding: 0.875rem 1rem;
+  background: #fff8f0;
+  border: 1px solid #fde8cc;
+  border-left: 4px solid #f59e0b;
+  border-radius: 8px;
+  gap: 1rem;
+}
+
+.pending-lesson-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.pending-lesson-title {
   font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.pending-lesson-tutor {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.pending-lesson-status {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #d97706;
+  background: #fef3c7;
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* Upcoming Lessons Section */
-.upcoming-lessons-section {
-  margin-bottom: 2rem;
+.student-dashboard .upcoming-lessons-section {
+  margin-bottom: 1.5rem;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-.upcoming-lessons-section h3 {
-  margin: 0 0 1rem 0;
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #333;
-  display: inline-block;
+.upcoming-lessons-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.student-dashboard .upcoming-lessons-section h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a2e;
 }
 
 .view-full-link {
-  margin-left: 1rem;
-  color: #1e3a2c;
+  color: #2D6A4F;
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 .view-full-link:hover {
   text-decoration: underline;
+}
+
+/* Empty states */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  gap: 0.75rem;
+}
+
+.empty-state-icon-wrap {
+  width: 64px;
+  height: 64px;
+  background: #f0f2f5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #adb5bd;
+  font-size: 1.5rem;
+}
+
+.empty-state-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.empty-state-subtitle {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.empty-state-small {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+.empty-state-small svg {
+  font-size: 1.5rem;
+  color: #adb5bd;
 }
 
 .lessons-table {
@@ -198,13 +282,14 @@
   gap: 0;
 }
 
-.lesson-row {
-  display: grid;
-  grid-template-columns: 1.2fr 1.5fr 1fr 1fr auto;
-  gap: 0.75rem;
+.student-dashboard .upcoming-lessons-section .lesson-row {
+  display: flex !important;
   align-items: center;
+  gap: 0.75rem;
   padding: 1rem 0.5rem;
   border-bottom: 1px solid #e9ecef;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .lesson-header-row {
@@ -219,29 +304,40 @@
   font-weight: 500;
 }
 
-.lesson-row:last-child {
+.student-dashboard .upcoming-lessons-section .lesson-row:last-child {
   border-bottom: none;
 }
 
-.lesson-datetime {
+.student-dashboard .upcoming-lessons-section .lesson-datetime {
   font-size: 0.85rem;
   color: #999;
   font-weight: 400;
+  flex: 0 0 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.lesson-name {
+.student-dashboard .upcoming-lessons-section .lesson-name {
   font-size: 0.9rem;
   color: #333;
   font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.tutor-name {
+.student-dashboard .upcoming-lessons-section .tutor-name {
   font-size: 0.9rem;
   color: #333;
   font-weight: 500;
+  flex: 0 0 110px;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
+  overflow: hidden;
 }
 
 .view-profile-btn {
@@ -261,15 +357,16 @@
 }
 
 .view-profile-btn:hover {
-  background-color: #4CAF50;
-  border-color: #4CAF50;
+  background-color: #2D6A4F;
+  border-color: #2D6A4F;
   color: white;
 }
 
-.status-indicator {
+.student-dashboard .upcoming-lessons-section .status-indicator {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex: 0 0 auto;
 }
 
 .status-dot {
@@ -285,12 +382,14 @@
   white-space: nowrap;
 }
 
-.lesson-actions {
+.student-dashboard .upcoming-lessons-section .lesson-actions {
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
-  flex-wrap: wrap;
   align-items: center;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  margin-left: auto;
 }
 
 .reschedule-blocked {
@@ -427,7 +526,7 @@
 
 .form-control:focus {
   outline: none;
-  border-color: #4CAF50;
+  border-color: #2D6A4F;
   box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
 }
 
@@ -465,12 +564,12 @@
 }
 
 .btn-primary {
-  background-color: #4CAF50;
+  background-color: #2D6A4F;
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: #45a049;
+  background-color: #1B4332;
 }
 
 .availability-loading {
@@ -522,17 +621,17 @@
 }
 
 .time-slot-btn.available {
-  border-color: #4CAF50;
-  color: #4CAF50;
+  border-color: #2D6A4F;
+  color: #2D6A4F;
 }
 
 .time-slot-btn.available:hover {
-  background-color: #4CAF50;
+  background-color: #2D6A4F;
   color: white;
 }
 
 .time-slot-btn.available.selected {
-  background-color: #4CAF50;
+  background-color: #2D6A4F;
   color: white;
   box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
 }
@@ -566,6 +665,8 @@
   border-left: 1px solid #e9ecef;
   box-sizing: border-box;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
   overflow: visible;
 }
 
@@ -586,10 +687,14 @@
 
 /* Calendar Section */
 .calendar-section {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   width: 100%;
   box-sizing: border-box;
-  padding: 0;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
   overflow: visible;
 }
 
@@ -600,13 +705,16 @@
   margin-bottom: 0.75rem;
   width: 100%;
   box-sizing: border-box;
+  background: #2D6A4F;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
 }
 
 .calendar-header h3 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
-  color: #333;
+  color: white;
 }
 
 .calendar-nav {
@@ -615,16 +723,17 @@
 }
 
 .calendar-nav button {
-  background: none;
+  background: rgba(255,255,255,0.15);
   border: none;
   cursor: pointer;
-  padding: 0.25rem;
-  color: #666;
-  transition: color 0.2s;
+  padding: 0.3rem 0.5rem;
+  color: white;
+  border-radius: 6px;
+  transition: background 0.2s;
 }
 
 .calendar-nav button:hover {
-  color: #333;
+  background: rgba(255,255,255,0.3);
 }
 
 .calendar {
@@ -683,12 +792,12 @@
 }
 
 .calendar-day.today {
-  background-color: #4CAF50;
+  background-color: #2D6A4F;
   color: white;
 }
 
 .calendar-day.weekend {
-  color: #4CAF50;
+  color: #2D6A4F;
   font-weight: 500;
 }
 
@@ -708,7 +817,7 @@
   transform: translateX(-50%);
   width: 4px;
   height: 4px;
-  background-color: #4CAF50;
+  background-color: #2D6A4F;
   border-radius: 50%;
 }
 
@@ -717,11 +826,25 @@
 }
 
 /* Upcoming Section */
+.upcoming-section {
+  width: 100%;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  /* Adjust this value to line up with the left card bottom */
+  min-height: 353px;
+}
+
 .upcoming-section h3 {
   margin: 0;
   font-size: 1rem;
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: #1a1a2e;
 }
 
 .upcoming-header {
@@ -820,35 +943,53 @@
     display: none;
   }
 
-  .lesson-row {
-    grid-template-columns: 1fr 1fr;
+  .student-dashboard .upcoming-lessons-section .lesson-row {
+    flex-wrap: wrap;
     gap: 0.4rem 0.75rem;
   }
 
-  .lesson-datetime {
-    grid-column: 1 / -1;
+  .student-dashboard .upcoming-lessons-section .lesson-datetime {
+    flex: 0 0 100%;
   }
 
-  .lesson-name {
-    grid-column: 1 / -1;
+  .student-dashboard .upcoming-lessons-section .lesson-name {
+    flex: 0 0 100%;
   }
 
-  .tutor-name {
-    grid-column: 1;
+  .student-dashboard .upcoming-lessons-section .tutor-name {
+    flex: 1 1 auto;
   }
 
-  .status-indicator {
-    grid-column: 2;
-    justify-self: end;
+  .student-dashboard .upcoming-lessons-section .status-indicator {
+    flex: 0 0 auto;
+    margin-left: auto;
   }
 
-  .lesson-actions {
-    grid-column: 1 / -1;
+  .student-dashboard .upcoming-lessons-section .lesson-actions {
+    flex: 0 0 100%;
     justify-content: flex-start;
+    margin-left: 0;
+    flex-wrap: wrap;
   }
 
   .reschedule-blocked {
     max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .student-dashboard .upcoming-lessons-section .lesson-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .student-dashboard .upcoming-lessons-section .lesson-actions .action-btn,
+  .student-dashboard .upcoming-lessons-section .lesson-actions .reschedule-btn,
+  .student-dashboard .upcoming-lessons-section .lesson-actions .cancel-btn,
+  .student-dashboard .upcoming-lessons-section .lesson-actions .pay-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 
@@ -1039,7 +1180,7 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  background: linear-gradient(135deg, #2D6A4F, #1B4332);
   color: white;
   font-size: 2rem;
   font-weight: 600;
@@ -1056,7 +1197,7 @@
   object-fit: cover;
   margin: 0 auto 1rem;
   display: block;
-  border: 3px solid #4CAF50;
+  border: 3px solid #2D6A4F;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -1105,7 +1246,7 @@
 }
 
 .message-tutor-btn {
-  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  background: linear-gradient(135deg, #2D6A4F, #1B4332);
   color: white;
   border: none;
   padding: 0.75rem 2rem;

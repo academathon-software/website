@@ -3,6 +3,7 @@ package com.academathon.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,6 +35,7 @@ public class UserController {
     }
 
     @GetMapping("/")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<User>> allUsers() {
         List <User> users = userService.allUsers();
         return ResponseEntity.ok(users);
@@ -66,29 +68,6 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/delete/{email}")
-    public ResponseEntity<String> deleteUserByEmail(@PathVariable String email) {
-        try {
-            userService.deleteUserByEmail(email);
-            return ResponseEntity.ok("User with email " + email + " has been successfully deleted.");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error deleting user: " + e.getMessage());
-        }
-    }
-
-    @GetMapping("/check/{email}")
-    public ResponseEntity<String> checkUserExists(@PathVariable String email) {
-        try {
-            boolean exists = userService.userExistsByEmail(email);
-            if (exists) {
-                return ResponseEntity.ok("User with email " + email + " EXISTS in database");
-            } else {
-                return ResponseEntity.ok("User with email " + email + " does NOT exist in database");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error checking user: " + e.getMessage());
-        }
-    }
 
     @PostMapping("/profile-picture")
     public ResponseEntity<?> uploadProfilePicture(@RequestParam("file") MultipartFile file) {

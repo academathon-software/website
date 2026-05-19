@@ -7,14 +7,14 @@ import {
   faUserPlus,
   faCalendarDays,
   faRightFromBracket,
-  faCircleUser,
   faChevronDown,
+  faCircleUser,
 } from '@fortawesome/free-solid-svg-icons';
 import StatisticsTab from './StatisticsTab';
 import UsersTab from './UsersTab';
 import TutorsTab from './TutorsTab';
 import BookingsTab from './BookingsTab';
-import logoImg from '../../assets/logo.avif';
+import logoImg from '../../assets/academathonLogo.png';
 import { logout } from '../../services/auth';
 import './AdminDashboard.css';
 
@@ -51,72 +51,68 @@ const AdminDashboard = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleTabChange = (tabId) => {
-    setSearchParams({ tab: tabId });
-  };
-
-  // Voluntary sign-out — no `reason` so the login page won't show a
-  // "session expired" notice the user didn't trigger.
-  const handleSignOut = () => {
-    logout();
-  };
+  const handleTabChange = (tabId) => setSearchParams({ tab: tabId });
+  const handleSignOut = () => logout();
 
   const renderActiveTab = () => {
     switch (activeTab) {
-      case 'users':
-        return <UsersTab />;
-      case 'tutors':
-        return <TutorsTab />;
-      case 'bookings':
-        return <BookingsTab />;
-      case 'statistics':
-      default:
-        return <StatisticsTab onNavigate={handleTabChange} />;
+      case 'users':     return <UsersTab />;
+      case 'tutors':    return <TutorsTab />;
+      case 'bookings':  return <BookingsTab />;
+      default:          return <StatisticsTab onNavigate={handleTabChange} />;
     }
   };
 
   return (
     <div className="admin-shell">
-      <header className="admin-topbar">
-        <div className="admin-topbar-inner">
-          <Link to="/" className="admin-logo" aria-label="Academathon home">
-            <img src={logoImg} alt="Academathon" className="admin-logo-img" />
-          </Link>
+      <div className="admin-wrapper">
 
-          <div className="admin-topbar-title">
-            <h1>Admin Dashboard</h1>
-            <p className="admin-topbar-subtitle">Manage your platform</p>
+        {/* ── Top bar ── */}
+        <header className="admin-topbar">
+          {/* Left: logo + brand name */}
+          <div className="admin-brand">
+            <Link to="/" className="admin-logo-link">
+              <img src={logoImg} alt="Academathon" className="admin-logo-img" />
+            </Link>
           </div>
 
-          <div className="admin-topbar-account" ref={menuRef}>
-            <button
-              className="admin-account-button"
-              onClick={() => setMenuOpen((prev) => !prev)}
-              aria-haspopup="true"
-              aria-expanded={menuOpen}
-            >
-              <FontAwesomeIcon icon={faCircleUser} className="admin-account-icon" />
-              <span className="admin-account-label">Administrator</span>
-              <FontAwesomeIcon
-                icon={faChevronDown}
-                className={`admin-account-chevron ${menuOpen ? 'open' : ''}`}
-              />
-            </button>
-
-            {menuOpen && (
-              <div className="admin-account-menu" role="menu">
-                <button className="admin-account-menu-item" onClick={handleSignOut}>
-                  <FontAwesomeIcon icon={faRightFromBracket} />
-                  <span>Sign out</span>
-                </button>
-              </div>
-            )}
+          {/* Centre: breadcrumb */}
+          <div className="admin-breadcrumb">
+            <span className="admin-bc-active">Dashboard</span>
+            <span className="admin-bc-sep">&nbsp;/&nbsp;</span>
+            <span className="admin-bc-current">Overview</span>
           </div>
-        </div>
-      </header>
 
-      <nav className="admin-tabs" role="tablist">
-        <div className="admin-tabs-inner">
+          {/* Right: search + bell + account */}
+          <div className="admin-topbar-right">
+            <div className="admin-account-wrap" ref={menuRef}>
+              <button
+                className="admin-account-button"
+                onClick={() => setMenuOpen((p) => !p)}
+                aria-haspopup="true"
+                aria-expanded={menuOpen}
+              >
+                <FontAwesomeIcon icon={faCircleUser} className="admin-account-icon" />
+                <span className="admin-account-label">Administrator</span>
+                <FontAwesomeIcon
+                  icon={faChevronDown}
+                  className={`admin-account-chevron ${menuOpen ? 'open' : ''}`}
+                />
+              </button>
+              {menuOpen && (
+                <div className="admin-account-menu" role="menu">
+                  <button className="admin-account-menu-item" onClick={handleSignOut}>
+                    <FontAwesomeIcon icon={faRightFromBracket} />
+                    <span>Sign out</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
+
+        {/* ── Tab bar ── */}
+        <nav className="admin-tabs" role="tablist">
           {TABS.map((tab) => (
             <button
               key={tab.id}
@@ -129,10 +125,12 @@ const AdminDashboard = () => {
               <span>{tab.label}</span>
             </button>
           ))}
-        </div>
-      </nav>
+        </nav>
 
-      <main className="admin-tab-panel">{renderActiveTab()}</main>
+        {/* ── Tab content ── */}
+        <main className="admin-tab-panel">{renderActiveTab()}</main>
+
+      </div>
     </div>
   );
 };

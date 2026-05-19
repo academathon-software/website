@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './StudentDashboard.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
+import {
   faStar,
   faChevronLeft,
   faChevronRight,
@@ -12,11 +12,13 @@ import {
   faDollarSign,
   faCircle,
   faCheck,
-  faUser
+  faUser,
+  faBookOpen,
+  faClock,
+  faCalendarAlt
 } from '@fortawesome/free-solid-svg-icons';
 import StudentSidebar from '../Shared/StudentSidebar';
 import BookingStatusBadge from '../Shared/BookingStatusBadge';
-import PaymentModal from '../Payment/PaymentModal';
 import { useUser } from '../../context/UserContext';
 import { bookingAPI, userAPI, availabilityAPI, tutorAPI } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
@@ -42,11 +44,17 @@ const StudentDashboard = () => {
   const [rescheduleLoading, setRescheduleLoading] = useState(false);
   const [availableSlots, setAvailableSlots] = useState([]);
   const [checkingAvailability, setCheckingAvailability] = useState(false);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [paymentBookingId, setPaymentBookingId] = useState(null);
   const [showTutorProfile, setShowTutorProfile] = useState(false);
   const [selectedTutorProfile, setSelectedTutorProfile] = useState(null);
   const [loadingTutorProfile, setLoadingTutorProfile] = useState(false);
+  // Booking timing config (loaded from backend; defaults match application.properties)
+  const [bookingTiming, setBookingTiming] = useState({
+    minimumAdvanceHours: 5,
+    tutorResponseBeforeLessonHours: 3,
+    rescheduleRequestBeforeLessonHours: 2,
+    rescheduleResponseBeforeLessonHours: 1,
+    cancellationBeforeLessonHours: 1,
+  });
   
   // Set user type and fetch data when component mounts
   useEffect(() => {
@@ -60,12 +68,17 @@ const StudentDashboard = () => {
       setLoading(true);
       setError(null);
 
-      // Fetch user profile and bookings in parallel
-      const [profileResponse, upcomingResponse, allBookingsResponse] = await Promise.all([
+      // Fetch user profile, bookings, and timing config in parallel
+      const [profileResponse, upcomingResponse, allBookingsResponse, timingResponse] = await Promise.all([
         userAPI.getCurrentUser(),
         bookingAPI.getUpcomingBookings(),
-        bookingAPI.getUserBookings()
+        bookingAPI.getUserBookings(),
+        bookingAPI.getTimingConfig().catch(() => null)
       ]);
+
+      if (timingResponse?.data) {
+        setBookingTiming(timingResponse.data);
+      }
 
       // Set profile data
       setStudentProfile({
@@ -119,13 +132,37 @@ const StudentDashboard = () => {
     }
   };
 
+  // Reschedule is only allowed for SCHEDULED (paid) bookings, and only until
+  // lesson - rescheduleRequestBeforeLessonHours. PENDING bookings can't be rescheduled;
+  // the student must cancel and re-book.
   const canReschedule = (booking) => {
+    if (booking.status !== 'SCHEDULED') return false;
     const now = new Date();
     const lessonStart = new Date(booking.startTime);
-    const minRescheduleTime = new Date(lessonStart.getTime() - 24 * 60 * 60 * 1000);
-    
-    return now < minRescheduleTime;
+    const cutoff = new Date(
+      lessonStart.getTime() - bookingTiming.rescheduleRequestBeforeLessonHours * 60 * 60 * 1000
+    );
+    return now < cutoff;
   };
+
+  // PENDING: cancellable any time before the lesson starts (no payment captured).
+  // SCHEDULED: cancellable until lesson - cancellationBeforeLessonHours (refund issued).
+  const canCancel = (booking) => {
+    const now = new Date();
+    const lessonStart = new Date(booking.startTime);
+    if (booking.status === 'PENDING') {
+      return now < lessonStart;
+    }
+    if (booking.status === 'SCHEDULED') {
+      const cutoff = new Date(
+        lessonStart.getTime() - bookingTiming.cancellationBeforeLessonHours * 60 * 60 * 1000
+      );
+      return now < cutoff;
+    }
+    return false;
+  };
+
+  const isPastLesson = (booking) => new Date(booking.endTime) < new Date();
 
   const handleOpenReschedule = (booking) => {
     setSelectedBooking(booking);
@@ -169,14 +206,15 @@ const StudentDashboard = () => {
       );
 
       // Convert the API response to the format expected by the UI
-      // Filter out slots that are less than 48 hours from now
+      // Filter out slots that are less than the configured advance booking window from now
       const now = new Date();
-      const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000); // 48 hours from now
+      const advanceHours = bookingTiming.minimumAdvanceHours;
+      const minBookingTime = new Date(now.getTime() + advanceHours * 60 * 60 * 1000);
       
       const slots = response.data
         .filter(slot => {
           const startTime = new Date(slot.startTime);
-          return startTime >= minBookingTime; // Only include slots 48+ hours in advance
+          return startTime >= minBookingTime;
         })
         .map(slot => {
           const startTime = new Date(slot.startTime);
@@ -251,22 +289,26 @@ const StudentDashboard = () => {
         return;
       }
 
-      // Validate 24-hour minimum reschedule window before original lesson
+      // Reschedule requests must be submitted at least N hours before the original lesson.
       const originalStartTime = new Date(selectedBooking.startTime);
       const now = new Date();
-      const minimumRescheduleTime = new Date(originalStartTime.getTime() - 24 * 60 * 60 * 1000);
-      
-      if (now >= minimumRescheduleTime) {
+      const rescheduleCutoffHours = bookingTiming.rescheduleRequestBeforeLessonHours;
+      const requestCutoff = new Date(
+        originalStartTime.getTime() - rescheduleCutoffHours * 60 * 60 * 1000
+      );
+
+      if (now >= requestCutoff) {
         const hoursUntilLesson = Math.floor((originalStartTime.getTime() - now.getTime()) / (1000 * 60 * 60));
-        alert(`Cannot update or reschedule within 24 hours of lesson start. Your lesson is in ${hoursUntilLesson} hours. Please contact your tutor directly.`);
+        alert(`Reschedule requests must be submitted at least ${rescheduleCutoffHours} hour(s) before the lesson. Your lesson is in ${hoursUntilLesson} hour(s).`);
         setRescheduleLoading(false);
         return;
       }
-      
-      // Validate 48-hour minimum advance booking for the new time
-      const minimumNewTime = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+
+      // The new time must satisfy the same advance booking rule used for new bookings.
+      const advanceHours = bookingTiming.minimumAdvanceHours;
+      const minimumNewTime = new Date(now.getTime() + advanceHours * 60 * 60 * 1000);
       if (newStartTime < minimumNewTime) {
-        alert('The new lesson time must be at least 48 hours in advance from now.');
+        alert(`The new lesson time must be at least ${advanceHours} hours in advance from now.`);
         setRescheduleLoading(false);
         return;
       }
@@ -291,16 +333,9 @@ const StudentDashboard = () => {
         formatLocalDateTime(newEndTime)
       );
 
-      // Refresh dashboard data
       await fetchDashboardData();
       handleCloseReschedule();
-      
-      // Show appropriate success message based on booking status
-      if (selectedBooking.status === 'PENDING') {
-        alert('Booking request updated successfully! The tutor will review your updated request.');
-      } else {
-        alert('Reschedule request sent successfully! Waiting for tutor approval.');
-      }
+      alert('Reschedule request sent successfully! Waiting for tutor approval.');
     } catch (err) {
       console.error('Error rescheduling booking:', err);
       alert('Failed to reschedule: ' + (err.response?.data?.error || err.message));
@@ -353,36 +388,15 @@ const StudentDashboard = () => {
   };
 
   const getStatusText = (booking) => {
-    const { status, paymentStatus } = booking;
-    
-    // Check if booking is confirmed but payment not succeeded
-    if (status === 'CONFIRMED' && paymentStatus !== 'SUCCEEDED') {
-      return 'Payment Required';
-    }
-    
+    const { status } = booking;
     const statusText = {
       'PENDING': 'Pending Confirmation',
-      'CONFIRMED': 'Confirmed',
       'SCHEDULED': 'Scheduled',
-      'PAID': 'Payment Complete',
       'REJECTED': 'Rejected',
       'CANCELLED': 'Cancelled',
       'COMPLETED': 'Completed'
     };
     return statusText[status] || status;
-  };
-
-  const handlePayNow = (bookingId) => {
-    setPaymentBookingId(bookingId);
-    setShowPaymentModal(true);
-  };
-
-  const handlePaymentSuccess = async () => {
-    setShowPaymentModal(false);
-    setPaymentBookingId(null);
-    // Refresh dashboard to show updated status
-    await fetchDashboardData();
-    alert('Payment successful! Your lesson is now confirmed.');
   };
 
   const handleViewTutorProfile = async (booking) => {
@@ -422,11 +436,6 @@ const StudentDashboard = () => {
     } finally {
       setLoadingTutorProfile(false);
     }
-  };
-
-  const handlePaymentCancel = () => {
-    setShowPaymentModal(false);
-    setPaymentBookingId(null);
   };
 
   // Get pending (PENDING status) bookings
@@ -556,7 +565,7 @@ const StudentDashboard = () => {
               style={{
                 marginTop: '20px',
                 padding: '10px 20px',
-                backgroundColor: '#4CAF50',
+                backgroundColor: '#2D6A4F',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
@@ -584,17 +593,17 @@ const StudentDashboard = () => {
               {typeof studentProfile.profileImage === 'string' && studentProfile.profileImage.startsWith('http') ? (
                 <img src={studentProfile.profileImage} alt="Profile" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
               ) : (
-                studentProfile.profileImage
+                <FontAwesomeIcon icon={faUser} style={{ fontSize: '1.4rem', color: '#6b7280' }} />
               )}
             </div>
           </div>
           <div className="welcome-text">
             <h2>{studentProfile.name}</h2>
             <p>Welcome back to Academathon!</p>
-            <div style={{ marginTop: '10px', display: 'flex', gap: '20px', fontSize: '14px' }}>
-              <span>📚 {stats.totalLessons} Lessons Completed</span>
-              <span>⏱️ {stats.totalHours} Hours</span>
-              <span>📅 {stats.upcomingCount} Upcoming</span>
+            <div className="stats-row">
+              <span className="stat-item"><FontAwesomeIcon icon={faBookOpen} className="stat-icon" /> {stats.totalLessons} Lessons Completed</span>
+              <span className="stat-item"><FontAwesomeIcon icon={faClock} className="stat-icon" /> {stats.totalHours} Hours</span>
+              <span className="stat-item"><FontAwesomeIcon icon={faCalendarAlt} className="stat-icon" /> {stats.upcomingCount} Upcoming</span>
             </div>
           </div>
         </div>
@@ -606,20 +615,14 @@ const StudentDashboard = () => {
           
           <div className="pending-lessons-grid">
             {pendingLessons.map(lesson => (
-              <div key={lesson.id} className="lesson-card" style={{ backgroundColor: lesson.color }}>
-                <div className="lesson-header">
-                  <div className="lesson-icon">
-                    <FontAwesomeIcon icon={lesson.icon} />
-                  </div>
-                  <div className="lesson-datetime">{lesson.dateTime}</div>
+              <div key={lesson.id} className="pending-lesson-row">
+                <div className="pending-lesson-left">
+                  <span className="pending-lesson-title">{lesson.title || `${lesson.subject} ${lesson.grade}`}</span>
+                  <span className="pending-lesson-tutor">{lesson.dateTime}</span>
                 </div>
-                <div className="lesson-info">
-                  <div className="lesson-subject">{lesson.subject} {lesson.grade}</div>
-                  <div className="lesson-title">{lesson.title}</div>
-                  <div className="lesson-status">
-                    <FontAwesomeIcon icon={lesson.statusIcon} />
-                    <span>{lesson.status}</span>
-                  </div>
+                <div className="pending-lesson-status">
+                  <FontAwesomeIcon icon={lesson.statusIcon} />
+                  <span>{lesson.status}</span>
                 </div>
               </div>
             ))}
@@ -629,19 +632,21 @@ const StudentDashboard = () => {
 
         {/* Upcoming Lessons Section */}
         <div className="upcoming-lessons-section">
-          <h3>Upcoming Lessons</h3>
-          <button 
-            className="view-full-link" 
-            onClick={() => navigate('/lesson-history')}
-            style={{ cursor: 'pointer', background: 'none', border: 'none', color: '#4CAF50' }}
-          >
-            View Full List
-          </button>
-          
+          <div className="upcoming-lessons-header">
+            <h3>Upcoming Lessons</h3>
+            <button className="view-full-link" onClick={() => navigate('/lesson-history')}>
+              View Full List <FontAwesomeIcon icon={faChevronRight} style={{ fontSize: '0.75rem' }} />
+            </button>
+          </div>
+
           <div className="lessons-table">
             {upcomingLessons.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
-                <p>No upcoming lessons. <button onClick={() => navigate('/book-lesson')} style={{ color: '#4CAF50', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>Book your first lesson!</button></p>
+              <div className="empty-state">
+                <div className="empty-state-icon-wrap">
+                  <FontAwesomeIcon icon={faCalendarAlt} />
+                </div>
+                <p className="empty-state-title">No upcoming lessons scheduled.</p>
+                <p className="empty-state-subtitle">Your confirmed lessons will appear here.</p>
               </div>
             ) : (
               <>
@@ -653,7 +658,7 @@ const StudentDashboard = () => {
                           <div style={{ color: '#666', marginBottom: '4px' }}>
                             <strong>Original:</strong> {formatDateTime(booking.startTime)}
                           </div>
-                          <div style={{ color: '#4CAF50' }}>
+                          <div style={{ color: '#2D6A4F' }}>
                             <strong>Requested:</strong> {formatDateTime(booking.requestedStartTime)}
                           </div>
                         </div>
@@ -681,25 +686,28 @@ const StudentDashboard = () => {
                       />
                     </div>
                     <div className="lesson-actions">
-                      {booking.status === 'CONFIRMED' && (
-                        <button 
-                          className="action-btn pay-btn" 
-                          onClick={() => handlePayNow(booking.id)}
-                          style={{ backgroundColor: '#4CAF50', color: 'white' }}
-                        >
-                          Pay Now
-                        </button>
+                      {!isPastLesson(booking) && (
+                        <>
+                          {booking.status === 'SCHEDULED' && (
+                            canReschedule(booking) ? (
+                              <button className="action-btn reschedule-btn" onClick={() => handleOpenReschedule(booking)}>
+                                Reschedule
+                              </button>
+                            ) : (
+                              <p className="reschedule-blocked">
+                                Reschedule requests must be made at least {bookingTiming.rescheduleRequestBeforeLessonHours} hour(s) before the lesson.
+                              </p>
+                            )
+                          )}
+                          {canCancel(booking) ? (
+                            <button className="action-btn cancel-btn" onClick={() => handleCancelBooking(booking.id)}>Cancel</button>
+                          ) : booking.status === 'SCHEDULED' ? (
+                            <p className="reschedule-blocked">
+                              Cancellations are not allowed within {bookingTiming.cancellationBeforeLessonHours} hour(s) of the lesson.
+                            </p>
+                          ) : null}
+                        </>
                       )}
-                      {(booking.status === 'PENDING' || booking.status === 'SCHEDULED') && (
-                        canReschedule(booking) ? (
-                          <button className="action-btn reschedule-btn" onClick={() => handleOpenReschedule(booking)}>
-                            {booking.status === 'PENDING' ? 'Update Request' : 'Reschedule'}
-                          </button>
-                        ) : (
-                          <p className="reschedule-blocked">Updates/reschedules must be requested at least 24 hours before the lesson</p>
-                        )
-                      )}
-                      <button className="action-btn cancel-btn" onClick={() => handleCancelBooking(booking.id)}>Cancel</button>
                     </div>
                   </div>
                 ))}
@@ -768,8 +776,9 @@ const StudentDashboard = () => {
           
           <div className="upcoming-list">
             {upcomingSessions.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
-                <p>No upcoming sessions</p>
+              <div className="empty-state-small">
+                <FontAwesomeIcon icon={faCalendarAlt} />
+                <span>No upcoming sessions</span>
               </div>
             ) : (
               upcomingSessions.map(session => (
@@ -790,21 +799,12 @@ const StudentDashboard = () => {
         </div>
       </div>
 
-      {/* Payment Modal */}
-      {showPaymentModal && paymentBookingId && (
-        <PaymentModal
-          bookingId={paymentBookingId}
-          onSuccess={handlePaymentSuccess}
-          onCancel={handlePaymentCancel}
-        />
-      )}
-
       {/* Reschedule Modal */}
       {showRescheduleModal && selectedBooking && (
         <div className="modal-overlay" onClick={handleCloseReschedule}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>{selectedBooking.status === 'PENDING' ? 'Update Booking Request' : 'Reschedule Lesson'}</h3>
+              <h3>Reschedule Lesson</h3>
               <button className="modal-close" onClick={handleCloseReschedule}>&times;</button>
             </div>
             
@@ -813,11 +813,9 @@ const StudentDashboard = () => {
                 <p><strong>Lesson:</strong> {selectedBooking.subject || 'Lesson'}</p>
                 <p><strong>Tutor:</strong> {selectedBooking.tutorName}</p>
                 <p><strong>Current Time:</strong> {formatDateTime(selectedBooking.startTime)}</p>
-                {selectedBooking.status === 'PENDING' && (
-                  <p style={{ color: '#3498db', fontSize: '14px', marginTop: '10px' }}>
-                    <em>Note: This will update your booking request to the new time. The tutor will review the updated request.</em>
-                  </p>
-                )}
+                <p style={{ color: '#6b7280', fontSize: '14px', marginTop: '10px' }}>
+                  <em>Your tutor must accept the new time at least {bookingTiming.rescheduleResponseBeforeLessonHours} hour(s) before the lesson. If they don't respond or decline, your original lesson stays as scheduled.</em>
+                </p>
               </div>
 
               <div className="form-group">
@@ -876,9 +874,7 @@ const StudentDashboard = () => {
                 onClick={handleRescheduleSubmit}
                 disabled={rescheduleLoading}
               >
-                {rescheduleLoading 
-                  ? (selectedBooking.status === 'PENDING' ? 'Updating...' : 'Rescheduling...') 
-                  : (selectedBooking.status === 'PENDING' ? 'Update Request' : 'Confirm Reschedule')}
+                {rescheduleLoading ? 'Rescheduling...' : 'Confirm Reschedule'}
               </button>
             </div>
           </div>

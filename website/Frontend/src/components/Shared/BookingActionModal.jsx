@@ -75,7 +75,7 @@ const BookingActionModal = ({ booking, action, onConfirm, onCancel }) => {
                   <span className="detail-value">{formatDateTime(booking.originalStartTime)}</span>
                 </div>
                 <div className="detail-row" style={{ marginTop: '10px', paddingTop: '10px', backgroundColor: '#e8f5e9', padding: '10px', borderRadius: '4px' }}>
-                  <span className="detail-label" style={{ color: '#4CAF50', fontWeight: 'bold' }}>Requested New Time:</span>
+                  <span className="detail-label" style={{ color: '#2D6A4F', fontWeight: 'bold' }}>Requested New Time:</span>
                   <span className="detail-value" style={{ fontWeight: 'bold' }}>{formatDateTime(booking.requestedStartTime)}</span>
                 </div>
               </>
@@ -97,8 +97,10 @@ const BookingActionModal = ({ booking, action, onConfirm, onCancel }) => {
           {isConfirm && (
             <div className="confirm-message">
               <p>
-                By confirming this booking, you're committing to teach this lesson at the scheduled time. 
-                The student will be notified{isReschedule ? '.' : ' and required to complete payment before the lesson is finalized.'}
+                By confirming this booking, you're committing to teach this lesson at the scheduled time.
+                {isReschedule
+                  ? ' The student will be notified that you accepted their new time.'
+                  : ' The student\'s saved card will be charged immediately and they\'ll receive a confirmation email.'}
               </p>
             </div>
           )}

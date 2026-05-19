@@ -28,16 +28,16 @@ const pricingPlans = [
 
 const faqs = [
   {
-    question: "Can I change my plan later?",
-    answer: "Yes! You can upgrade or downgrade your plan at any time. Changes take effect at the start of your next billing cycle."
+    question: "Is there a subscription or monthly commitment?",
+    answer: "No — Academathon is pay-as-you-go. You're only charged for the lessons you book, at the hourly rate for your grade level ($25/hr for Grades 1–8, $30/hr for Grades 9–10, $35/hr for Grades 11–12, in CAD). There are no plans to upgrade, downgrade, or cancel."
   },
   {
-    question: "What happens to unused hours?",
-    answer: "Unused hours roll over to the next month for up to 3 months on Pro and Premium plans. Starter plan hours do not expire monthly."
+    question: "When am I charged for a lesson?",
+    answer: "You save your card when you request a lesson, but nothing is charged yet. Your card is only charged once the tutor accepts the request. If the tutor declines, or doesn't respond before the deadline, your card is never charged. Cancel in time and you'll get a full refund."
   },
   {
     question: "What subjects are available?",
-    answer: "We offer tutoring in over 50 subjects including Math, Science, English, History, Computer Science, Languages, and many more."
+    answer: "We currently offer tutoring across 18 subjects: Math, English, Science, French, History, Computer Science, Business, Advanced Functions, Functions, Calculus & Vectors, Chemistry, Social Studies, Physics, Biology, Accounting, Data Management, Stats & Probability, and Economics."
   },
   {
     question: "How do I book a session?",

@@ -1,5 +1,8 @@
 package com.academathon.controller;
 
+import com.academathon.model.Booking;
+import com.academathon.model.User;
+import com.academathon.repository.BookingRepository;
 import com.academathon.service.PaymentService;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
@@ -23,13 +26,58 @@ public class PaymentController {
     private String webhookSecret;
 
     private final PaymentService paymentService;
+    private final BookingRepository bookingRepository;
 
-    public PaymentController(PaymentService paymentService) {
+    public PaymentController(PaymentService paymentService, BookingRepository bookingRepository) {
         this.paymentService = paymentService;
+        this.bookingRepository = bookingRepository;
     }
 
     /**
-     * Create a payment intent for a booking
+     * Look up the price for a given grade level. The frontend uses this to display the
+     * amount on the SetupIntent step so the student knows what they're authorizing.
+     * GET /api/payments/quote?gradeLevel=...
+     */
+    @GetMapping("/quote")
+    public ResponseEntity<?> getQuote(@RequestParam(required = false) String gradeLevel) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+            }
+            return ResponseEntity.ok(paymentService.getQuote(gradeLevel));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * Create a Stripe SetupIntent so the student can save a card at booking time.
+     * The card is then auto-charged off-session when the tutor confirms.
+     * POST /api/payments/setup-intent
+     */
+    @PostMapping("/setup-intent")
+    public ResponseEntity<?> createSetupIntent() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+            }
+
+            User currentUser = (User) authentication.getPrincipal();
+            Map<String, Object> setupIntent = paymentService.createSetupIntent(currentUser.getId());
+            return ResponseEntity.ok(setupIntent);
+        } catch (StripeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Stripe error: " + e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * Create a payment intent for a booking (legacy manual flow).
+     * Kept for backward compatibility; the new workflow auto-charges the saved card
+     * at tutor-confirm time and does not call this endpoint.
      * POST /api/payments/create-intent
      */
     @PostMapping("/create-intent")
@@ -43,6 +91,13 @@ public class PaymentController {
             Long bookingId = request.get("bookingId");
             if (bookingId == null) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Booking ID is required"));
+            }
+
+            User currentUser = (User) authentication.getPrincipal();
+            Booking booking = bookingRepository.findById(bookingId)
+                    .orElseThrow(() -> new RuntimeException("Booking not found"));
+            if (!booking.getStudent().getId().equals(currentUser.getId())) {
+                return ResponseEntity.status(403).body(Map.of("error", "You can only pay for your own bookings"));
             }
 
             Map<String, Object> paymentIntent = paymentService.createPaymentIntent(bookingId);
@@ -64,6 +119,16 @@ public class PaymentController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+            }
+
+            User currentUser = (User) authentication.getPrincipal();
+            Booking booking = bookingRepository.findById(bookingId)
+                    .orElseThrow(() -> new RuntimeException("Booking not found"));
+            boolean isStudent = booking.getStudent().getId().equals(currentUser.getId());
+            boolean isTutor = booking.getTutor().getUser().getId().equals(currentUser.getId());
+            boolean isAdmin = currentUser.getRole() == User.Role.ADMIN;
+            if (!isStudent && !isTutor && !isAdmin) {
+                return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
             }
 
             Map<String, Object> details = paymentService.getPaymentDetails(bookingId);
@@ -159,6 +224,11 @@ public class PaymentController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+            }
+
+            User currentUser = (User) authentication.getPrincipal();
+            if (currentUser.getRole() != User.Role.ADMIN) {
+                return ResponseEntity.status(403).body(Map.of("error", "Admin access required for refunds"));
             }
 
             paymentService.refundPayment(bookingId);

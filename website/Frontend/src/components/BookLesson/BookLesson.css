@@ -81,7 +81,7 @@
   padding: 2rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   max-width: 800px;
-  margin: 0 auto;
+  margin: 4rem auto 0;
 }
 
 .booking-card h3 {
@@ -190,7 +190,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  text-align: left;
+  text-align: center;
 }
 
 .course-button:hover {
@@ -225,8 +225,8 @@
 .tutor-availability-container {
   display: flex;
   gap: 2rem;
-  min-height: 600px;
-  margin-bottom: 150px;
+  min-height: 0;
+  margin-bottom: 1.5rem;
   position: relative;
 }
 
@@ -236,7 +236,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  max-height: 600px;
+  max-height: 400px;
   overflow-y: auto;
   padding-right: 0.5rem;
 }
@@ -252,16 +252,16 @@
 }
 
 .tutor-card:hover {
-  border-color: #2ecc71;
+  border-color: #2D6A4F;
   transform: translateX(4px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .tutor-card.active {
-  background-color: #2ecc71;
-  border-color: #2ecc71;
+  background-color: #2D6A4F;
+  border-color: #2D6A4F;
   color: white;
-  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+  box-shadow: 0 4px 12px rgba(45, 106, 79, 0.3);
 }
 
 .tutor-card-name {
@@ -330,8 +330,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.25rem 1.5rem;
-  background-color: #2ecc71;
+  padding: 0.875rem 1.5rem;
+  background-color: #2D6A4F;
   color: white;
   font-weight: 600;
   font-size: 1.1rem;
@@ -384,7 +384,7 @@
   font-size: 0.95rem;
   color: #666;
   border-bottom: 1px solid #e0e0e0;
-  height: 50px;
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -454,7 +454,7 @@
 }
 
 .time-slot-cell {
-  height: 50px;
+  height: 70px;
   border-bottom: 1px solid #e0e0e0;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -645,14 +645,18 @@
 .booking-confirmation-popup {
   position: fixed !important;
   bottom: 2rem !important;
-  left: 50% !important;
+  left: calc(50% + 125px) !important;
   transform: translateX(-50%) !important;
   background-color: white;
-  border: 3px solid #2ecc71;
+  border: 3px solid #2D6A4F;
   border-radius: 12px;
   padding: 1.5rem 2rem;
   width: 90%;
   max-width: 600px;
+  /* Cap height to viewport so the SetupIntent step (Stripe card form) doesn't
+     grow off the top. Anything taller scrolls inside the popup. */
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   cursor: default;
   z-index: 10000 !important;
@@ -847,7 +851,7 @@
   .time-header {
     font-size: 0.7rem;
     padding: 0.4rem;
-    height: 50px;
+    height: 70px;
   }
   
   .time-label {
@@ -858,11 +862,11 @@
   }
 
   .day-headers {
-    height: 50px;
+    height: 70px;
   }
 
   .day-header {
-    height: 50px;
+    height: 70px;
     padding: 0.4rem 0.2rem;
     min-width: 45px;
   }
@@ -897,6 +901,8 @@
     max-width: 92%;
     padding: 1rem;
     bottom: 1rem !important;
+    left: 50% !important;
+    max-height: calc(100vh - 2rem);
   }
   
   .booking-confirmation-popup p {
@@ -1024,8 +1030,8 @@
 }
 
 .tutor-card:not(.active) .view-tutor-profile-btn:hover {
-  background-color: #4CAF50;
-  border-color: #4CAF50;
+  background-color: #2D6A4F;
+  border-color: #2D6A4F;
   color: white;
 }
 
@@ -1117,7 +1123,7 @@
   width: 90px;
   height: 90px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  background: linear-gradient(135deg, #2D6A4F, #2E7D32);
   color: white;
   font-size: 2.2rem;
   font-weight: 600;
@@ -1134,7 +1140,7 @@
   object-fit: cover;
   margin: 0 auto 1rem;
   display: block;
-  border: 3px solid #4CAF50;
+  border: 3px solid #2D6A4F;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -1226,7 +1232,7 @@
 }
 
 .select-tutor-btn {
-  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  background: linear-gradient(135deg, #2D6A4F, #2E7D32);
   color: white;
   border: none;
   padding: 0.85rem 2.5rem;

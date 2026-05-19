@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
 import {
   Elements,
   PaymentElement,
@@ -7,10 +6,8 @@ import {
   useElements
 } from '@stripe/react-stripe-js';
 import { paymentAPI } from '../../services/api';
+import { stripePromise } from '../../services/stripe';
 import './PaymentModal.css';
-
-// Initialize Stripe with your publishable key
-const stripePromise = loadStripe('pk_test_51STUpUFHtMAfRjT28TbDzOjy8vKSt6jYCafrb8gYdfb2IoopYUOl14YkWLdG9fuR4XoSZY12RchXSocdgX5v2bvv00cEPSOs5e');
 
 const PaymentForm = ({ bookingId, bookingDetails, onSuccess, onCancel }) => {
   const stripe = useStripe();
@@ -30,19 +27,13 @@ const PaymentForm = ({ bookingId, bookingDetails, onSuccess, onCancel }) => {
     setError(null);
 
     try {
-      console.log('Submitting payment to Stripe...');
-      console.log('Elements:', elements);
-      console.log('Stripe:', stripe);
-      
       const { error: submitError } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: window.location.origin + '/student-dashboard',
+          return_url: window.location.origin + '/dashboard',
         },
         redirect: 'if_required',
       });
-
-      console.log('Stripe confirmPayment response:', { submitError });
 
       if (submitError) {
         setError(submitError.message);
@@ -54,12 +45,9 @@ const PaymentForm = ({ bookingId, bookingDetails, onSuccess, onCancel }) => {
           bookingDetails.clientSecret
         );
         
-        console.log('Payment Intent Status:', paymentIntent.paymentIntent.status);
-        
         if (paymentIntent.paymentIntent.status === 'succeeded') {
           try {
             await paymentAPI.confirmPayment(paymentIntent.paymentIntent.id);
-            console.log('Backend confirmation successful');
             onSuccess();
           } catch (confirmError) {
             console.error('Backend confirmation error:', confirmError);
@@ -90,7 +78,6 @@ const PaymentForm = ({ bookingId, bookingDetails, onSuccess, onCancel }) => {
       <PaymentElement 
         id="payment-element"
         onReady={() => {
-          console.log('PaymentElement is ready');
           setIsReady(true);
         }}
       />

@@ -19,7 +19,7 @@ import jakarta.mail.MessagingException;
 
 @Service
 public class AuthenticationService {
-    
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -135,9 +135,6 @@ public class AuthenticationService {
                 + "<body style=\"margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0fdf4;\">"
                 + "<div style=\"max-width: 560px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08);\">"
                 + "<div style=\"background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 32px; text-align: center;\">"
-                + "<div style=\"width: 56px; height: 56px; background-color: rgba(255,255,255,0.2); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px;\">"
-                + "<span style=\"color: #ffffff; font-size: 20px; font-weight: 700;\">at</span>"
-                + "</div>"
                 + "<h1 style=\"color: #ffffff; margin: 0; font-size: 24px; font-weight: 600;\">Academathon</h1>"
                 + "</div>"
                 + "<div style=\"padding: 40px 32px;\">"

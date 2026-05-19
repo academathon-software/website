@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import './BookLesson.css';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -15,9 +15,135 @@ import {
   faUser,
   faStar
 } from '@fortawesome/free-solid-svg-icons';
+import {
+  Elements,
+  PaymentElement,
+  useStripe,
+  useElements
+} from '@stripe/react-stripe-js';
 import StudentSidebar from '../Shared/StudentSidebar';
 import { useUser } from '../../context/UserContext';
-import { tutorAPI, bookingAPI, availabilityAPI, userAPI } from '../../services/api';
+import { tutorAPI, bookingAPI, availabilityAPI, userAPI, paymentAPI } from '../../services/api';
+import { stripePromise } from '../../services/stripe';
+
+/**
+ * Build a YYYY-MM-DD key based on the date's LOCAL components, not its UTC ones.
+ * We can't use `date.toISOString().split('T')[0]` because that returns the UTC date,
+ * which silently shifts forward by a day in negative-offset timezones once it's late
+ * enough in the evening (e.g. 10 PM EDT on the 18th is already the 19th in UTC).
+ * Using local components keeps slot timestamps and week-grid dates in the same frame
+ * of reference so the calendar lines up regardless of the user's timezone.
+ */
+const toLocalDateKey = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+/**
+ * Format a numeric amount + ISO currency code as a localized string, e.g. "$35.00 CAD".
+ * Falls back to a plain "$X.XX" if the currency code is missing or unusable.
+ */
+const formatPrice = (amount, currency) => {
+  if (typeof amount !== 'number' || Number.isNaN(amount)) return null;
+  try {
+    return new Intl.NumberFormat('en-CA', {
+      style: 'currency',
+      currency: currency || 'CAD',
+      currencyDisplay: 'code',
+    }).format(amount);
+  } catch {
+    return `$${amount.toFixed(2)}${currency ? ` ${currency}` : ''}`;
+  }
+};
+
+/**
+ * Renders the Stripe PaymentElement inside an Elements provider so the student can
+ * save a card. Confirms the SetupIntent and surfaces the resulting payment method id
+ * to the parent via onPaymentMethod(paymentMethodId).
+ */
+const SaveCardForm = ({ onPaymentMethod, onCancel, summary, submitting, pricing }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [error, setError] = useState(null);
+  const [isReady, setIsReady] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+
+    setError(null);
+    setConfirming(true);
+
+    try {
+      const { error: submitError, setupIntent } = await stripe.confirmSetup({
+        elements,
+        confirmParams: {
+          return_url: window.location.origin + '/book-lesson',
+        },
+        redirect: 'if_required',
+      });
+
+      if (submitError) {
+        setError(submitError.message);
+        setConfirming(false);
+        return;
+      }
+
+      if (setupIntent && setupIntent.status === 'succeeded' && setupIntent.payment_method) {
+        await onPaymentMethod(setupIntent.payment_method);
+      } else {
+        setError('Could not save your card. Please try again.');
+      }
+    } catch (err) {
+      setError(err.message || 'Could not save your card. Please try again.');
+    } finally {
+      setConfirming(false);
+    }
+  };
+
+  const busy = confirming || submitting;
+
+  const priceLabel = formatPrice(pricing?.amount, pricing?.currency);
+
+  return (
+    <form onSubmit={handleSubmit} className="save-card-form">
+      {priceLabel && (
+        <p className="save-card-total" style={{ fontWeight: 700, fontSize: '1.05rem', margin: '0 0 0.4rem' }}>
+          Total: {priceLabel}
+        </p>
+      )}
+      <p className="save-card-subtitle">
+        Your card will be saved now and only charged {priceLabel ? `(${priceLabel}) ` : ''}
+        if {summary?.tutorName || 'your tutor'} confirms the booking.
+      </p>
+      <PaymentElement
+        id="setup-payment-element"
+        onReady={() => setIsReady(true)}
+      />
+      {error && <p className="error-text">{error}</p>}
+      <div className="booking-confirmation-buttons">
+        <button
+          type="submit"
+          className="confirm-book-button"
+          disabled={!stripe || !elements || !isReady || busy}
+        >
+          {busy ? 'Saving…' : 'Save card & book'}
+        </button>
+        <button
+          type="button"
+          className="cancel-book-button"
+          onClick={onCancel}
+          disabled={busy}
+        >
+          Back
+        </button>
+      </div>
+    </form>
+  );
+};
 
 const BookLesson = () => {
   const navigate = useNavigate();
@@ -66,6 +192,51 @@ const BookLesson = () => {
   const [availableSlots, setAvailableSlots] = useState({});
   const [showTutorProfile, setShowTutorProfile] = useState(false);
   const [selectedTutorProfile, setSelectedTutorProfile] = useState(null);
+  // Booking timing config (loaded from backend; defaults match application.properties)
+  const [bookingTiming, setBookingTiming] = useState({
+    minimumAdvanceHours: 5,
+    tutorResponseBeforeLessonHours: 3,
+    rescheduleRequestBeforeLessonHours: 2,
+    rescheduleResponseBeforeLessonHours: 1,
+    cancellationBeforeLessonHours: 1,
+  });
+
+  // SetupIntent state for the "save card" sub-step that runs after the user clicks Book.
+  const [setupClientSecret, setSetupClientSecret] = useState(null);
+  const [setupLoading, setSetupLoading] = useState(false);
+
+  // Backend-driven price quote so the SetupIntent step can disclose the amount
+  // before the student saves their card. Refetched any time the grade changes
+  // (today it's locked to the profile but keeping the dep is cheap insurance).
+  const [pricing, setPricing] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    bookingAPI.getTimingConfig()
+      .then(response => {
+        if (!cancelled && response?.data) {
+          setBookingTiming(response.data);
+        }
+      })
+      .catch(() => { /* fall back to defaults */ });
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    if (!studentGradeLabel) return;
+    let cancelled = false;
+    paymentAPI.getQuote(studentGradeLabel)
+      .then(response => {
+        if (!cancelled && response?.data) {
+          setPricing(response.data);
+        }
+      })
+      .catch((err) => {
+        // Non-fatal: the popup just won't show a price.
+        console.error('Failed to load price quote:', err);
+      });
+    return () => { cancelled = true; };
+  }, [studentGradeLabel]);
 
   // Map a stored profile grade label (e.g. "8th Grade", "College/University")
   // back onto our internal grade object so getSubjectsForGrade keeps working.
@@ -80,138 +251,27 @@ const BookLesson = () => {
     return { id: 12, name: label };
   };
 
-  // Grade-specific subject and course structure
-  const getSubjectsForGrade = (gradeId) => {
-    const allSubjects = [
-      { id: 'math', name: 'Math', icon: faCalculator, color: '#e74c3c' },
-      { id: 'english', name: 'English / Language Arts', icon: faGlobe, color: '#f1c40f' },
-      { id: 'science', name: 'Science', icon: faFlask, color: '#2ecc71' },
-      { id: 'social', name: 'Social Studies', icon: faGlobeAmericas, color: '#9b59b6' },
-      { id: 'french', name: 'French', icon: faGlobe, color: '#e67e22' },
-      { id: 'technology', name: 'Technology / CS', icon: faCog, color: '#3498db' },
-      { id: 'business', name: 'Business', icon: faBriefcase, color: '#8B4513' }
-    ];
-
-    // Grades 1-3 (Primary)
-    if (gradeId >= 1 && gradeId <= 3) {
-      return allSubjects.filter(s => ['math', 'english', 'science', 'french'].includes(s.id));
-    }
-    // Grades 4-6 (Junior)
-    if (gradeId >= 4 && gradeId <= 6) {
-      return allSubjects.filter(s => ['math', 'english', 'science', 'social', 'french'].includes(s.id));
-    }
-    // Grades 7-8 (Intermediate)
-    if (gradeId >= 7 && gradeId <= 8) {
-      return allSubjects.filter(s => ['math', 'english', 'science', 'social', 'french', 'technology'].includes(s.id));
-    }
-    // Grade 9
-    if (gradeId === 9) {
-      return allSubjects.filter(s => !['business'].includes(s.id) || s.id === 'business'); // All except explicitly disallowed
-    }
-    // Grades 10-12
-    return allSubjects; // All subjects available
-  };
-
-  const getCoursesForGradeAndSubject = (gradeId, subjectId) => {
-    // Grades 1-3 (Primary)
-    if (gradeId >= 1 && gradeId <= 3) {
-      const courses = {
-        math: ['Addition & Subtraction', 'Place Value', 'Patterns', 'Basic Geometry', 'Time & Money'],
-        english: ['Reading', 'Phonics', 'Writing', 'Spelling', 'Basic Grammar'],
-        science: ['Life Systems', 'Materials', 'Weather & Seasons', 'Simple Machines'],
-        french: ['French Basics', 'French Reading', 'French Writing']
-      };
-      return courses[subjectId] || [];
-    }
-
-    // Grades 4-6 (Junior)
-    if (gradeId >= 4 && gradeId <= 6) {
-      const courses = {
-        math: ['Multiplication & Division', 'Fractions', 'Decimals', 'Intro Algebra (Patterns)', 'Geometry', 'Measurement'],
-        english: ['Reading Comprehension', 'Paragraph Writing', 'Grammar', 'Vocabulary'],
-        science: ['Life Systems', 'Electricity', 'Space', 'Biodiversity'],
-        social: ['Heritage & Identity', 'People & Environments', 'History Basics', 'Geography Basics'],
-        french: ['French Intermediate', 'French Conversation', 'French Grammar']
-      };
-      return courses[subjectId] || [];
-    }
-
-    // Grades 7-8 (Intermediate)
-    if (gradeId >= 7 && gradeId <= 8) {
-      const courses = {
-        math: ['Integers', 'Ratios & Rates', 'Equations (Intro)', 'Pythagorean Theorem', 'Graphing Basics', 'Probability'],
-        english: ['English Language Arts', 'Reading & Analysis', 'Essay Writing', 'Grammar & Composition'],
-        science: ['Cells & Systems', 'Fluids', 'Heat & Energy', 'Ecology'],
-        social: ['History', 'Geography', 'World Cultures', 'Canadian Studies'],
-        french: ['French Advanced', 'French Literature', 'French Communication'],
-        technology: ['Coding Fundamentals', 'Robotics Basics', 'Digital Literacy']
-      };
-      return courses[subjectId] || [];
-    }
-
-    // Grade 9
-    if (gradeId === 9) {
-      const courses = {
-        math: ['Foundations of Algebra', 'Linear Relations', 'Analytic Geometry (Intro)'],
-        science: ['General Science', 'Biology Intro', 'Chemistry Intro', 'Physics Intro'],
-        english: ['English 9', 'Reading & Writing', 'Literature Analysis'],
-        social: ['Geography 9', 'World Geography'],
-        french: ['French 9', 'Core French', 'French Immersion'],
-        technology: ['Intro to Coding (Python)', 'Intro to Coding (Java)', 'Digital Literacy', 'Web Basics'],
-        business: ['Intro to Business (optional)', 'Entrepreneurship Basics']
-      };
-      return courses[subjectId] || [];
-    }
-
-    // Grade 10
-    if (gradeId === 10) {
-      const courses = {
-        math: ['Quadratics', 'Trigonometry Basics', 'Systems of Equations', 'Linear Relations'],
-        science: ['Biology', 'Chemistry', 'Physics', 'General Science'],
-        english: ['English 10', 'Literature & Composition', 'Media Studies'],
-        social: ['History 10', 'Canadian History', 'Civics & Career Studies'],
-        french: ['French 10', 'Core French', 'French Immersion'],
-        technology: ['Programming Fundamentals', 'Web Development Basics', 'Computer Science'],
-        business: ['Intro to Business', 'Entrepreneurship', 'Marketing Basics']
-      };
-      return courses[subjectId] || [];
-    }
-
-    // Grade 11
-    if (gradeId === 11) {
-      const courses = {
-        math: ['Functions', 'College Math', 'Workplace Math'],
-        science: ['Biology', 'Chemistry', 'Physics'],
-        english: ['English 11', 'Literature', 'Writing & Rhetoric'],
-        social: ['Social Sciences', 'World History', 'Law & Politics'],
-        french: ['French 11', 'Core French', 'French Immersion'],
-        technology: ['Programming (Intermediate)', 'Data Structures', 'Web Development', 'App Development'],
-        business: ['Marketing', 'Accounting (Intro)', 'Entrepreneurship', 'Business Management']
-      };
-      return courses[subjectId] || [];
-    }
-
-    // Grade 12
-    if (gradeId === 12) {
-      const courses = {
-        math: ['Advanced Functions', 'Calculus & Vectors', 'Data Management', 'Statistics'],
-        science: ['Biology', 'Chemistry', 'Physics'],
-        english: ['English 12', 'Literature', 'University Preparation'],
-        social: ['Social Sciences', 'World Issues', 'Philosophy'],
-        french: ['French 12', 'Core French', 'French Immersion'],
-        technology: ['Software Engineering', 'OOP', 'Algorithms', 'Databases', 'Web Applications'],
-        business: ['Financial Accounting', 'Finance & Investing', 'Marketing & Management', 'Business Leadership']
-      };
-      return courses[subjectId] || [];
-    }
-
-    return [];
-  };
-
-  const subjects = selectedGrade ? getSubjectsForGrade(selectedGrade.id) : [];
-  const courses = (selectedGrade && selectedSubject) 
-    ? getCoursesForGradeAndSubject(selectedGrade.id, selectedSubject.id) 
-    : [];
+  // All available subjects — same for every student regardless of grade
+  const ALL_SUBJECTS = [
+    'Math',
+    'English',
+    'Science',
+    'French',
+    'History',
+    'Computer Science',
+    'Business',
+    'Advanced Functions',
+    'Functions',
+    'Calculus & Vectors',
+    'Chemistry',
+    'Social Studies',
+    'Physics',
+    'Biology',
+    'Accounting',
+    'Data Management',
+    'Stats & Probability',
+    'Economics'
+  ];
 
   const fetchTutors = async () => {
     if (!selectedSubject) return;
@@ -220,20 +280,12 @@ const BookLesson = () => {
       setLoading(true);
       setError(null);
       
-      // Use the specific course if selected, otherwise use the subject category
-      const searchSubject = selectedCourse || selectedSubject.name;
-      console.log('Searching for tutors with subject:', searchSubject, 'and grade:', studentGradeLabel);
+      const searchSubject = selectedSubject;
       const response = await tutorAPI.searchTutors({
         subject: searchSubject,
         gradeLevel: studentGradeLabel || undefined,
         size: 500
       });
-      
-      console.log('Found tutors:', response.data.tutors.map(t => ({
-        id: t.id,
-        name: t.displayName,
-        subjects: t.subjects?.map(s => s.name)
-      })));
       
       setTutors(response.data.tutors);
       
@@ -277,15 +329,16 @@ const BookLesson = () => {
       const slotsResponses = await Promise.all(slotsPromises);
       
       // Map tutor IDs to their available slots
-      // Filter out slots that are less than 48 hours from now
+      // Filter out slots that are less than the configured advance booking window from now
       const now = new Date();
-      const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000); // 48 hours from now
+      const advanceHours = bookingTiming.minimumAdvanceHours;
+      const minBookingTime = new Date(now.getTime() + advanceHours * 60 * 60 * 1000);
       
       const slotsMap = {};
       tutorsList.forEach((tutor, index) => {
         const allSlots = slotsResponses[index].data || [];
         
-        // Only include slots that are 48+ hours in the future
+        // Only include slots far enough in the future
         const filteredSlots = allSlots.filter(slot => {
           const slotDateTime = new Date(slot.startTime);
           return slotDateTime >= minBookingTime;
@@ -301,13 +354,13 @@ const BookLesson = () => {
     }
   };
 
-  // Fetch tutors when course is selected
+  // Fetch tutors when subject is selected
   useEffect(() => {
-    if (selectedCourse && selectedSubject) {
+    if (selectedSubject) {
       fetchTutors();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCourse, selectedSubject]);
+  }, [selectedSubject]);
 
   // Auto-select first tutor when tutors are loaded
   useEffect(() => {
@@ -355,7 +408,7 @@ const BookLesson = () => {
   };
 
   const handleNext = () => {
-    if (currentStep < 4) {
+    if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -368,12 +421,6 @@ const BookLesson = () => {
 
   const handleSubjectSelect = (subject) => {
     setSelectedSubject(subject);
-    // Reset course when subject changes
-    setSelectedCourse(null);
-  };
-
-  const handleCourseSelect = (course) => {
-    setSelectedCourse(course);
   };
 
   const handleTimeSlotSelect = async (tutorId, timeSlot, day, date, slotData) => {
@@ -386,14 +433,15 @@ const BookLesson = () => {
       return;
     }
     
-    // Validate 48-hour minimum at selection time
+    // Validate minimum advance booking window at selection time
     const slotDateTime = new Date(slotData.startTime);
     const now = new Date();
-    const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+    const advanceHours = bookingTiming.minimumAdvanceHours;
+    const minBookingTime = new Date(now.getTime() + advanceHours * 60 * 60 * 1000);
     
     if (slotDateTime < minBookingTime) {
       const hoursAway = (slotDateTime - now) / (1000 * 60 * 60);
-      alert(`This slot is only ${hoursAway.toFixed(1)} hours away. Lessons must be booked at least 48 hours in advance.`);
+      alert(`This slot is only ${hoursAway.toFixed(1)} hours away. Lessons must be booked at least ${advanceHours} hours in advance.`);
       return;
     }
     
@@ -419,71 +467,107 @@ const BookLesson = () => {
     setSelectedTimeSlot({ timeSlot, day, date, slotData });
   };
 
+  // Step 1: validate the slot and request a Stripe SetupIntent so the student can save
+  // a card. This transitions the confirmation popup into the "save card" sub-step.
   const handleBookLesson = async () => {
     try {
       setBookingLoading(true);
       setError(null);
 
-      // Find the selected tutor
       const tutor = tutors.find(t => t.id === selectedTutor);
       if (!tutor) {
         throw new Error('Selected tutor not found');
       }
 
-      // Use the slot data from the availability API
       const slotData = selectedTimeSlot.slotData;
       if (!slotData || !slotData.startTime) {
         throw new Error('Invalid slot data - please select a different time slot');
       }
 
-      // Validate 48-hour minimum booking window
       const selectedDateTime = new Date(slotData.startTime);
       const now = new Date();
-      const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+      const advanceHours = bookingTiming.minimumAdvanceHours;
+      const minBookingTime = new Date(now.getTime() + advanceHours * 60 * 60 * 1000);
       const hoursAway = (selectedDateTime - now) / (1000 * 60 * 60);
-      
-      console.log('Booking validation:');
-      console.log('  Current time:', now);
-      console.log('  Selected slot time:', selectedDateTime);
-      console.log('  Hours away:', hoursAway);
-      console.log('  Min booking time (48h):', minBookingTime);
-      console.log('  Is valid?', selectedDateTime >= minBookingTime);
-      
+
       if (selectedDateTime < minBookingTime) {
-        const errorMsg = `Lessons must be booked at least 48 hours in advance. This slot is only ${hoursAway.toFixed(1)} hours away.`;
+        const errorMsg = `Lessons must be booked at least ${advanceHours} hours in advance. This slot is only ${hoursAway.toFixed(1)} hours away.`;
         setError(errorMsg);
         alert(errorMsg);
         setBookingLoading(false);
         return;
       }
 
-      // Format for backend - use the exact times from the availability slot
+      setSetupLoading(true);
+      const setupResponse = await paymentAPI.createSetupIntent();
+      const clientSecret = setupResponse?.data?.clientSecret;
+      if (!clientSecret) {
+        throw new Error('Could not start payment setup. Please try again.');
+      }
+      setSetupClientSecret(clientSecret);
+    } catch (err) {
+      console.error('Error preparing booking:', err);
+      setError(err.response?.data?.error || err.message || 'Failed to start booking. Please try again.');
+    } finally {
+      setBookingLoading(false);
+      setSetupLoading(false);
+    }
+  };
+
+  // Step 2: after Stripe confirms the SetupIntent and gives us a payment method id,
+  // submit the actual booking. The backend auto-charges this method when the tutor confirms.
+  const submitBookingWithPaymentMethod = async (paymentMethodId) => {
+    try {
+      setBookingLoading(true);
+      setError(null);
+
+      const tutor = tutors.find(t => t.id === selectedTutor);
+      const slotData = selectedTimeSlot?.slotData;
+      if (!tutor || !slotData?.startTime) {
+        throw new Error('Booking details are incomplete. Please pick a slot again.');
+      }
+
       const bookingData = {
         tutorProfileId: tutor.id,
         startTime: slotData.startTime,
         endTime: slotData.endTime,
-        notes: `${studentGradeLabel || selectedGrade?.name || ''} ${selectedCourse}`.trim()
+        notes: `${studentGradeLabel || selectedGrade?.name || ''} ${selectedSubject}`.trim(),
+        gradeLevel: studentGradeLabel || selectedGrade?.name || '',
+        paymentMethodId,
       };
 
       await bookingAPI.createBooking(bookingData);
-      
-      // Close the booking confirmation popup and show success modal
+
+      setSetupClientSecret(null);
       setSelectedTimeSlot(null);
       setShowSuccessModal(true);
     } catch (err) {
       console.error('Error creating booking:', err);
-      setError(err.response?.data?.error || 'Failed to book lesson. Please try again.');
+      setError(err.response?.data?.error || err.message || 'Failed to book lesson. Please try again.');
     } finally {
       setBookingLoading(false);
     }
   };
+
+  const cancelBookingFlow = () => {
+    setSetupClientSecret(null);
+    setSelectedTimeSlot(null);
+    setError(null);
+  };
+
+  const stripeElementsOptions = useMemo(() => ({
+    clientSecret: setupClientSecret,
+    appearance: {
+      theme: 'stripe',
+      variables: { colorPrimary: '#1A803D' },
+    },
+  }), [setupClientSecret]);
 
   const handleBookNewLesson = () => {
     setCurrentStep(1);
     // Keep selectedGrade in place — it's locked to the student's profile and
     // resolveGradeFromLabel(studentGradeLabel) is the source of truth.
     setSelectedSubject(null);
-    setSelectedCourse(null);
     setSelectedTutor(null);
     setSelectedTimeSlot(null);
     setShowSuccessModal(false);
@@ -508,18 +592,19 @@ const BookLesson = () => {
               <>
                 <div style={{
                   display: 'flex',
+                  flexDirection: 'column',
                   alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '1.25rem 1.5rem',
+                  gap: '1rem',
+                  padding: '1.5rem',
                   border: '1px solid #d1d5db',
                   borderRadius: '12px',
                   backgroundColor: '#f0fdf4'
                 }}>
-                  <div>
+                  <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: '0.85rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                       Booking as
                     </div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1A803D', marginTop: '4px' }}>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#2D6A4F', marginTop: '4px' }}>
                       {studentGradeLabel}
                     </div>
                   </div>
@@ -527,13 +612,13 @@ const BookLesson = () => {
                     type="button"
                     onClick={() => navigate('/profile')}
                     style={{
-                      padding: '0.5rem 1rem',
-                      border: '1px solid #1A803D',
+                      padding: '0.4rem 1rem',
+                      border: '1px solid #2D6A4F',
                       borderRadius: '6px',
                       backgroundColor: 'white',
-                      color: '#1A803D',
+                      color: '#2D6A4F',
                       cursor: 'pointer',
-                      fontSize: '0.9rem',
+                      fontSize: '0.875rem',
                       fontWeight: 500
                     }}
                   >
@@ -546,17 +631,17 @@ const BookLesson = () => {
 
                 <div style={{
                   display: 'flex',
-                  justifyContent: 'flex-end',
+                  justifyContent: 'center',
                   marginTop: '1.5rem',
                   width: '100%'
                 }}>
                   <button
                     onClick={handleNext}
                     style={{
-                      padding: '0.75rem 1.5rem',
+                      padding: '0.75rem 2.5rem',
                       border: 'none',
-                      borderRadius: '6px',
-                      backgroundColor: '#1A803D',
+                      borderRadius: '8px',
+                      backgroundColor: '#2D6A4F',
                       color: 'white',
                       cursor: 'pointer',
                       fontSize: '1rem',
@@ -605,33 +690,31 @@ const BookLesson = () => {
         return (
           <div className="booking-card">
             <h3>Choose your subject:</h3>
-            <div className="subject-grid">
-              {subjects.map(subject => (
+            <div className="course-grid">
+              {ALL_SUBJECTS.map((subject, index) => (
                 <button
-                  key={subject.id}
-                  className={`subject-button ${selectedSubject?.id === subject.id ? 'selected' : ''}`}
+                  key={index}
+                  className={`course-button ${selectedSubject === subject ? 'selected' : ''}`}
                   onClick={() => handleSubjectSelect(subject)}
-                  style={{ backgroundColor: subject.color }}
                 >
-                  <FontAwesomeIcon icon={subject.icon} />
-                  <span>{subject.name}</span>
+                  {subject}
                 </button>
               ))}
             </div>
-            <div style={{ 
-              display: 'flex', 
-              gap: '1rem', 
-              justifyContent: 'flex-end', 
+            <div style={{
+              display: 'flex',
+              gap: '1rem',
+              justifyContent: 'flex-end',
               marginTop: '1.5rem',
               width: '100%'
             }}>
-              <button 
+              <button
                 onClick={handleBack}
-                style={{ 
-                  padding: '0.75rem 1.5rem', 
-                  border: '1px solid #ddd', 
-                  borderRadius: '6px', 
-                  backgroundColor: 'white', 
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  border: '1px solid #ddd',
+                  borderRadius: '6px',
+                  backgroundColor: 'white',
                   color: '#333',
                   cursor: 'pointer',
                   fontSize: '1rem',
@@ -640,14 +723,14 @@ const BookLesson = () => {
               >
                 Back
               </button>
-              <button 
+              <button
                 onClick={handleNext}
                 disabled={!selectedSubject}
-                style={{ 
-                  padding: '0.75rem 1.5rem', 
-                  border: 'none', 
-                  borderRadius: '6px', 
-                  backgroundColor: selectedSubject ? '#1A803D' : '#ccc', 
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  border: 'none',
+                  borderRadius: '6px',
+                  backgroundColor: selectedSubject ? '#1A803D' : '#ccc',
                   color: 'white',
                   cursor: selectedSubject ? 'pointer' : 'not-allowed',
                   fontSize: '1rem',
@@ -661,66 +744,6 @@ const BookLesson = () => {
         );
 
       case 3:
-        return (
-          <div className="booking-card">
-            <h3>Choose a course:</h3>
-            {courses.length === 0 && selectedSubject && (
-              <p className="no-courses-message">No courses available for this grade and subject combination.</p>
-            )}
-            <div className="course-grid">
-              {courses.map((course, index) => (
-                <button
-                  key={index}
-                  className={`course-button ${selectedCourse === course ? 'selected' : ''}`}
-                  onClick={() => handleCourseSelect(course)}
-                >
-                  {course}
-                </button>
-              ))}
-            </div>
-            <div style={{ 
-              display: 'flex', 
-              gap: '1rem', 
-              justifyContent: 'flex-end', 
-              marginTop: '1.5rem',
-              width: '100%'
-            }}>
-              <button 
-                onClick={handleBack}
-                style={{ 
-                  padding: '0.75rem 1.5rem', 
-                  border: '1px solid #ddd', 
-                  borderRadius: '6px', 
-                  backgroundColor: 'white', 
-                  color: '#333',
-                  cursor: 'pointer',
-                  fontSize: '1rem',
-                  fontWeight: '500'
-                }}
-              >
-                Back
-              </button>
-              <button 
-                onClick={handleNext}
-                disabled={!selectedCourse}
-                style={{ 
-                  padding: '0.75rem 1.5rem', 
-                  border: 'none', 
-                  borderRadius: '6px', 
-                  backgroundColor: selectedCourse ? '#1A803D' : '#ccc', 
-                  color: 'white',
-                  cursor: selectedCourse ? 'pointer' : 'not-allowed',
-                  fontSize: '1rem',
-                  fontWeight: '600'
-                }}
-              >
-                Continue
-              </button>
-            </div>
-          </div>
-        );
-
-      case 4:
         const weekDates = getWeekDates();
         const currentTutor = tutors.find(t => t.id === selectedTutor) || tutors[0];
         const currentTutorSlots = availableSlots[selectedTutor] || [];
@@ -729,14 +752,18 @@ const BookLesson = () => {
         const groupSlotsByDateTime = () => {
           const grouped = {};
           const now = new Date();
-          const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000); // 48 hours from now
+          const advanceHours = bookingTiming.minimumAdvanceHours;
+          const minBookingTime = new Date(now.getTime() + advanceHours * 60 * 60 * 1000);
           
           currentTutorSlots.forEach(slot => {
             const slotDate = new Date(slot.startTime);
             
-            // Only include slots that are at least 48 hours in advance
+            // Only include slots far enough in advance
             if (slotDate >= minBookingTime) {
-              const dateKey = slotDate.toISOString().split('T')[0];
+              // Local date key so the week-grid columns line up with the slot day in the
+              // user's timezone (see comment on toLocalDateKey for why we don't use
+              // .toISOString().split('T')[0] here).
+              const dateKey = toLocalDateKey(slotDate);
               const timeKey = slotDate.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
               
               if (!grouped[dateKey]) {
@@ -857,7 +884,11 @@ const BookLesson = () => {
                           
                           <div className="availability-grid-new">
                             {weekDates.map((date, dayIndex) => {
-                              const dateKey = date.toISOString().split('T')[0];
+                              // Local date key (matches the one in groupSlotsByDateTime).
+                              // Using toISOString here was the source of an off-by-one-day
+                              // bug: late-evening weekDates rolled over to the next day in
+                              // UTC and ended up showing the *next* day's availability.
+                              const dateKey = toLocalDateKey(date);
                               const daySlots = slotsGrouped[dateKey] || {};
                               
                               return (
@@ -870,15 +901,16 @@ const BookLesson = () => {
                                     let unavailableReason = 'Tutor has not set availability for this time';
                                     
                                     if (slotData && slotData.startTime) {
-                                      // Check if slot is at least 48 hours in advance
+                                      // Check if slot is far enough in advance
                                       const slotDateTime = new Date(slotData.startTime);
                                       const now = new Date();
-                                      const minBookingTime = new Date(now.getTime() + 48 * 60 * 60 * 1000); // 48 hours from now
+                                      const advanceHours = bookingTiming.minimumAdvanceHours;
+                                      const minBookingTime = new Date(now.getTime() + advanceHours * 60 * 60 * 1000);
                                       
                                       if (slotDateTime >= minBookingTime) {
                                         isAvailable = true;
                                       } else {
-                                        unavailableReason = 'Must book at least 48 hours in advance';
+                                        unavailableReason = `Must book at least ${advanceHours} hours in advance`;
                                       }
                                     }
                                     
@@ -956,7 +988,7 @@ const BookLesson = () => {
         <div className="page-header">
           <h1>Book Lesson</h1>
           <div className="progress-indicator">
-            {[1, 2, 3, 4].map(step => (
+            {[1, 2, 3].map(step => (
               <React.Fragment key={step}>
                 <div className={`progress-circle ${step <= currentStep ? 'active' : ''}`}></div>
                 {step < 4 && <div className="progress-line"></div>}
@@ -972,7 +1004,7 @@ const BookLesson = () => {
       {selectedTimeSlot && selectedTutor && (
         <div 
           className="booking-confirmation-overlay" 
-          onClick={() => setSelectedTimeSlot(null)}
+          onClick={cancelBookingFlow}
         >
           <div 
             className="booking-confirmation-popup"
@@ -981,21 +1013,54 @@ const BookLesson = () => {
             {(() => {
               const currentTutor = tutors.find(t => t.id === selectedTutor);
               const weekDates = getWeekDates();
+              const priceLabel = formatPrice(pricing?.amount, pricing?.currency);
+              const summaryLine = (
+                <p>
+                  Book {studentGradeLabel || selectedGrade?.name} {selectedSubject} with {currentTutor?.displayName || currentTutor?.name} on {weekDays[weekDates[selectedTimeSlot.day]?.getDay()]}, {weekDates[selectedTimeSlot.day]?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at {selectedTimeSlot.timeSlot} - {new Date(selectedTimeSlot.slotData.endTime).toLocaleTimeString('en-US', { hour: 'numeric', hour12: true })}
+                </p>
+              );
+
+              if (setupClientSecret) {
+                return (
+                  <>
+                    {summaryLine}
+                    <Elements key={setupClientSecret} stripe={stripePromise} options={stripeElementsOptions}>
+                      <SaveCardForm
+                        summary={{ tutorName: currentTutor?.displayName || currentTutor?.name }}
+                        pricing={pricing}
+                        onPaymentMethod={submitBookingWithPaymentMethod}
+                        onCancel={cancelBookingFlow}
+                        submitting={bookingLoading}
+                      />
+                    </Elements>
+                    {error && <p className="error-text">{error}</p>}
+                  </>
+                );
+              }
+
               return (
                 <>
-                  <p>Book {studentGradeLabel || selectedGrade?.name} {selectedCourse} with {currentTutor?.displayName || currentTutor?.name} on {weekDays[weekDates[selectedTimeSlot.day]?.getDay()]}, {weekDates[selectedTimeSlot.day]?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at {selectedTimeSlot.timeSlot} - {new Date(selectedTimeSlot.slotData.endTime).toLocaleTimeString('en-US', { hour: 'numeric', hour12: true })}</p>
+                  {summaryLine}
+                  {priceLabel && (
+                    <p style={{ fontWeight: 700, fontSize: '1.05rem', margin: '0 0 0.4rem' }}>
+                      Total: {priceLabel}
+                    </p>
+                  )}
+                  <p style={{ fontSize: '0.85rem', color: '#6b7280', margin: '0 0 0.75rem' }}>
+                    You'll save a card next. We only charge {priceLabel ? `${priceLabel} ` : 'it '}once your tutor confirms the booking.
+                  </p>
                   <div className="booking-confirmation-buttons">
-                    <button 
-                      className="confirm-book-button" 
+                    <button
+                      className="confirm-book-button"
                       onClick={handleBookLesson}
-                      disabled={bookingLoading}
+                      disabled={bookingLoading || setupLoading}
                     >
-                      {bookingLoading ? 'Booking...' : 'Book'}
+                      {bookingLoading || setupLoading ? 'Preparing…' : 'Continue to payment'}
                     </button>
-                    <button 
-                      className="cancel-book-button" 
-                      onClick={() => setSelectedTimeSlot(null)}
-                      disabled={bookingLoading}
+                    <button
+                      className="cancel-book-button"
+                      onClick={cancelBookingFlow}
+                      disabled={bookingLoading || setupLoading}
                     >
                       Cancel
                     </button>

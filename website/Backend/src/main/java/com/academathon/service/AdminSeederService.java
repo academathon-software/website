@@ -26,30 +26,31 @@ public class AdminSeederService {
     
     @PostConstruct
     public void seedAdminUser() {
-        // Check if admin already exists
-        Optional<User> existingAdmin = userRepository.findByEmail(ADMIN_EMAIL);
-        
-        if (existingAdmin.isPresent()) {
-            // Admin already exists, no need to create
+        if (userRepository.findByEmail(ADMIN_EMAIL).isPresent()) {
             System.out.println("Admin user already exists. Skipping admin creation.");
             return;
         }
-        
-        // Generate secure random password
+
+        // Skip if the username is already taken — e.g. a prior seed run created
+        // an admin under a different email. Avoids a unique-constraint crash.
+        if (userRepository.findByUsername(ADMIN_USERNAME).isPresent()) {
+            System.out.println("Admin username '" + ADMIN_USERNAME
+                + "' already exists under a different email. Skipping admin creation. "
+                + "Update that row's email to " + ADMIN_EMAIL + " (or delete it) to re-seed.");
+            return;
+        }
+
         String generatedPassword = generateSecurePassword();
-        
-        // Create admin user
+
         User admin = new User();
         admin.setEmail(ADMIN_EMAIL);
         admin.setUsername(ADMIN_USERNAME);
         admin.setPasswordHash(passwordEncoder.encode(generatedPassword));
         admin.setRole(User.Role.ADMIN);
         admin.setEnabled(true);
-        
-        // Save admin to database
+
         userRepository.save(admin);
-        
-        // Display password information (ONLY ONCE)
+
         displayAdminCredentials(generatedPassword);
     }
     

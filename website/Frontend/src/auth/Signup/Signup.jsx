@@ -208,7 +208,6 @@ function SignUpPage() {
       const strength = calculatePasswordStrength(value);
       const strengthTexts = ['Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
       const text = strengthTexts[strength] || 'Weak';
-      console.log('Password:', value, 'Strength:', strength, 'Text:', text);
       setPasswordStrength(strength);
     }
   };
@@ -260,9 +259,6 @@ function SignUpPage() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("SUCCESSFULLY SIGNED UP!");
-        console.log("User created:", data);
-        
         // Redirect to verification page with email
         navigate('/verify', { 
           state: { email: formData.email } 
@@ -293,10 +289,6 @@ function SignUpPage() {
     <div className='signup-page'>
       <div className='greenblock'>
         <div className='welcome-content'>
-          <div className='title'>
-            <FontAwesomeIcon icon={faGraduationCap} />
-            Academathon
-          </div>
           <h2>Join Hundreds of Successful Students</h2>
           <p>Connect with expert tutors and accelerate your learning journey</p>
           <div className='features-list'>
@@ -330,11 +322,6 @@ function SignUpPage() {
           <h2 className='starttext'>
             {signupStep === 1 ? 'Create Your Account' : 'Complete Your Profile'}
           </h2>
-          <h3 className='undertext'>
-            {signupStep === 1 
-              ? 'Let\'s start with your basic information' 
-              : 'Tell us more about your learning goals'}
-          </h3>
         </div>
 
         <form onSubmit={signupStep === 2 ? handleSignUp : (e) => { e.preventDefault(); handleNextStep(); }}>
@@ -531,7 +518,7 @@ function SignUpPage() {
             </div>
           )}
         </form>
-        
+
         {errors.general && (
           <div className="error-general">
             <FontAwesomeIcon icon={faTimes} />
@@ -539,10 +526,6 @@ function SignUpPage() {
           </div>
         )}
         
-        <h4 className='underbutton'>
-          Already have an account?
-          <strong> <a href="/login">Login</a></strong>
-        </h4>
       </div>
     </div>
   );

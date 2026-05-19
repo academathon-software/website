@@ -127,17 +127,14 @@ function VerificationPage() {
   return (
     <div className="verification-page">
       <div className="verification-container">
-        <div className="verification-header">
-          <div className="logo">
-            <FontAwesomeIcon icon={faGraduationCap} />
-            <span>academathon</span>
-          </div>
-          <h2>Verify Your Email</h2>
-          <p>We've sent a 6-digit verification code to:</p>
-          <div className="email-display">
-            <FontAwesomeIcon icon={faEnvelope} />
-            <span>{email || 'your email address'}</span>
-          </div>
+
+
+        <h2 className="verification-title">Verify Your Email</h2>
+        <p className="verification-subtitle">We've sent a 6-digit verification code to:</p>
+
+        <div className="email-display">
+          <FontAwesomeIcon icon={faEnvelope} />
+          <span>{email || 'your email address'}</span>
         </div>
 
         <form onSubmit={handleVerification} className="verification-form">
@@ -161,52 +158,32 @@ function VerificationPage() {
             )}
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="verify-btn"
             disabled={isLoading || verificationCode.length !== 6}
           >
             {isLoading ? (
-              <>
-                <FontAwesomeIcon icon={faSpinner} className="spinning" />
-                Verifying...
-              </>
+              <><FontAwesomeIcon icon={faSpinner} className="spinning" /> Verifying...</>
             ) : (
-              <>
-                <FontAwesomeIcon icon={faCheck} />
-                Verify Account
-              </>
+              <><FontAwesomeIcon icon={faCheck} /> Verify Account</>
             )}
           </button>
         </form>
 
         <div className="verification-footer">
           <p>Didn't receive the code?</p>
-          <button 
-            type="button" 
-            className="resend-btn"
-            onClick={handleResendCode}
-            disabled={isResending}
-          >
+          <button type="button" className="resend-btn" onClick={handleResendCode} disabled={isResending}>
             {isResending ? (
-              <>
-                <FontAwesomeIcon icon={faSpinner} className="spinning" />
-                Sending...
-              </>
-            ) : (
-              'Resend Code'
-            )}
+              <><FontAwesomeIcon icon={faSpinner} className="spinning" /> Sending...</>
+            ) : 'Resend Code'}
           </button>
-          
-          <button 
-            type="button" 
-            className="back-btn"
-            onClick={() => navigate('/signup')}
-          >
+          <button type="button" className="back-btn" onClick={() => navigate('/signup')}>
             <FontAwesomeIcon icon={faArrowLeft} />
             Back to Signup
           </button>
         </div>
+
       </div>
     </div>
   );

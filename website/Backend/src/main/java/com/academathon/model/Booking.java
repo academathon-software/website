@@ -30,8 +30,14 @@ public class Booking {
     @Column(name = "subject")
     private String subject;
 
+    @Column(name = "grade_level")
+    private String gradeLevel;
+
     @Column(name = "payment_intent_id")
     private String paymentIntentId;
+
+    @Column(name = "payment_method_id")
+    private String paymentMethodId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status")
@@ -149,12 +155,28 @@ public class Booking {
         this.subject = subject;
     }
 
+    public String getGradeLevel() {
+        return gradeLevel;
+    }
+
+    public void setGradeLevel(String gradeLevel) {
+        this.gradeLevel = gradeLevel;
+    }
+
     public String getPaymentIntentId() {
         return paymentIntentId;
     }
 
     public void setPaymentIntentId(String paymentIntentId) {
         this.paymentIntentId = paymentIntentId;
+    }
+
+    public String getPaymentMethodId() {
+        return paymentMethodId;
+    }
+
+    public void setPaymentMethodId(String paymentMethodId) {
+        this.paymentMethodId = paymentMethodId;
     }
 
     public PaymentStatus getPaymentStatus() {

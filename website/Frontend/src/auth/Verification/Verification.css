@@ -1,110 +1,118 @@
-/* Verification Page Styles */
+/* Verification Page - matches Login style */
 .verification-page {
-  min-height: 100vh;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  padding: 100px 2rem 40px;
+  background-color: #f5f5f5;
+  font-family: Arial, Helvetica, sans-serif;
   box-sizing: border-box;
 }
 
 .verification-container {
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  padding: 3rem;
-  max-width: 500px;
   width: 100%;
+  max-width: 450px;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 35px;
+  box-sizing: border-box;
+  border-radius: 16px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Logo */
+.verification-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #008037;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.verification-logo svg {
+  font-size: 28px;
+}
+
+/* Title */
+.verification-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 8px;
   text-align: center;
 }
 
-.verification-header {
-  margin-bottom: 2rem;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #008037;
-  margin-bottom: 2rem;
-}
-
-.logo svg {
-  font-size: 2rem;
-}
-
-.verification-header h2 {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 1rem;
-}
-
-.verification-header p {
+.verification-subtitle {
+  font-size: 15px;
   color: #666;
-  font-size: 1rem;
-  margin-bottom: 1rem;
+  margin: 0 0 16px;
+  text-align: center;
 }
 
+/* Email display */
 .email-display {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 1rem;
+  gap: 8px;
+  padding: 10px 16px;
   background: #f8f9fa;
-  border-radius: 12px;
-  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  border: 1.5px solid #e9ecef;
   font-weight: 600;
+  font-size: 14px;
   color: #333;
-  margin: 1rem 0;
+  margin-bottom: 24px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .email-display svg {
   color: #008037;
 }
 
+/* Form */
 .verification-form {
-  margin-bottom: 2rem;
+  width: 100%;
 }
 
 .input-group {
-  margin-bottom: 1.5rem;
-  text-align: left;
+  width: 100%;
+  margin-bottom: 20px;
 }
 
 .input-group label {
   display: block;
-  font-size: 0.9rem;
+  text-align: center;
+  font-size: 14px;
   font-weight: 600;
   color: #333;
-  margin-bottom: 0.5rem;
+  margin-bottom: 8px;
 }
 
 .verification-input {
   width: 100%;
-  height: 60px;
-  padding: 0 1rem;
-  border: 2px solid #e9ecef;
-  border-radius: 12px;
-  font-size: 1.5rem;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1.4rem;
   font-weight: 600;
   text-align: center;
-  letter-spacing: 0.5rem;
-  transition: all 0.3s ease;
+  letter-spacing: 0.4rem;
+  transition: border-color 0.2s ease;
   box-sizing: border-box;
-  background-color: white;
+  background: white;
   color: #333;
   -webkit-text-fill-color: #333;
+  font-family: inherit;
 }
 
-/* Safari autofill fix */
 .verification-input:-webkit-autofill,
 .verification-input:-webkit-autofill:hover,
 .verification-input:-webkit-autofill:focus {
@@ -121,87 +129,87 @@
 
 .verification-input.error {
   border-color: #dc3545;
-  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
 }
 
 .verification-input::placeholder {
   color: #999;
   letter-spacing: normal;
-  font-size: 1rem;
+  font-size: 0.95rem;
 }
 
 .error-message {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 6px;
   color: #dc3545;
-  font-size: 0.9rem;
-  font-weight: 500;
-  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  margin-top: 6px;
 }
 
+/* Verify button — matches login Sign In button */
 .verify-btn {
   width: 100%;
-  height: 55px;
-  background: linear-gradient(135deg, #008037 0%, #006b2e 100%);
+  padding: 14px;
+  background: #008037;
   color: white;
   border: none;
-  border-radius: 12px;
-  font-size: 1rem;
+  border-radius: 10px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.2s ease, transform 0.1s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 8px;
+  font-family: inherit;
+  margin-bottom: 20px;
 }
 
 .verify-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 128, 55, 0.3);
+  background: #006b2e;
+  transform: translateY(-1px);
 }
 
 .verify-btn:disabled {
   background: #ccc;
   cursor: not-allowed;
   transform: none;
-  box-shadow: none;
 }
 
+/* Footer */
 .verification-footer {
+  width: 100%;
   border-top: 1px solid #e9ecef;
-  padding-top: 1.5rem;
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
 .verification-footer p {
   color: #666;
-  margin-bottom: 1rem;
+  font-size: 14px;
+  margin: 0;
 }
 
-.resend-btn,
-.back-btn {
+.resend-btn {
+  background: none;
+  border: none;
+  color: #008037;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  border: 2px solid #e9ecef;
-  background: transparent;
-  color: #666;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin: 0.5rem;
-  text-decoration: none;
+  gap: 6px;
+  padding: 0;
 }
 
-.resend-btn:hover:not(:disabled),
-.back-btn:hover {
-  border-color: #008037;
-  color: #008037;
-  background: rgba(0, 128, 55, 0.05);
+.resend-btn:hover:not(:disabled) {
+  text-decoration: underline;
 }
 
 .resend-btn:disabled {
@@ -209,25 +217,44 @@
   cursor: not-allowed;
 }
 
+.back-btn {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+}
+
+.back-btn:hover {
+  color: #008037;
+}
+
+/* Success state */
 .success-message {
   text-align: center;
-  padding: 2rem;
+  padding: 1rem 0;
 }
 
 .success-icon {
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  width: 70px;
+  height: 70px;
+  background: #008037;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 1.5rem;
-  animation: successPulse 0.6s ease-out;
+  margin: 0 auto 20px;
+  animation: successPulse 0.5s ease-out;
 }
 
 .success-icon svg {
-  font-size: 2rem;
+  font-size: 1.8rem;
   color: white;
 }
 
@@ -235,13 +262,12 @@
   font-size: 1.8rem;
   font-weight: 700;
   color: #333;
-  margin-bottom: 1rem;
+  margin-bottom: 8px;
 }
 
 .success-message p {
   color: #666;
-  font-size: 1rem;
-  line-height: 1.5;
+  font-size: 15px;
 }
 
 .spinning {
@@ -249,72 +275,11 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  to { transform: rotate(360deg); }
 }
 
 @keyframes successPulse {
-  0% {
-    transform: scale(0);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .verification-page {
-    padding: 1rem;
-  }
-  
-  .verification-container {
-    padding: 2rem;
-  }
-  
-  .verification-header h2 {
-    font-size: 1.5rem;
-  }
-  
-  .verification-input {
-    height: 55px;
-    font-size: 1.2rem;
-    letter-spacing: 0.3rem;
-  }
-  
-  .resend-btn,
-  .back-btn {
-    display: block;
-    width: 100%;
-    margin: 0.5rem 0;
-  }
-}
-
-@media (max-width: 480px) {
-  .verification-container {
-    padding: 1.5rem;
-  }
-  
-  .logo {
-    font-size: 1.5rem;
-  }
-  
-  .logo svg {
-    font-size: 1.5rem;
-  }
-  
-  .verification-header h2 {
-    font-size: 1.3rem;
-  }
-  
-  .verification-input {
-    height: 50px;
-    font-size: 1rem;
-    letter-spacing: 0.2rem;
-  }
+  0%   { transform: scale(0); opacity: 0; }
+  60%  { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
 }

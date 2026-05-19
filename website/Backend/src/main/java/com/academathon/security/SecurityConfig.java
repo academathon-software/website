@@ -108,12 +108,9 @@ public class SecurityConfig {
             "http://127.0.0.1:5173", 
             "http://127.0.0.1:5174",
             // Production domains
-            "https://academathon.com",
-            "https://www.academathon.com",
             "https://academathon.ca",
             "https://www.academathon.ca",
-            "https://academathon.vercel.app",
-            "https://*.vercel.app"
+            "https://academathon.vercel.app"
         ));
         // Allow all HTTP methods
         cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));

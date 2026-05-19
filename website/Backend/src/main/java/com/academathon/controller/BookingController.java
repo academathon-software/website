@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import com.academathon.config.BookingTimingProperties;
 import com.academathon.dto.BookingRequestDTO;
 import com.academathon.dto.BookingResponseDTO;
 import com.academathon.model.User;
@@ -20,9 +21,21 @@ import java.util.Map;
 public class BookingController {
     
     private final BookingService bookingService;
+    private final BookingTimingProperties bookingTiming;
     
-    public BookingController(BookingService bookingService) {
+    public BookingController(BookingService bookingService, BookingTimingProperties bookingTiming) {
         this.bookingService = bookingService;
+        this.bookingTiming = bookingTiming;
+    }
+
+    /**
+     * Expose booking timing configuration so the frontend can show consistent
+     * messages and run identical client-side validation.
+     * GET /api/bookings/timing-config
+     */
+    @GetMapping("/timing-config")
+    public ResponseEntity<BookingTimingProperties> getTimingConfig() {
+        return ResponseEntity.ok(bookingTiming);
     }
     
     /**

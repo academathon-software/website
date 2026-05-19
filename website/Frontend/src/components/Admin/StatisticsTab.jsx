@@ -10,6 +10,7 @@ import {
   faUsers,
   faUserPlus,
   faCalendarDays,
+  faChevronRight,
 } from '@fortawesome/free-solid-svg-icons';
 import adminAPI from '../../services/adminApi';
 
@@ -23,10 +24,65 @@ const formatCurrency = (amount) =>
 const formatNumber = (value) =>
   new Intl.NumberFormat('en-CA').format(value || 0);
 
+/* ── Sparkline SVG component ── */
+const Sparkline = ({ path, color }) => (
+  <svg
+    viewBox="0 0 200 55"
+    className="admin-sparkline"
+    preserveAspectRatio="none"
+  >
+    <defs>
+      <linearGradient id={`sg-${color}`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stopColor={color} stopOpacity="0.25" />
+        <stop offset="100%" stopColor={color} stopOpacity="0"    />
+      </linearGradient>
+    </defs>
+    <path
+      d={`${path} L200,55 L0,55 Z`}
+      fill={`url(#sg-${color})`}
+    />
+    <path
+      d={path}
+      stroke={color}
+      strokeWidth="2"
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const CARD_META = [
+  {
+    iconBg:    '#dbeafe',
+    iconColor: '#3b82f6',
+    chartColor:'3b82f6',
+    chartPath: 'M0,38 C25,40 45,42 70,32 C95,22 120,36 150,24 C170,16 188,12 200,8',
+  },
+  {
+    iconBg:    '#dcfce7',
+    iconColor: '#22c55e',
+    chartColor:'22c55e',
+    chartPath: 'M0,42 C40,40 80,34 120,28 C160,22 180,18 200,14',
+  },
+  {
+    iconBg:    '#f3e8ff',
+    iconColor: '#a855f7',
+    chartColor:'a855f7',
+    chartPath: 'M0,32 C40,34 80,32 120,33 C160,32 180,30 200,31',
+  },
+  {
+    iconBg:    '#fef3c7',
+    iconColor: '#f59e0b',
+    chartColor:'f59e0b',
+    chartPath: 'M0,30 C25,34 55,26 85,30 C115,34 145,26 170,28 C185,29 195,26 200,24',
+  },
+];
+
 const StatisticsTab = ({ onNavigate }) => {
-  const [stats, setStats] = useState(null);
+  const [stats, setStats]     = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError]     = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -34,127 +90,115 @@ const StatisticsTab = ({ onNavigate }) => {
       try {
         setLoading(true);
         const response = await adminAPI.getStatistics();
-        if (!cancelled) {
-          setStats(response.data);
-          setError(null);
-        }
-      } catch (err) {
-        if (cancelled) return;
-        // 401s are intercepted globally and redirect to /login.
-        setError('Failed to load statistics. Please try again.');
+        if (!cancelled) { setStats(response.data); setError(null); }
+      } catch {
+        if (!cancelled) setError('Failed to load statistics. Please try again.');
       } finally {
         if (!cancelled) setLoading(false);
       }
     };
     load();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
-  if (loading) {
-    return <div className="admin-loading">Loading statistics...</div>;
-  }
-
-  if (error) {
-    return <div className="admin-error">{error}</div>;
-  }
-
-  const totalUsers = stats?.totalUsers || 0;
-  const activeTutors = stats?.activeTutors || 0;
-  const totalBookings = stats?.totalBookings || 0;
-  const totalRevenue = stats?.totalRevenue || 0;
+  if (loading) return <div className="admin-loading">Loading statistics...</div>;
+  if (error)   return <div className="admin-error">{error}</div>;
 
   const cards = [
+    { label: 'Total Users',    value: formatNumber(stats?.totalUsers || 0),        icon: faUserGroup,      trend: stats?.userGrowthRate,    trendLabel: 'from last month' },
+    { label: 'Active Tutors',  value: formatNumber(stats?.activeTutors || 0),       icon: faChalkboardUser, trend: stats?.tutorGrowthRate,   trendLabel: 'from last month' },
+    { label: 'Total Bookings', value: formatNumber(stats?.totalBookings || 0),      icon: faCalendarCheck,  trend: stats?.bookingGrowthRate, trendLabel: 'from last month' },
+    { label: 'Revenue',        value: formatCurrency(stats?.totalRevenue || 0),     icon: faDollarSign,     trend: stats?.revenueGrowthRate, trendLabel: 'from last month' },
+  ];
+
+  const quickActions = [
     {
-      label: 'Total Users',
-      value: formatNumber(totalUsers),
-      icon: faUserGroup,
-      trend: stats?.userGrowthRate,
-      trendLabel: 'from last month',
+      icon: faUsers,
+      iconBg: '#dcfce7', iconColor: '#22c55e',
+      title: 'Manage Users',
+      desc: 'View, edit and manage user accounts and permissions',
+      tab: 'users',
     },
     {
-      label: 'Active Tutors',
-      value: formatNumber(activeTutors),
-      icon: faChalkboardUser,
-      trend: stats?.tutorGrowthRate ?? null,
-      trendLabel: 'from last month',
+      icon: faUserPlus,
+      iconBg: '#dcfce7', iconColor: '#22c55e',
+      title: 'Invite Tutors',
+      desc: 'Send invitations and onboard new tutors',
+      tab: 'tutors',
     },
     {
-      label: 'Total Bookings',
-      value: formatNumber(totalBookings),
-      icon: faCalendarCheck,
-      trend: stats?.bookingGrowthRate,
-      trendLabel: 'from last month',
-    },
-    {
-      label: 'Revenue',
-      value: formatCurrency(totalRevenue),
-      icon: faDollarSign,
-      trend: stats?.revenueGrowthRate ?? null,
-      trendLabel: 'from last month',
+      icon: faCalendarDays,
+      iconBg: '#f3e8ff', iconColor: '#a855f7',
+      title: 'View Bookings',
+      desc: 'Browse and manage all bookings and appointments',
+      tab: 'bookings',
     },
   ];
 
   return (
     <div className="admin-section">
+      {/* ── Stat cards ── */}
       <div className="admin-stats-row">
-        {cards.map((card) => {
-          const trendValue = card.trend;
-          const hasTrend =
-            trendValue !== null && trendValue !== undefined && !Number.isNaN(trendValue);
-          const isNegative = hasTrend && trendValue < 0;
+        {cards.map((card, i) => {
+          const meta      = CARD_META[i];
+          const hasTrend  = card.trend !== null && card.trend !== undefined && !Number.isNaN(card.trend);
+          const isNeg     = hasTrend && card.trend < 0;
+
           return (
             <div key={card.label} className="admin-stat-card">
               <div className="admin-stat-card-top">
-                <span className="admin-stat-label">{card.label}</span>
-                <FontAwesomeIcon icon={card.icon} className="admin-stat-icon" />
+                <div
+                  className="admin-stat-icon-box"
+                  style={{ background: meta.iconBg, color: meta.iconColor }}
+                >
+                  <FontAwesomeIcon icon={card.icon} />
+                </div>
+                <FontAwesomeIcon icon={card.icon} className="admin-stat-icon-ghost" />
               </div>
+
+              <div className="admin-stat-label">{card.label}</div>
               <div className="admin-stat-value">{card.value}</div>
+
               {hasTrend && (
-                <div className={`admin-stat-trend ${isNegative ? 'negative' : ''}`}>
-                  <FontAwesomeIcon
-                    icon={isNegative ? faArrowTrendDown : faArrowTrendUp}
-                  />
-                  <span>
-                    {isNegative ? '' : '+'}
-                    {trendValue.toFixed(1)}%
-                  </span>
+                <div className={`admin-stat-trend ${isNeg ? 'negative' : ''}`}>
+                  <FontAwesomeIcon icon={isNeg ? faArrowTrendDown : faArrowTrendUp} />
+                  <span>{isNeg ? '' : '+'}{card.trend.toFixed(1)}%</span>
                   <span className="admin-stat-trend-label">{card.trendLabel}</span>
                 </div>
               )}
+
+              <Sparkline path={meta.chartPath} color={`#${meta.chartColor}`} />
             </div>
           );
         })}
       </div>
 
+      {/* ── Quick actions ── */}
       <div className="admin-quick-actions">
         <h2 className="admin-quick-actions-title">Quick Actions</h2>
+        <p className="admin-quick-actions-subtitle">Access the most common administrative tasks</p>
+
         <div className="admin-quick-actions-grid">
-          <button
-            type="button"
-            className="admin-quick-action"
-            onClick={() => onNavigate?.('users')}
-          >
-            <FontAwesomeIcon icon={faUsers} />
-            <span>Manage Users</span>
-          </button>
-          <button
-            type="button"
-            className="admin-quick-action"
-            onClick={() => onNavigate?.('tutors')}
-          >
-            <FontAwesomeIcon icon={faUserPlus} />
-            <span>Invite Tutors</span>
-          </button>
-          <button
-            type="button"
-            className="admin-quick-action"
-            onClick={() => onNavigate?.('bookings')}
-          >
-            <FontAwesomeIcon icon={faCalendarDays} />
-            <span>View Bookings</span>
-          </button>
+          {quickActions.map((a) => (
+            <button
+              key={a.tab}
+              type="button"
+              className="admin-quick-action"
+              onClick={() => onNavigate?.(a.tab)}
+            >
+              <div
+                className="admin-quick-action-icon"
+                style={{ background: a.iconBg, color: a.iconColor }}
+              >
+                <FontAwesomeIcon icon={a.icon} />
+              </div>
+              <div className="admin-quick-action-text">
+                <span className="admin-quick-action-title">{a.title}</span>
+                <span className="admin-quick-action-desc">{a.desc}</span>
+              </div>
+              <FontAwesomeIcon icon={faChevronRight} className="admin-quick-action-arrow" />
+            </button>
+          ))}
         </div>
       </div>
     </div>
