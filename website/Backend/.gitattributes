@@ -1,2 +1,9 @@
 /mvnw text eol=lf
 *.cmd text eol=crlf
+
+# Flyway computes a content checksum for every migration and stores it in
+# flyway_schema_history. If the byte content drifts (e.g. CRLF vs LF flips
+# between Windows and Linux checkouts) Flyway refuses to start with a
+# checksum mismatch. Pin migration scripts to LF so the checksum is stable
+# regardless of which OS checked the repo out.
+src/main/resources/db/migration/*.sql text eol=lf
