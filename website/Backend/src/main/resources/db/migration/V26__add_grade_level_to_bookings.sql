@@ -1,1 +1,1 @@
-ALTER TABLE bookings ADD COLUMN grade_level VARCHAR(50);
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS grade_level VARCHAR(50);
