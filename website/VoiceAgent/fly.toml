@@ -1,0 +1,10 @@
+app = 'ace-voice-agent-moonlit-garden-9668'
+primary_region = 'ord'
+
+[build]
+  dockerfile = 'Dockerfile'
+
+[[vm]]
+  memory = '512mb'
+  cpu_kind = 'shared'
+  cpus = 1
