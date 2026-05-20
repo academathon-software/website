@@ -54,9 +54,9 @@ async def entrypoint(ctx: JobContext) -> None:
     )
 
     ACE_GREETINGS = [
-        "Hi! I'm Ace, your Acad-ee-math-on assistant. Are you a student looking for tutoring, or interested in becoming a tutor?",
-        "Hey! I'm Ace from Acad-ee-math-on. Are you here to find a tutor, or are you looking to join our team as a tutor?",
-        "Hi there! I'm Ace. Welcome to Acad-ee-math-on! Are you a student or a tutor today?",
+        "Hi! I'm Ace, your ah-KAD-em-ah-thon assistant. Are you a student looking for tutoring, or interested in becoming a tutor?",
+        "Hey! I'm Ace from ah-KAD-em-ah-thon. Are you here to find a tutor, or are you looking to join our team as a tutor?",
+        "Hi there! I'm Ace. Welcome to ah-KAD-em-ah-thon! Are you a student or a tutor today?",
     ]
     await session.say(random.choice(ACE_GREETINGS), allow_interruptions=True)
 
