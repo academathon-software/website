@@ -8,7 +8,6 @@ Run:
 from __future__ import annotations
 
 import logging
-import os
 import random
 
 from dotenv import load_dotenv
@@ -19,7 +18,7 @@ from livekit.agents import (
     WorkerOptions,
     cli,
 )
-from livekit.plugins import openai, silero
+from livekit.plugins.openai import realtime
 
 from prompts import ACE_SYSTEM_PROMPT
 
@@ -42,10 +41,11 @@ async def entrypoint(ctx: JobContext) -> None:
     await ctx.connect()
 
     session = AgentSession(
-        stt=openai.STT(model="gpt-4o-transcribe", language="en"),
-        llm=openai.LLM(model="gpt-4o-mini", temperature=0.6),
-        tts=openai.TTS(model="tts-1", voice="nova"),
-        vad=silero.VAD.load(),
+        llm=realtime.RealtimeModel(
+            model="gpt-4o-realtime-preview",
+            voice="shimmer",
+            temperature=0.6,
+        )
     )
 
     await session.start(
