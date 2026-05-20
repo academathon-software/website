@@ -16,7 +16,6 @@ from livekit.agents import (
     Agent,
     AgentSession,
     JobContext,
-    RoomInputOptions,
     WorkerOptions,
     cli,
 )
@@ -42,37 +41,22 @@ async def entrypoint(ctx: JobContext) -> None:
     log.info("Connecting to room %s", ctx.room.name)
     await ctx.connect()
 
-    turn_detection = None
-    try:
-        from livekit.plugins.turn_detector.multilingual import MultilingualModel
-        turn_detection = MultilingualModel()
-    except Exception:
-        try:
-            from livekit.plugins.turn_detector.english import EnglishModel
-            turn_detection = EnglishModel()
-        except Exception:
-            log.info("turn_detector not available; using VAD-only endpointing.")
-
     session = AgentSession(
-        stt=openai.STT(model="whisper-1", language="en"),
-        llm=openai.LLM(model="gpt-4o", temperature=0.7),
+        stt=openai.STT(model="gpt-4o-transcribe", language="en"),
+        llm=openai.LLM(model="gpt-4o-mini", temperature=0.6),
         tts=openai.TTS(model="tts-1", voice="nova"),
         vad=silero.VAD.load(),
-        turn_detection=turn_detection,
-        aec_warmup_duration=0,
     )
 
     await session.start(
         agent=AceAgent(),
         room=ctx.room,
-        room_input_options=RoomInputOptions(),
     )
 
     ACE_GREETINGS = [
-        "Hi! I'm Ace, your Academathon assistant. How can I help you today?",
-        "Hey there! I'm Ace from Academathon. Are you looking for a tutor, or do you have questions about our services?",
-        "Hello! I'm Ace — here to help you find the right tutor. What can I do for you?",
-        "Hi, I'm Ace! Whether it's booking a session or learning about pricing, I've got you. What's on your mind?",
+        "Hi! I'm Ace, your Acad-ee-math-on assistant. Are you a student looking for tutoring, or interested in becoming a tutor?",
+        "Hey! I'm Ace from Acad-ee-math-on. Are you here to find a tutor, or are you looking to join our team as a tutor?",
+        "Hi there! I'm Ace. Welcome to Acad-ee-math-on! Are you a student or a tutor today?",
     ]
     await session.say(random.choice(ACE_GREETINGS), allow_interruptions=True)
 
