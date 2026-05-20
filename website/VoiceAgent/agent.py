@@ -28,7 +28,7 @@ from prompts import ACE_SYSTEM_PROMPT
 # Intercept any variation of the name before it hits TTS and replace with
 # a phonetic respelling that OpenAI TTS reliably pronounces correctly.
 _NAME_RE = re.compile(r'\bAcademathon\b', re.IGNORECASE)
-_PHONETIC = "Ah-cad-em-a-thon"
+_PHONETIC = "Ah-cademathon"
 
 
 def _fix_pronunciation(text: str) -> str:
