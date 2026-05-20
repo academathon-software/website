@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import logging
 import random
+import re
+from typing import AsyncIterable
 
 from dotenv import load_dotenv
 from livekit.agents import (
@@ -17,10 +19,20 @@ from livekit.agents import (
     JobContext,
     WorkerOptions,
     cli,
+    tts as agents_tts,
 )
 from livekit.plugins import openai, silero
 
 from prompts import ACE_SYSTEM_PROMPT
+
+# Intercept any variation of the name before it hits TTS and replace with
+# a phonetic respelling that OpenAI TTS reliably pronounces correctly.
+_NAME_RE = re.compile(r'\bAcademathon\b', re.IGNORECASE)
+_PHONETIC = "Ah-cad-em-a-thon"
+
+
+def _fix_pronunciation(text: str) -> str:
+    return _NAME_RE.sub(_PHONETIC, text)
 
 load_dotenv()
 
@@ -34,6 +46,18 @@ log = logging.getLogger("ace.agent")
 class AceAgent(Agent):
     def __init__(self) -> None:
         super().__init__(instructions=ACE_SYSTEM_PROMPT)
+
+    async def tts_node(
+        self,
+        text: AsyncIterable[str],
+        model_settings: agents_tts.TTSCapabilities | None = None,
+    ) -> AsyncIterable[agents_tts.SynthesizedAudio]:
+        async def _fixed():
+            async for chunk in text:
+                yield _fix_pronunciation(chunk)
+
+        async for audio in super().tts_node(_fixed(), model_settings):
+            yield audio
 
 
 async def entrypoint(ctx: JobContext) -> None:
@@ -62,9 +86,9 @@ async def entrypoint(ctx: JobContext) -> None:
     )
 
     ACE_GREETINGS = [
-        "Hi! I'm Ace, your ah-KAD-em-ah-thon assistant. Are you a student looking for tutoring, or interested in becoming a tutor?",
-        "Hey! I'm Ace from ah-KAD-em-ah-thon. Are you here to find a tutor, or are you looking to join our team as a tutor?",
-        "Hi there! I'm Ace. Welcome to ah-KAD-em-ah-thon! Are you a student or a tutor today?",
+        "Hi! I'm Ace, your Academathon assistant. Are you a student looking for tutoring, or interested in becoming a tutor?",
+        "Hey! I'm Ace from Academathon. Are you here to find a tutor, or are you looking to join our team as a tutor?",
+        "Hi there! I'm Ace. Welcome to Academathon! Are you a student or a tutor today?",
     ]
     await session.say(random.choice(ACE_GREETINGS), allow_interruptions=True)
 
