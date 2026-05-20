@@ -21,7 +21,7 @@ from livekit.agents import (
     cli,
     tts as agents_tts,
 )
-from livekit.plugins import deepgram, openai, silero
+from livekit.plugins import openai, silero
 
 from prompts import ACE_SYSTEM_PROMPT
 
@@ -79,13 +79,7 @@ async def entrypoint(ctx: JobContext) -> None:
         log.info("turn_detector not found — run: python3 -m livekit.agents download-files")
 
     session = AgentSession(
-        stt=deepgram.STT(
-            model="nova-2",
-            language="en-US",
-            interim_results=True,
-            smart_format=True,
-            punctuate=True,
-        ),
+        stt=openai.STT(model="gpt-4o-mini-transcribe", language="en"),
         llm=openai.LLM(model="gpt-4o-mini", temperature=0.6),
         tts=openai.TTS(model="tts-1", voice="nova"),
         vad=vad,
