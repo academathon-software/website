@@ -21,7 +21,7 @@ from livekit.agents import (
     cli,
     tts as agents_tts,
 )
-from livekit.plugins import openai
+from livekit.plugins import openai, silero
 
 from prompts import ACE_SYSTEM_PROMPT
 
@@ -68,6 +68,7 @@ async def entrypoint(ctx: JobContext) -> None:
         stt=openai.STT(model="gpt-4o-mini-transcribe", language="en"),
         llm=openai.LLM(model="gpt-4o-mini", temperature=0.6),
         tts=openai.TTS(model="tts-1", voice="nova"),
+        vad=silero.VAD.load(),
         aec_warmup_duration=0,
     )
 
