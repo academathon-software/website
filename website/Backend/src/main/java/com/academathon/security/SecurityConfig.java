@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -74,6 +75,8 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource))
             .authorizeHttpRequests(auth -> auth
+                // Allow ALL OPTIONS preflight requests (CORS)
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // expose your auth endpoints; tweak as needed
                 .requestMatchers("/", "/login", "/auth/**", "/css/**", "/js/**", "/images/**", "/actuator/**").permitAll()
                 // Allow public access to tutor invitation validation
@@ -102,15 +105,17 @@ public class SecurityConfig {
         CorsConfiguration cfg = new CorsConfiguration();
         // Allow frontend origins (localhost for dev, production domain)
         cfg.setAllowedOrigins(List.of(
-            "http://localhost:3000", 
-            "http://localhost:5173", 
-            "http://localhost:5174", 
-            "http://127.0.0.1:3000", 
-            "http://127.0.0.1:5173", 
+            "http://localhost:3000",
+            "http://localhost:5173",
+            "http://localhost:5174",
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1:5173",
             "http://127.0.0.1:5174",
             // Production domains
             "https://academathon.ca",
             "https://www.academathon.ca",
+            "https://academathon.com",
+            "https://www.academathon.com",
             "https://academathon.vercel.app"
         ));
         // Allow all HTTP methods
