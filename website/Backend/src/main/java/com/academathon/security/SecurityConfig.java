@@ -78,6 +78,7 @@ public class SecurityConfig {
                 .requestMatchers("/", "/login", "/auth/**", "/css/**", "/js/**", "/images/**", "/actuator/**").permitAll()
                 // Allow public access to tutor invitation validation
                 .requestMatchers("/api/tutor-invitations/validate/**").permitAll()
+                .requestMatchers("/api/voice/token").permitAll()
                 // Protect admin endpoints - require ADMIN role
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 // Allow authenticated users to access API endpoints

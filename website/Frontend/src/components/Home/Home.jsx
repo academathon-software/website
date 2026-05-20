@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './Home.css';
 import Footer from '../Footer/Footer';
+import VoiceAgent from '../VoiceAgent/VoiceAgent';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBookOpen, faUsers, faChartLine, faClock } from '@fortawesome/free-solid-svg-icons';
 import waterlooLogo from '../../assets/waterloo.png';
@@ -96,6 +97,7 @@ function Home() {
       </section>
 
       <Footer />
+      <VoiceAgent />
     </div>
   );
 }
