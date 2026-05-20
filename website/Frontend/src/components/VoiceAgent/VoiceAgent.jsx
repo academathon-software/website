@@ -9,7 +9,7 @@ import {
 import '@livekit/components-styles';
 import './VoiceAgent.css';
 
-const AGENT_URL = import.meta.env.VITE_AGENT_URL || 'http://localhost:8081';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 function statusLabel(state) {
   if (state === 'speaking') return 'Speaking...';
@@ -50,7 +50,7 @@ export default function VoiceAgent() {
     setError(null);
     setLoading(true);
     try {
-      const resp = await fetch(`${AGENT_URL}/token`);
+      const resp = await fetch(`${API_BASE}/api/voice/token`);
       if (!resp.ok) throw new Error('Could not reach Ace. Try again shortly.');
       const data = await resp.json();
       setToken(data.token);
