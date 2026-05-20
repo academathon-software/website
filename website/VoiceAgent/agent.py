@@ -8,7 +8,6 @@ Run:
 from __future__ import annotations
 
 import logging
-import os
 import random
 import re
 from typing import AsyncIterable
@@ -22,7 +21,7 @@ from livekit.agents import (
     cli,
     tts as agents_tts,
 )
-from livekit.plugins import deepgram, elevenlabs, openai, silero
+from livekit.plugins import deepgram, openai, silero
 
 from prompts import ACE_SYSTEM_PROMPT
 
@@ -88,18 +87,7 @@ async def entrypoint(ctx: JobContext) -> None:
             punctuate=True,
         ),
         llm=openai.LLM(model="gpt-4o-mini", temperature=0.6),
-        tts=elevenlabs.TTS(
-            api_key=os.environ["ELEVENLABS_API_KEY"],
-            voice_id=os.environ["ELEVENLABS_VOICE_ID"],
-            model="eleven_turbo_v2_5",
-            voice_settings=elevenlabs.VoiceSettings(
-                stability=0.50,
-                similarity_boost=0.85,
-                style=0.0,
-                use_speaker_boost=True,
-                speed=0.90,
-            ),
-        ),
+        tts=openai.TTS(model="tts-1", voice="nova"),
         vad=vad,
         turn_detection=turn_detection,
         min_endpointing_delay=0.2,
