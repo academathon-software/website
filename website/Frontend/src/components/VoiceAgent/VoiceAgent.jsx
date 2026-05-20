@@ -3,7 +3,6 @@ import {
   LiveKitRoom,
   useVoiceAssistant,
   BarVisualizer,
-  VoiceAssistantControlBar,
   RoomAudioRenderer,
 } from '@livekit/components-react';
 import '@livekit/components-styles';
@@ -34,7 +33,7 @@ function VoiceAgentInner({ onClose }) {
       <div className="voice-visualizer">
         <BarVisualizer state={state} trackRef={audioTrack} barCount={12} />
       </div>
-      <VoiceAssistantControlBar />
+      <p className="ace-hint">Just start talking — Ace is listening.</p>
     </div>
   );
 }

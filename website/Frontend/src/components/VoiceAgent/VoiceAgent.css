@@ -106,7 +106,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.ace-hint {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #999;
+  margin: 0;
 }
 
 .voice-error {
