@@ -18,7 +18,7 @@ from livekit.agents import (
     WorkerOptions,
     cli,
 )
-from livekit.plugins.openai import realtime
+from livekit.plugins import openai, silero
 
 from prompts import ACE_SYSTEM_PROMPT
 
@@ -40,12 +40,20 @@ async def entrypoint(ctx: JobContext) -> None:
     log.info("Connecting to room %s", ctx.room.name)
     await ctx.connect()
 
+    # Tight VAD: only 250ms of silence needed to end a turn (default is ~800ms)
+    vad = silero.VAD.load(
+        min_silence_duration=0.25,
+        min_speech_duration=0.05,
+        activation_threshold=0.55,
+    )
+
     session = AgentSession(
-        llm=realtime.RealtimeModel(
-            model="gpt-4o-realtime-preview",
-            voice="shimmer",
-            temperature=0.6,
-        )
+        stt=openai.STT(model="gpt-4o-mini-transcribe", language="en"),
+        llm=openai.LLM(model="gpt-4o-mini", temperature=0.6),
+        tts=openai.TTS(model="tts-1", voice="nova"),
+        vad=vad,
+        min_endpointing_delay=0.3,
+        max_endpointing_delay=1.5,
     )
 
     await session.start(
