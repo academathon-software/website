@@ -64,20 +64,28 @@ async def entrypoint(ctx: JobContext) -> None:
     log.info("Connecting to room %s", ctx.room.name)
     await ctx.connect()
 
-    # Tight VAD: only 250ms of silence needed to end a turn (default is ~800ms)
     vad = silero.VAD.load(
-        min_silence_duration=0.25,
+        min_silence_duration=0.2,
         min_speech_duration=0.05,
         activation_threshold=0.55,
     )
+
+    turn_detection = None
+    try:
+        from livekit.plugins.turn_detector.multilingual import MultilingualModel
+        turn_detection = MultilingualModel()
+        log.info("turn_detector loaded")
+    except Exception:
+        log.info("turn_detector not found — run: python3 -m livekit.agents download-files")
 
     session = AgentSession(
         stt=openai.STT(model="gpt-4o-mini-transcribe", language="en"),
         llm=openai.LLM(model="gpt-4o-mini", temperature=0.6),
         tts=openai.TTS(model="tts-1", voice="nova"),
         vad=vad,
-        min_endpointing_delay=0.3,
-        max_endpointing_delay=1.5,
+        turn_detection=turn_detection,
+        min_endpointing_delay=0.2,
+        max_endpointing_delay=0.8,
     )
 
     await session.start(
