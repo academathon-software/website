@@ -13,6 +13,28 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Global border-box reset.
+ *
+ * Without this, any element with `width: 100%` plus padding/border renders
+ * wider than its parent and overflows on narrow screens. Specific recent
+ * symptoms this fixes:
+ *   - Tutor signup form inputs spilling past the right edge on mobile
+ *   - Home page hero buttons (Get Started / View Pricing) cropping off
+ *     the right side on ~360px Android viewports
+ *   - Any other "width: 100% + padding" container the codebase has
+ *     accumulated without explicitly setting box-sizing on each one
+ *
+ * border-box is what every modern CSS reset / framework (Tailwind,
+ * Bootstrap, etc.) ships with by default and what the inputs throughout
+ * this codebase were already setting individually. Making it global keeps
+ * future components from accidentally regressing the same way.
+ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 a {
   font-weight: 500;
   color: #2D6A4F;
