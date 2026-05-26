@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom';
 import React from 'react';
-import Home from './components/Home/Home';
+import HomeV2 from './components/Home/HomeV2';
 import './App.css'
 import Login from './auth/Login/Login';
 import Signup from './auth/Signup/Signup';
@@ -35,7 +35,7 @@ function App() {
       <SessionExpiryWatcher />
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
+          <Route index element={<HomeV2 />} />
           <Route path="about" element={<About />} />
           <Route path="team" element={<Team />} />
           <Route path="pricing" element={<Pricing />} />
