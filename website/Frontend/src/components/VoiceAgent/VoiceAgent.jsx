@@ -6,6 +6,8 @@ import {
   RoomAudioRenderer,
 } from '@livekit/components-react';
 import '@livekit/components-styles';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWaveSquare } from '@fortawesome/free-solid-svg-icons';
 import './VoiceAgent.css';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -74,9 +76,9 @@ export default function VoiceAgent() {
         className="voice-fab"
         onClick={startSession}
         disabled={loading}
-        title="Talk to Ace"
+        title="Talk to ACE"
       >
-        🎤 {loading ? 'Connecting...' : 'Talk to Ace'}
+        <FontAwesomeIcon icon={faWaveSquare} /> {loading ? 'Connecting...' : 'Talk to ACE'}
       </button>
 
       {error && (

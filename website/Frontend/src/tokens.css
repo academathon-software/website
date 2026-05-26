@@ -1,0 +1,36 @@
+:root {
+  --font-sans: 'Outfit', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+
+  /* Backgrounds */
+  --color-bg:           #FAFAF8;
+  --color-surface:      #F5F4F0;
+  --color-surface-raised: #FFFFFF;
+  --color-border:       #EAE7E2;
+  --color-border-subtle:#F0EDE8;
+
+  /* Text */
+  --color-text-primary:   #1C1917;
+  --color-text-secondary: #57534E;
+  --color-text-tertiary:  #A8A29E;
+
+  /* Accent — deep forest green */
+  --color-accent:         #2D6A4F;
+  --color-accent-hover:   #1B4332;
+  --color-accent-subtle:  #ECFDF5;
+  --color-accent-border:  #A7F3D0;
+  --color-accent-light:   #52B788;
+
+  /* Radius */
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --radius-xl:   18px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+}
+
