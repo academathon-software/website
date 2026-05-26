@@ -34,6 +34,9 @@ dist/
 build/
 out/
 
+# Claude Code
+.claude/
+
 # Misc
 .cache/
 coverage/
