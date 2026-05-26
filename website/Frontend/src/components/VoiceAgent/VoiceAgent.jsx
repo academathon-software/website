@@ -27,7 +27,7 @@ function VoiceAgentInner({ onClose }) {
       <div className="voice-agent-header">
         <div className="ace-avatar">🎓</div>
         <div>
-          <h3 className="ace-name">Ace</h3>
+          <h3 className="ace-name">ACE</h3>
           <span className="ace-status">{statusLabel(state)}</span>
         </div>
         <button className="close-btn" onClick={onClose} aria-label="Close">✕</button>
@@ -35,7 +35,7 @@ function VoiceAgentInner({ onClose }) {
       <div className="voice-visualizer">
         <BarVisualizer state={state} trackRef={audioTrack} barCount={12} />
       </div>
-      <p className="ace-hint">Just start talking — Ace is listening.</p>
+      <p className="ace-hint">Just start talking — ACE is listening.</p>
     </div>
   );
 }
