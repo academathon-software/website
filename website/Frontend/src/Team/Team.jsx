@@ -2,127 +2,121 @@ import React from 'react';
 import './Team.css';
 import Footer from '../components/Footer/Footer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faHeart,
-  faUsers,
-  faLightbulb,
-  faShieldAlt,
-  faEnvelope,
-  faUserGraduate
-} from '@fortawesome/free-solid-svg-icons';
-import { faLinkedin, faTwitter, faGithub } from '@fortawesome/free-brands-svg-icons';
+import { faEnvelope, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faLinkedin, faGithub } from '@fortawesome/free-brands-svg-icons';
 import sahilImage from '../assets/sahil.avif';
 
 const teamMembers = [
   {
-    name: "Sahil Talati",
-    role: "Founder",
-    bio: "Sahil is currently pursuing a Computer Science degree with a concentration in Big Data Systems at Wilfrid Laurier University. With a strong passion for technology, he has gained extensive experience through internships, where he worked on innovative software solutions and advanced data systems. His expertise spans software development, cloud technologies, and data-driven problem-solving.",
+    name: 'Sahil Talati',
+    role: 'Founder & CEO',
+    bio: 'Sahil is pursuing Computer Science with a concentration in Big Data Systems at Wilfrid Laurier University. His passion for accessible education — paired with hands-on experience building software at scale — led him to create Academathon from scratch. He oversees product strategy, platform growth, and company direction.',
     image: sahilImage,
+    initials: 'ST',
+    expertise: ['Product Strategy', 'Full-Stack Engineering', 'EdTech'],
     social: {
-      linkedin: "https://www.linkedin.com/in/sahil-talati/",
-      twitter: "https://twitter.com/sarahjohnson",
-      email: "sahil@academathon.ca"
+      linkedin: 'https://www.linkedin.com/in/sahil-talati/',
+      email: 'sahil@academathon.ca',
     },
-    expertise: ["Educational Technology", "Strategic Planning", "Leadership"]
   },
   {
-    name: "Ryan Tang",
-    role: "CTO",
-    bio: "Ryan is currently a computer science student at Wilfrid Laurier University with a concentration in AI, and a full-stack developer focused on building scalable technology solutions. He leads platform architecture, backend systems, and product development, with expertise in cloud infrastructure, modern web technologies, and AI-powered features. Ryan is driven by creating reliable, high-performance systems that enhance learning experiences.",
+    name: 'Ryan Tang',
+    role: 'CTO',
+    bio: "Ryan is a Computer Science student at Wilfrid Laurier University specializing in AI. As CTO, he leads platform architecture, backend systems, and AI-powered features — building the infrastructure that makes every lesson possible. He's driven by reliable, high-performance systems that quietly make learning better.",
+    initials: 'RT',
+    expertise: ['Cloud Architecture', 'AI / ML', 'Backend Systems'],
     social: {
-      linkedin: "https://www.linkedin.com/in/ryan-tng/",
-      github: "https://github.com/ryan-tng",
-      email: "ryant012015@gmail.com"
+      linkedin: 'https://www.linkedin.com/in/ryan-tng/',
+      github: 'https://github.com/ryan-tng',
+      email: 'ryant012015@gmail.com',
     },
-    expertise: ["Full-Stack Development", "Cloud Architecture", "AI/ML"]
-  }
+  },
 ];
 
-const cultureItems = [
-  {
-    icon: faHeart,
-    title: 'Passion for Education',
-    description: 'Every team member is driven by the belief that quality education should be accessible to all students worldwide.'
-  },
-  {
-    icon: faUsers,
-    title: 'Collaborative Spirit',
-    description: 'We work together as one team, supporting each other and our users to achieve common goals.'
-  },
-  {
-    icon: faLightbulb,
-    title: 'Innovation First',
-    description: 'We embrace new ideas and technologies to continuously improve the learning experience.'
-  },
-  {
-    icon: faShieldAlt,
-    title: 'Trust & Transparency',
-    description: 'We maintain open communication and build trust with our team, users, and partners.'
-  }
-];
-
-function Team() {
+export default function Team() {
   return (
     <div className="team-page">
+
+      {/* ── Hero ── */}
       <section className="team-hero">
         <div className="team-container">
-          <h1>Meet Our Team</h1>
+          <p className="team-eyebrow">The Founders</p>
+          <h1 className="team-h1">
+            Two builders with one <em>shared mission.</em>
+          </h1>
           <p className="team-subtitle">
-          Academathon was founded in February 2021 to support students struggling with online learning during the pandemic. What began as a small initiative to provide accessible tutoring has quickly grown into a large platform, connecting students with expert tutors across various subjects. Through personalized learning and dedicated support, we've helped countless students adapt to new challenges, improve their skills, and thrive in an ever-changing academic environment.
+            Academathon was built in February 2021 by two university students who saw a
+            gap — students struggling, and talented tutors with nowhere to connect. We fixed that.
           </p>
         </div>
       </section>
 
-      <section className="team-leadership">
+      {/* ── Founders ── */}
+      <section className="team-members">
         <div className="team-container">
-          <h2>Leadership Team</h2>
-          <p className="team-section-subtitle">The visionaries leading Academathon's mission to democratize education</p>
-          <div className="team-grid">
-            {teamMembers.map((member, index) => (
-              <div key={index} className="team-card">
-                <div className="member-avatar">
+          <p className="team-overline">Leadership</p>
+          <h2 className="team-h2">Meet the team</h2>
+          <div className="team-cards">
+            {teamMembers.map((member, i) => (
+              <div key={i} className="founder-card">
+                <div className="founder-avatar-col">
                   {member.image ? (
-                    <img src={member.image} alt={member.name} />
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="founder-photo"
+                    />
                   ) : (
-                    <div className="avatar-placeholder">
-                      <FontAwesomeIcon icon={faUserGraduate} />
+                    <div className="founder-initials" aria-hidden="true">
+                      {member.initials}
                     </div>
                   )}
                 </div>
-                <div className="member-info">
-                  <h3>{member.name}</h3>
-                  <span className="member-role">{member.role}</span>
-                  <p className="member-bio">{member.bio}</p>
-                  <div className="member-expertise">
-                    <h4>Expertise</h4>
-                    <div className="expertise-tags">
-                      {member.expertise.map((skill, i) => (
-                        <span key={i} className="expertise-tag">{skill}</span>
-                      ))}
+                <div className="founder-info">
+                  <div className="founder-header">
+                    <div className="founder-title-group">
+                      <h3 className="founder-name">{member.name}</h3>
+                      <span className="founder-role">{member.role}</span>
+                    </div>
+                    <div className="founder-social">
+                      {member.social.linkedin && (
+                        <a
+                          href={member.social.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="social-link"
+                          aria-label={`${member.name} on LinkedIn`}
+                        >
+                          <FontAwesomeIcon icon={faLinkedin} />
+                        </a>
+                      )}
+                      {member.social.github && (
+                        <a
+                          href={member.social.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="social-link"
+                          aria-label={`${member.name} on GitHub`}
+                        >
+                          <FontAwesomeIcon icon={faGithub} />
+                        </a>
+                      )}
+                      {member.social.email && (
+                        <a
+                          href={`mailto:${member.social.email}`}
+                          className="social-link"
+                          aria-label={`Email ${member.name}`}
+                        >
+                          <FontAwesomeIcon icon={faEnvelope} />
+                        </a>
+                      )}
                     </div>
                   </div>
-                  <div className="member-social">
-                    {member.social.linkedin && (
-                      <a href={member.social.linkedin} target="_blank" rel="noopener noreferrer" className="social-link">
-                        <FontAwesomeIcon icon={faLinkedin} />
-                      </a>
-                    )}
-                    {member.social.twitter && (
-                      <a href={member.social.twitter} target="_blank" rel="noopener noreferrer" className="social-link">
-                        <FontAwesomeIcon icon={faTwitter} />
-                      </a>
-                    )}
-                    {member.social.github && (
-                      <a href={member.social.github} target="_blank" rel="noopener noreferrer" className="social-link">
-                        <FontAwesomeIcon icon={faGithub} />
-                      </a>
-                    )}
-                    {member.social.email && (
-                      <a href={`mailto:${member.social.email}`} className="social-link">
-                        <FontAwesomeIcon icon={faEnvelope} />
-                      </a>
-                    )}
+                  <p className="founder-bio">{member.bio}</p>
+                  <div className="founder-expertise">
+                    {member.expertise.map((tag, j) => (
+                      <span key={j} className="expertise-tag">{tag}</span>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -131,35 +125,22 @@ function Team() {
         </div>
       </section>
 
-      <section className="team-culture">
-        <div className="team-container">
-          <h2>Our Culture</h2>
-          <p className="team-section-subtitle">What makes Academathon a great place to work</p>
-          <div className="culture-grid">
-            {cultureItems.map((item, index) => (
-              <div key={index} className="culture-card">
-                <div className="culture-icon">
-                  <FontAwesomeIcon icon={item.icon} />
-                </div>
-                <h3>{item.title}</h3>
-                <p>{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
+      {/* ── CTA ── */}
       <section className="team-cta">
-        <div className="team-container">
-          <h2>Want to Join Our Team?</h2>
-          <p>We're always looking for passionate educators to join our community.</p>
+        <div className="team-container team-cta-inner">
+          <p className="team-cta-overline">Join our community</p>
+          <h2 className="team-cta-h2">Become a tutor.</h2>
+          <p className="team-cta-sub">
+            We're always looking for passionate university students to join our
+            network. Invite-only — apply and we'll be in touch.
+          </p>
           <a
             href="https://docs.google.com/forms/d/e/1FAIpQLSf-QDRnM5yjm9n7D713aiLNlLQyTyLgvD_tIdP7VcG1RNqRrA/viewform"
             target="_blank"
             rel="noopener noreferrer"
             className="team-cta-btn"
           >
-            Apply as a Tutor
+            Apply as a tutor <FontAwesomeIcon icon={faArrowRight} />
           </a>
         </div>
       </section>
@@ -168,5 +149,3 @@ function Team() {
     </div>
   );
 }
-
-export default Team;
