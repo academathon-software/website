@@ -1,107 +1,137 @@
 import React from 'react';
 import './About.css';
 import Footer from '../components/Footer/Footer';
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBullseye,
   faHeart,
   faLightbulb,
-  faArrowTrendUp
+  faArrowTrendUp,
+  faArrowRight,
 } from '@fortawesome/free-solid-svg-icons';
+
+const stats = [
+  { number: '200+',  label: 'Students served' },
+  { number: '98%',   label: 'Satisfaction rate' },
+  { number: '85%',   label: 'See grade improvement' },
+  { number: '2021',  label: 'Founded' },
+];
 
 const values = [
   {
     icon: faBullseye,
     title: 'Our Mission',
-    description: 'To make quality education accessible to everyone through personalized online learning that adapts to each student\'s unique learning style.'
+    description:
+      'To make quality education accessible to every student across Canada through personalized, one-on-one tutoring that meets them where they are.',
   },
   {
     icon: faHeart,
     title: 'Student-Centered',
-    description: 'We put students first, creating a supportive environment where learners feel confident to ask questions and make mistakes.'
+    description:
+      "We put students first — building confidence, not just grades. Every lesson is designed around how that student learns, not a one-size-fits-all script.",
   },
   {
     icon: faLightbulb,
-    title: 'Innovation',
-    description: 'We leverage the latest educational technology and teaching methods to deliver the most effective learning experiences.'
+    title: 'Vetted Tutors',
+    description:
+      'Every tutor is a university student with proven subject expertise, hand-selected through our invite-only process — no random marketplace signups.',
   },
   {
     icon: faArrowTrendUp,
-    title: 'Continuous Growth',
-    description: 'We believe in constant improvement for both our students and tutors, fostering a culture of lifelong learning.'
-  }
+    title: 'Real Results',
+    description:
+      '85% of students see measurable grade improvement within the first two months of working with an Academathon tutor. Progress you can show a report card.',
+  },
 ];
 
-const impact = [
-  {
-    title: 'Grade Improvement',
-    stat: '85% of our students see measurable improvement in their grades within 2 months.'
-  },
-  {
-    title: 'Student Satisfaction',
-    stat: '98% satisfaction rating, with over 50 positive reviews.'
-  },
-  {
-    title: 'Tutor Quality',
-    stat: 'All tutors are certified educators with an average of 5 years teaching experience.'
-  },
-  {
-    title: 'Global Reach',
-    stat: 'Students from over Ontario, Canada have benefited from our platform.'
-  }
-];
-
-function About() {
+export default function About() {
   return (
     <div className="about-page">
+
+      {/* ── Hero ── */}
       <section className="about-hero">
         <div className="about-container">
-          <h1>About Academathon</h1>
+          <p className="about-eyebrow">Our Story</p>
+          <h1 className="about-h1">
+            Built to give every student<br />
+            <em>a fair shot.</em>
+          </h1>
           <p className="about-subtitle">
-            Empowering students worldwide with personalized education that inspires confidence and drives success.
+            Academathon started as a small tutoring initiative in 2021. Today it's a
+            platform connecting hundreds of Canadian students with university tutors
+            who genuinely care about seeing them succeed.
           </p>
         </div>
       </section>
 
+      {/* ── Story ── */}
       <section className="about-story">
-        <div className="about-container">
-          <h2>Our Mission</h2>
-          <div className="story-text">
+        <div className="about-container about-story-grid">
+          <blockquote className="about-pullquote">
+            <span className="pullquote-bar" />
+            <p>"We're dedicated to more than helping students pass exams — we're here to empower them to reach their full potential."</p>
+          </blockquote>
+          <div className="about-story-body">
             <p>
-            At Academathon, we’re dedicated to more than just helping students succeed in exams — we’re here to empower them to reach their full potential. Our personalized tutoring approach extends beyond academic support; we focus on building the skills, confidence, and mindset needed to thrive in today’s competitive world. Whether you’re gearing up for university, advancing your career, or aiming to boost your grades, Academathon is committed to guiding and supporting you every step of the way.
+              At Academathon, personalized tutoring goes beyond academic support. We focus on
+              building the skills, confidence, and mindset needed to thrive — whether you're
+              preparing for university, strengthening your foundations, or aiming for that
+              grade that opens the next door.
+            </p>
+            <p>
+              What started as a way to keep students learning during the pandemic has grown
+              into a full platform, built on the same human touch that made the original
+              service so effective. Over 200 students. 18 subjects. One simple goal.
             </p>
           </div>
         </div>
       </section>
 
-      <section className="about-values">
+      {/* ── Stats ── */}
+      <section className="about-stats">
         <div className="about-container">
-          <h2>Our Values</h2>
-          <div className="values-grid">
-            {values.map((value, index) => (
-              <div key={index} className="value-card">
-                <div className="value-icon">
-                  <FontAwesomeIcon icon={value.icon} />
-                </div>
-                <h3>{value.title}</h3>
-                <p>{value.description}</p>
+          <div className="about-stats-row">
+            {stats.map((s, i) => (
+              <div key={i} className="about-stat-item">
+                <span className="about-stat-number">{s.number}</span>
+                <span className="about-stat-label">{s.label}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="about-impact">
+      {/* ── Values ── */}
+      <section className="about-values">
         <div className="about-container">
-          <h2>Our Impact</h2>
-          <div className="impact-grid">
-            {impact.map((item, index) => (
-              <div key={index} className="impact-card">
-                <h3>{item.title}</h3>
-                <p>{item.stat}</p>
+          <p className="about-overline">What we stand for</p>
+          <h2 className="about-h2">Our values</h2>
+          <div className="values-grid">
+            {values.map((v, i) => (
+              <div key={i} className="value-card">
+                <div className="value-icon-wrap">
+                  <FontAwesomeIcon icon={v.icon} />
+                </div>
+                <h3 className="value-title">{v.title}</h3>
+                <p className="value-desc">{v.description}</p>
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── CTA ── */}
+      <section className="about-cta-section">
+        <div className="about-container about-cta-inner">
+          <p className="about-cta-overline">Ready to start?</p>
+          <h2 className="about-cta-h2">Find your tutor today.</h2>
+          <p className="about-cta-sub">
+            Browse tutors across 18 subjects. Pay per lesson — no subscription needed.
+          </p>
+          <Link to="/signup" className="about-cta-btn">
+            Get started <FontAwesomeIcon icon={faArrowRight} />
+          </Link>
         </div>
       </section>
 
@@ -109,5 +139,3 @@ function About() {
     </div>
   );
 }
-
-export default About;
