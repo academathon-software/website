@@ -21,7 +21,7 @@ const teamMembers = [
   },
   {
     name: 'Ryan Tang',
-    role: 'Co-Founder & CTO',
+    role: 'CTO',
     bio: "Ryan is a Computer Science student at Wilfrid Laurier University specializing in AI. As CTO, he leads platform architecture, backend systems, and AI-powered features — building the infrastructure that makes every lesson possible. He's driven by reliable, high-performance systems that quietly make learning better.",
     initials: 'RT',
     expertise: ['Cloud Architecture', 'AI / ML', 'Backend Systems'],
