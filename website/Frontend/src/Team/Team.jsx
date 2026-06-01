@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './Team.css';
 import Footer from '../components/Footer/Footer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -8,10 +8,12 @@ import {
   faLightbulb,
   faShieldAlt,
   faEnvelope,
-  faUserGraduate
+  faUserGraduate,
+  faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import { faLinkedin, faTwitter, faGithub } from '@fortawesome/free-brands-svg-icons';
 import sahilImage from '../assets/sahil.avif';
+import ryanImage from '../assets/ryan-tang.png';
 
 const teamMembers = [
   {
@@ -30,6 +32,7 @@ const teamMembers = [
     name: "Ryan Tang",
     role: "CTO",
     bio: "Ryan is currently a computer science student at Wilfrid Laurier University with a concentration in AI, and a full-stack developer focused on building scalable technology solutions. He leads platform architecture, backend systems, and product development, with expertise in cloud infrastructure, modern web technologies, and AI-powered features. Ryan is driven by creating reliable, high-performance systems that enhance learning experiences.",
+    image: ryanImage,
     social: {
       linkedin: "https://www.linkedin.com/in/ryan-tng/",
       github: "https://github.com/ryan-tng",
@@ -63,6 +66,24 @@ const cultureItems = [
 ];
 
 function Team() {
+  const [photoPreview, setPhotoPreview] = useState(null);
+
+  useEffect(() => {
+    if (!photoPreview) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setPhotoPreview(null);
+    };
+
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [photoPreview]);
+
   return (
     <div className="team-page">
       <section className="team-hero">
@@ -83,7 +104,14 @@ function Team() {
               <div key={index} className="team-card">
                 <div className="member-avatar">
                   {member.image ? (
-                    <img src={member.image} alt={member.name} />
+                    <button
+                      type="button"
+                      className="member-avatar-button"
+                      onClick={() => setPhotoPreview({ name: member.name, image: member.image })}
+                      aria-label={`View larger photo of ${member.name}`}
+                    >
+                      <img src={member.image} alt={member.name} />
+                    </button>
                   ) : (
                     <div className="avatar-placeholder">
                       <FontAwesomeIcon icon={faUserGraduate} />
@@ -163,6 +191,36 @@ function Team() {
           </a>
         </div>
       </section>
+
+      {photoPreview && (
+        <div
+          className="team-photo-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${photoPreview.name} photo`}
+          onClick={() => setPhotoPreview(null)}
+        >
+          <div
+            className="team-photo-lightbox-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="team-photo-lightbox-close"
+              onClick={() => setPhotoPreview(null)}
+              aria-label="Close photo"
+            >
+              <FontAwesomeIcon icon={faTimes} />
+            </button>
+            <img
+              src={photoPreview.image}
+              alt={photoPreview.name}
+              className="team-photo-lightbox-image"
+            />
+            <p className="team-photo-lightbox-caption">{photoPreview.name}</p>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
