@@ -16,19 +16,20 @@
 .login-form-panel {
   display: flex;
   flex-direction: column;
-  padding: 44px 56px;
+  padding: 48px 56px;
   min-height: 100vh;
   background: var(--color-bg);
   box-sizing: border-box;
 }
 
-/* Brand / logo — always top-left */
+/* Brand / logo */
 .login-brand {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   text-decoration: none;
-  flex-shrink: 0;
+  margin-bottom: auto;
+  padding-bottom: 8px;
 }
 
 .login-brand-mark {
@@ -55,19 +56,12 @@
   letter-spacing: -0.02em;
 }
 
-/* Centre-wrapper — takes remaining vertical space and centres form */
-.login-form-center {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 32px 0;
-}
-
-/* Form wrap — left-aligned (inherits panel padding edge) */
+/* Form wrap — vertically centered in the panel */
 .login-form-wrap {
   width: 100%;
   max-width: 400px;
+  margin: auto;
+  padding: 48px 0;
 }
 
 .login-eyebrow {
@@ -317,6 +311,20 @@
   line-height: 1.35;
   margin: 0;
   letter-spacing: -0.01em;
+}
+
+.login-visual-stats {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.02em;
+}
+
+.login-stat-dot {
+  opacity: 0.4;
 }
 
 /* ── Responsive ───────────────────────── */
