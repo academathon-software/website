@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './Team.css';
 import Footer from '../components/Footer/Footer';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faArrowRight, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { faLinkedin, faGithub } from '@fortawesome/free-brands-svg-icons';
 import sahilImage from '../assets/sahil.avif';
+import ryanImage from '../assets/ryan-tang.png';
 
 const teamMembers = [
   {
@@ -23,6 +24,7 @@ const teamMembers = [
     name: 'Ryan Tang',
     role: 'CTO',
     bio: "Ryan is a Computer Science student at Wilfrid Laurier University specializing in AI. As CTO, he leads platform architecture, backend systems, and AI-powered features — building the infrastructure that makes every lesson possible. He's driven by reliable, high-performance systems that quietly make learning better.",
+    image: ryanImage,
     initials: 'RT',
     expertise: ['Cloud Architecture', 'AI / ML', 'Backend Systems'],
     social: {
@@ -34,6 +36,24 @@ const teamMembers = [
 ];
 
 export default function Team() {
+  const [photoPreview, setPhotoPreview] = useState(null);
+
+  useEffect(() => {
+    if (!photoPreview) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setPhotoPreview(null);
+    };
+
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [photoPreview]);
+
   return (
     <div className="team-page">
 
@@ -61,11 +81,18 @@ export default function Team() {
               <div key={i} className="founder-card">
                 <div className="founder-avatar-col">
                   {member.image ? (
-                    <img
-                      src={member.image}
-                      alt={member.name}
-                      className="founder-photo"
-                    />
+                    <button
+                      type="button"
+                      className="founder-photo-button"
+                      onClick={() => setPhotoPreview({ name: member.name, image: member.image })}
+                      aria-label={`View full photo of ${member.name}`}
+                    >
+                      <img
+                        src={member.image}
+                        alt={member.name}
+                        className="founder-photo"
+                      />
+                    </button>
                   ) : (
                     <div className="founder-initials" aria-hidden="true">
                       {member.initials}
@@ -144,6 +171,36 @@ export default function Team() {
           </a>
         </div>
       </section>
+
+      {photoPreview && (
+        <div
+          className="team-photo-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${photoPreview.name} photo`}
+          onClick={() => setPhotoPreview(null)}
+        >
+          <div
+            className="team-photo-lightbox-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="team-photo-lightbox-close"
+              onClick={() => setPhotoPreview(null)}
+              aria-label="Close photo"
+            >
+              <FontAwesomeIcon icon={faTimes} />
+            </button>
+            <img
+              src={photoPreview.image}
+              alt={photoPreview.name}
+              className="team-photo-lightbox-image"
+            />
+            <p className="team-photo-lightbox-caption">{photoPreview.name}</p>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
