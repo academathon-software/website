@@ -9,133 +9,140 @@ import {
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-/* ── Inline SVG illustration — educational tree ── */
+/* ── Inline SVG illustration — learning tree ── */
 function TreeIllustration() {
   return (
     <svg
-      viewBox="0 0 400 520"
+      viewBox="0 0 400 500"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className="login-tree-svg"
       aria-hidden="true"
     >
-      {/* Soft glow behind tree */}
-      <ellipse cx="200" cy="280" rx="145" ry="200" fill="rgba(82,183,136,0.08)" />
-
       {/* Ground shadow */}
-      <ellipse cx="200" cy="448" rx="92" ry="14" fill="rgba(0,0,0,0.2)" />
-
-      {/* Root flares */}
-      <path d="M182 430 C172 428 152 422 136 416" stroke="rgba(255,255,255,0.18)" strokeWidth="9" strokeLinecap="round" />
-      <path d="M218 430 C228 428 248 422 264 416" stroke="rgba(255,255,255,0.18)" strokeWidth="9" strokeLinecap="round" />
+      <ellipse cx="200" cy="450" rx="68" ry="10" fill="rgba(0,0,0,0.22)" />
 
       {/* Trunk */}
-      <path
-        d="M188 440 C186 400 183 365 182 340 C181 325 180 315 180 308 C180 315 179 325 178 340 C177 365 174 400 172 440 Z"
-        fill="rgba(255,255,255,0.28)"
-      />
-      <rect x="176" y="308" width="28" height="134" rx="10" fill="rgba(255,255,255,0.22)" />
+      <rect x="182" y="308" width="36" height="136" rx="13" fill="rgba(185,135,72,0.4)" />
+      <rect x="188" y="314" width="10" height="124" rx="5" fill="rgba(255,210,120,0.18)" />
 
-      {/* Foliage — layer 1 (base, widest, darkest) */}
-      <ellipse cx="200" cy="330" rx="118" ry="74" fill="#163D2A" />
-      {/* Foliage — layer 2 */}
-      <ellipse cx="200" cy="278" rx="104" ry="70" fill="#1B4332" />
-      {/* Foliage — layer 3 */}
-      <ellipse cx="200" cy="232" rx="88" ry="64" fill="#2D6A4F" />
-      {/* Foliage — layer 4 */}
-      <ellipse cx="200" cy="190" rx="70" ry="54" fill="#40916C" />
-      {/* Foliage — layer 5 */}
-      <ellipse cx="200" cy="155" rx="54" ry="44" fill="#52B788" />
-      {/* Foliage — layer 6 (tip, lightest) */}
-      <ellipse cx="200" cy="126" rx="36" ry="34" fill="#74C69D" />
-      {/* Very tip */}
-      <ellipse cx="200" cy="104" rx="20" ry="22" fill="#95D5B2" />
+      {/* Root flares */}
+      <path d="M188 430 Q167 436 146 426" stroke="rgba(185,135,72,0.3)" strokeWidth="9" strokeLinecap="round" />
+      <path d="M212 430 Q233 436 254 426" stroke="rgba(185,135,72,0.3)" strokeWidth="9" strokeLinecap="round" />
 
-      {/* ── Book decorations in foliage ── */}
-      {/* Book 1 — mid left */}
-      <g opacity="0.55">
-        <rect x="128" y="268" width="22" height="16" rx="2" fill="white" />
-        <rect x="128" y="268" width="22" height="16" rx="2" stroke="rgba(45,106,79,0.4)" strokeWidth="0.5" />
-        <line x1="139" y1="268" x2="139" y2="284" stroke="rgba(45,106,79,0.6)" strokeWidth="1.5" />
-        {/* Pages hint */}
-        <line x1="131" y1="272" x2="138" y2="272" stroke="rgba(45,106,79,0.35)" strokeWidth="0.8" />
-        <line x1="131" y1="275" x2="138" y2="275" stroke="rgba(45,106,79,0.35)" strokeWidth="0.8" />
-        <line x1="141" y1="272" x2="148" y2="272" stroke="rgba(45,106,79,0.35)" strokeWidth="0.8" />
-      </g>
+      {/* ── Canopy: three-circle cloud-puff ── */}
+      {/* Deep shadow backing */}
+      <circle cx="200" cy="210" r="138" fill="rgba(18,43,34,0.55)" />
+      {/* Layer 1 — darkest */}
+      <circle cx="157" cy="232" r="98"  fill="#163D2A" />
+      <circle cx="243" cy="232" r="98"  fill="#163D2A" />
+      <circle cx="200" cy="176" r="110" fill="#163D2A" />
+      {/* Layer 2 */}
+      <circle cx="158" cy="226" r="88"  fill="#1B4332" />
+      <circle cx="242" cy="226" r="88"  fill="#1B4332" />
+      <circle cx="200" cy="172" r="100" fill="#1B4332" />
+      {/* Layer 3 */}
+      <circle cx="160" cy="220" r="76"  fill="#2D6A4F" />
+      <circle cx="240" cy="220" r="76"  fill="#2D6A4F" />
+      <circle cx="200" cy="168" r="88"  fill="#2D6A4F" />
+      {/* Layer 4 */}
+      <circle cx="162" cy="215" r="64"  fill="#40916C" />
+      <circle cx="238" cy="215" r="64"  fill="#40916C" />
+      <circle cx="200" cy="163" r="76"  fill="#40916C" />
+      {/* Layer 5 — bright */}
+      <circle cx="164" cy="210" r="52"  fill="#52B788" />
+      <circle cx="236" cy="210" r="52"  fill="#52B788" />
+      <circle cx="200" cy="158" r="64"  fill="#52B788" />
+      {/* Top highlight */}
+      <circle cx="200" cy="149" r="50"  fill="#74C69D" />
+      <circle cx="200" cy="141" r="33"  fill="#95D5B2" />
+      {/* Shine spot */}
+      <ellipse cx="175" cy="124" rx="21" ry="15" fill="rgba(255,255,255,0.09)" />
 
-      {/* Book 2 — mid right */}
-      <g opacity="0.5">
-        <rect x="248" y="248" width="20" height="15" rx="2" fill="white" />
-        <line x1="258" y1="248" x2="258" y2="263" stroke="rgba(45,106,79,0.6)" strokeWidth="1.5" />
-        <line x1="251" y1="252" x2="257" y2="252" stroke="rgba(45,106,79,0.35)" strokeWidth="0.8" />
-        <line x1="251" y1="255" x2="257" y2="255" stroke="rgba(45,106,79,0.35)" strokeWidth="0.8" />
-        <line x1="259" y1="252" x2="266" y2="252" stroke="rgba(45,106,79,0.35)" strokeWidth="0.8" />
-      </g>
+      {/* ── Icon badges ── */}
 
-      {/* Book 3 — upper */}
-      <g opacity="0.45">
-        <rect x="166" y="196" width="18" height="13" rx="2" fill="white" />
-        <line x1="175" y1="196" x2="175" y2="209" stroke="rgba(45,106,79,0.6)" strokeWidth="1.5" />
-      </g>
+      {/* BOOK — left */}
+      <circle cx="96"  cy="234" r="27" fill="white" opacity="0.93" />
+      <rect x="83" y="222" width="26" height="20" rx="3" fill="#2D6A4F" />
+      <rect x="83" y="222" width="12" height="20" rx="2" fill="#52B788" />
+      <line x1="95" y1="222" x2="95" y2="242" stroke="white" strokeWidth="1.5" />
+      <line x1="85" y1="227" x2="93" y2="227" stroke="rgba(255,255,255,0.65)" strokeWidth="1.1" strokeLinecap="round" />
+      <line x1="85" y1="231" x2="93" y2="231" stroke="rgba(255,255,255,0.65)" strokeWidth="1.1" strokeLinecap="round" />
+      <line x1="85" y1="235" x2="93" y2="235" stroke="rgba(255,255,255,0.65)" strokeWidth="1.1" strokeLinecap="round" />
 
-      {/* Book 4 — upper right */}
-      <g opacity="0.4">
-        <rect x="216" y="188" width="16" height="12" rx="2" fill="white" />
-        <line x1="224" y1="188" x2="224" y2="200" stroke="rgba(45,106,79,0.55)" strokeWidth="1.5" />
-      </g>
+      {/* LIGHTBULB — upper right */}
+      <circle cx="298" cy="156" r="27" fill="#FFD60A" opacity="0.95" />
+      <circle cx="298" cy="149" r="9"  fill="white" />
+      <rect   x="294" y="157" width="8" height="3" rx="1.5" fill="white" opacity="0.85" />
+      <rect   x="295" y="160" width="6" height="2" rx="1"   fill="white" opacity="0.65" />
+      <line x1="298" y1="136" x2="298" y2="133" stroke="white" strokeWidth="2" strokeLinecap="round" />
+      <line x1="307" y1="139" x2="309" y2="137" stroke="white" strokeWidth="2" strokeLinecap="round" />
+      <line x1="289" y1="139" x2="287" y2="137" stroke="white" strokeWidth="2" strokeLinecap="round" />
+      <line x1="313" y1="149" x2="316" y2="149" stroke="white" strokeWidth="2" strokeLinecap="round" />
+      <line x1="283" y1="149" x2="280" y2="149" stroke="white" strokeWidth="2" strokeLinecap="round" />
 
-      {/* ── Star / glow at very top ── */}
-      <circle cx="200" cy="84" r="13" fill="rgba(255,255,255,0.15)" />
-      <circle cx="200" cy="84" r="8" fill="white" opacity="0.92" />
-      <circle cx="200" cy="84" r="4" fill="#52B788" />
+      {/* GRADUATION CAP — upper left */}
+      <circle cx="114" cy="166" r="27" fill="#90CAF9" opacity="0.95" />
+      <polygon points="114,153 97,162 131,162" fill="white" />
+      <rect x="99" y="170" width="26" height="12" rx="3" fill="white" />
+      <line x1="129" y1="162" x2="129" y2="170" stroke="white" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="129" cy="172" r="2.5" fill="white" />
 
-      {/* Star rays */}
-      <line x1="200" y1="71" x2="200" y2="65" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.7" />
-      <line x1="200" y1="97" x2="200" y2="103" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.7" />
-      <line x1="187" y1="84" x2="181" y2="84" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.7" />
-      <line x1="213" y1="84" x2="219" y2="84" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.7" />
-      <line x1="191" y1="75" x2="186" y2="70" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
-      <line x1="209" y1="75" x2="214" y2="70" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
-      <line x1="191" y1="93" x2="186" y2="98" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
-      <line x1="209" y1="93" x2="214" y2="98" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
+      {/* CODE </> — right */}
+      <circle cx="304" cy="231" r="27" fill="#CE93D8" opacity="0.95" />
+      <text x="304" y="231" textAnchor="middle" dominantBaseline="central" fontSize="13" fontWeight="700" fill="white" fontFamily="monospace">{'</>'}</text>
+
+      {/* ATOM — lower left of canopy */}
+      <circle cx="135" cy="274" r="22" fill="rgba(255,255,255,0.15)" />
+      <circle cx="135" cy="274" r="4.5" fill="rgba(255,255,255,0.88)" />
+      <ellipse cx="135" cy="274" rx="17" ry="6.5" stroke="rgba(255,255,255,0.72)" strokeWidth="1.4" fill="none" />
+      <ellipse cx="135" cy="274" rx="17" ry="6.5" stroke="rgba(255,255,255,0.72)" strokeWidth="1.4" fill="none" transform="rotate(60 135 274)" />
+      <ellipse cx="135" cy="274" rx="17" ry="6.5" stroke="rgba(255,255,255,0.72)" strokeWidth="1.4" fill="none" transform="rotate(120 135 274)" />
+
+      {/* MATH ∑ — lower right of canopy */}
+      <circle cx="265" cy="274" r="22" fill="rgba(255,255,255,0.15)" />
+      <text x="265" y="274" textAnchor="middle" dominantBaseline="central" fontSize="17" fontWeight="700" fill="rgba(255,255,255,0.88)">∑</text>
+
+      {/* ── Star at top ── */}
+      <circle cx="200" cy="80" r="14" fill="rgba(255,255,255,0.15)" />
+      <circle cx="200" cy="80" r="9"  fill="white" opacity="0.95" />
+      <circle cx="200" cy="80" r="4"  fill="#52B788" />
+      <line x1="200" y1="66" x2="200" y2="60" stroke="white" strokeWidth="2"   strokeLinecap="round" opacity="0.7" />
+      <line x1="200" y1="94" x2="200" y2="100" stroke="white" strokeWidth="2"   strokeLinecap="round" opacity="0.7" />
+      <line x1="186" y1="80" x2="180" y2="80" stroke="white" strokeWidth="2"   strokeLinecap="round" opacity="0.7" />
+      <line x1="214" y1="80" x2="220" y2="80" stroke="white" strokeWidth="2"   strokeLinecap="round" opacity="0.7" />
+      <line x1="191" y1="71" x2="186" y2="66" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
+      <line x1="209" y1="71" x2="214" y2="66" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
+      <line x1="191" y1="89" x2="186" y2="94" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
+      <line x1="209" y1="89" x2="214" y2="94" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
 
       {/* ── Floating sparkle dots ── */}
-      <circle cx="58"  cy="210" r="5"   fill="white" opacity="0.45" />
-      <circle cx="58"  cy="210" r="2.5" fill="white" opacity="0.7" />
+      <circle cx="54"  cy="205" r="5"   fill="white" opacity="0.42" />
+      <circle cx="54"  cy="205" r="2.5" fill="white" opacity="0.68" />
+      <circle cx="350" cy="180" r="4"   fill="white" opacity="0.36" />
+      <circle cx="350" cy="180" r="2"   fill="white" opacity="0.62" />
+      <circle cx="40"  cy="305" r="3.5" fill="white" opacity="0.28" />
+      <circle cx="362" cy="282" r="4.5" fill="white" opacity="0.32" />
+      <circle cx="362" cy="282" r="2"   fill="white" opacity="0.58" />
+      <circle cx="80"  cy="142" r="3"   fill="white" opacity="0.36" />
+      <circle cx="322" cy="134" r="3"   fill="white" opacity="0.33" />
 
-      <circle cx="348" cy="185" r="4"   fill="white" opacity="0.38" />
-      <circle cx="348" cy="185" r="2"   fill="white" opacity="0.65" />
-
-      <circle cx="44"  cy="310" r="3.5" fill="white" opacity="0.32" />
-
-      <circle cx="362" cy="290" r="4.5" fill="white" opacity="0.35" />
-      <circle cx="362" cy="290" r="2"   fill="white" opacity="0.6" />
-
-      <circle cx="88"  cy="148" r="3"   fill="white" opacity="0.38" />
-      <circle cx="320" cy="138" r="3.5" fill="white" opacity="0.35" />
-
-      <circle cx="72"  cy="385" r="2.5" fill="white" opacity="0.28" />
-      <circle cx="336" cy="370" r="3"   fill="white" opacity="0.3" />
-
-      <circle cx="116" cy="110" r="2"   fill="white" opacity="0.4" />
-      <circle cx="290" cy="105" r="2.5" fill="white" opacity="0.38" />
-
-      {/* Small cross sparkles */}
-      <g opacity="0.5">
-        <line x1="340" y1="340" x2="340" y2="350" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-        <line x1="335" y1="345" x2="345" y2="345" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-      </g>
-      <g opacity="0.42">
-        <line x1="62" y1="270" x2="62" y2="278" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-        <line x1="58" y1="274" x2="66" y2="274" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+      {/* Cross sparkles */}
+      <g opacity="0.46">
+        <line x1="342" y1="332" x2="342" y2="342" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="337" y1="337" x2="347" y2="337" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
       </g>
       <g opacity="0.38">
-        <line x1="155" y1="64" x2="155" y2="72" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-        <line x1="151" y1="68" x2="159" y2="68" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="58"  y1="264" x2="58"  y2="272" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="54"  y1="268" x2="62"  y2="268" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
       </g>
-      <g opacity="0.4">
-        <line x1="248" y1="60" x2="248" y2="68" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-        <line x1="244" y1="64" x2="252" y2="64" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+      <g opacity="0.35">
+        <line x1="152" y1="56"  x2="152" y2="64"  stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="148" y1="60"  x2="156" y2="60"  stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+      </g>
+      <g opacity="0.38">
+        <line x1="248" y1="52"  x2="248" y2="60"  stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="244" y1="56"  x2="252" y2="56"  stroke="white" strokeWidth="1.5" strokeLinecap="round" />
       </g>
     </svg>
   );
@@ -288,13 +295,6 @@ function LoginPage() {
           <p className="login-visual-tagline">
             Growing minds,<br />one lesson at a time.
           </p>
-          <div className="login-visual-stats">
-            <span>200+ students</span>
-            <span className="login-stat-dot">·</span>
-            <span>18 subjects</span>
-            <span className="login-stat-dot">·</span>
-            <span>Since 2021</span>
-          </div>
         </div>
       </div>
 

@@ -133,6 +133,7 @@
   font-weight: 600;
   color: var(--color-text-primary);
   letter-spacing: -0.01em;
+  text-align: left;
 }
 
 .login-forgot {
@@ -313,19 +314,6 @@
   letter-spacing: -0.01em;
 }
 
-.login-visual-stats {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
-  letter-spacing: 0.02em;
-}
-
-.login-stat-dot {
-  opacity: 0.4;
-}
 
 /* ── Responsive ───────────────────────── */
 
