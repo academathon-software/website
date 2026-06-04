@@ -23,10 +23,11 @@
   box-sizing: border-box;
 }
 
-/* Form wrap — vertically centered by parent flex */
+/* Form wrap — centered in panel */
 .login-form-wrap {
   width: 100%;
   max-width: 400px;
+  margin: 0 auto;
 }
 
 .login-eyebrow {
