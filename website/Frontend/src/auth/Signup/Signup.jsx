@@ -178,12 +178,6 @@ function SignUpPage() {
   return (
     <div className="su-page">
 
-      {/* Brand */}
-      <a href="/" className="su-brand" aria-label="Academathon home">
-        <span className="su-brand-mark">at</span>
-        <span className="su-brand-name">Academathon</span>
-      </a>
-
       <div className="su-wrap">
 
         {/* Progress stepper */}

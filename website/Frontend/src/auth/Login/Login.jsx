@@ -212,11 +212,6 @@ function LoginPage() {
 
       {/* ── Left: form panel ── */}
       <div className="login-form-panel">
-        <a href="/" className="login-brand" aria-label="Academathon home">
-          <span className="login-brand-mark">at</span>
-          <span className="login-brand-name">Academathon</span>
-        </a>
-
         <div className="login-form-wrap">
           <p className="login-eyebrow">Welcome back</p>
           <h1 className="login-heading">

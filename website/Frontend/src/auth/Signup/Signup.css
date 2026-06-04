@@ -10,43 +10,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 36px 24px 48px;
+  justify-content: center;
+  padding: 72px 24px 56px;
   box-sizing: border-box;
 }
 
-/* ── Brand ──────────────────────────────── */
-.su-brand {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  margin-bottom: 28px;
-}
-
-.su-brand-mark {
-  font-family: var(--font-sans);
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-accent);
-  letter-spacing: -0.04em;
-  line-height: 1;
-  background: var(--color-accent-subtle);
-  border: 1.5px solid var(--color-accent-border);
-  border-radius: var(--radius-md);
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.su-brand-name {
-  font-size: 1.0625rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  letter-spacing: -0.02em;
-}
 
 /* ── Form container ─────────────────────── */
 .su-wrap {
@@ -457,11 +425,8 @@ select.su-select {
 /* ── Responsive ─────────────────────────── */
 @media (max-width: 600px) {
   .su-page {
-    padding: 32px 20px 56px;
-  }
-
-  .su-brand {
-    margin-bottom: 36px;
+    padding: 56px 20px 48px;
+    justify-content: flex-start;
   }
 
   .su-row {
