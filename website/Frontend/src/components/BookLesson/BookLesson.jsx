@@ -111,7 +111,7 @@ const SaveCardForm = ({ onPaymentMethod, onCancel, summary, submitting, pricing 
   return (
     <form onSubmit={handleSubmit} className="save-card-form">
       {priceLabel && (
-        <p className="save-card-total" style={{ fontWeight: 700, fontSize: '1.05rem', margin: '0 0 0.4rem' }}>
+        <p className="save-card-total">
           Total: {priceLabel}
         </p>
       )}
@@ -590,94 +590,36 @@ const BookLesson = () => {
               <p>Loading your profile…</p>
             ) : studentGradeLabel ? (
               <>
-                <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '1rem',
-                  padding: '1.5rem',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '12px',
-                  backgroundColor: '#f0fdf4'
-                }}>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.85rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      Booking as
-                    </div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#2D6A4F', marginTop: '4px' }}>
-                      {studentGradeLabel}
-                    </div>
-                  </div>
+                <div className="bl-grade-box">
+                  <p className="bl-grade-meta">Booking as</p>
+                  <p className="bl-grade-name">{studentGradeLabel}</p>
                   <button
                     type="button"
                     onClick={() => navigate('/profile')}
-                    style={{
-                      padding: '0.4rem 1rem',
-                      border: '1px solid #2D6A4F',
-                      borderRadius: '6px',
-                      backgroundColor: 'white',
-                      color: '#2D6A4F',
-                      cursor: 'pointer',
-                      fontSize: '0.875rem',
-                      fontWeight: 500
-                    }}
+                    className="bl-change-grade-btn"
                   >
                     Change in profile
                   </button>
                 </div>
-                <p style={{ marginTop: '1rem', color: '#6b7280', fontSize: '0.9rem' }}>
+                <p className="bl-grade-hint">
                   We'll only show tutors who teach this grade.
                 </p>
-
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  marginTop: '1.5rem',
-                  width: '100%'
-                }}>
-                  <button
-                    onClick={handleNext}
-                    style={{
-                      padding: '0.75rem 2.5rem',
-                      border: 'none',
-                      borderRadius: '8px',
-                      backgroundColor: '#2D6A4F',
-                      color: 'white',
-                      cursor: 'pointer',
-                      fontSize: '1rem',
-                      fontWeight: '600'
-                    }}
-                  >
+                <div className="bl-continue-row">
+                  <button onClick={handleNext} className="bl-continue-btn">
                     Continue
                   </button>
                 </div>
               </>
             ) : (
-              <div style={{
-                padding: '1.5rem',
-                border: '1px solid #fbbf24',
-                borderRadius: '12px',
-                backgroundColor: '#fffbeb'
-              }}>
-                <div style={{ fontWeight: 600, color: '#92400e', marginBottom: '0.5rem' }}>
-                  Set your grade level to continue
-                </div>
-                <p style={{ color: '#78350f', marginBottom: '1rem', fontSize: '0.95rem' }}>
+              <div className="bl-no-grade-box">
+                <p className="bl-no-grade-title">Set your grade level to continue</p>
+                <p className="bl-no-grade-body">
                   We use your grade to show only tutors who teach at your level. You can update it any time on your profile.
                 </p>
                 <button
                   type="button"
                   onClick={() => navigate('/profile')}
-                  style={{
-                    padding: '0.6rem 1.25rem',
-                    border: 'none',
-                    borderRadius: '6px',
-                    backgroundColor: '#1A803D',
-                    color: 'white',
-                    cursor: 'pointer',
-                    fontSize: '0.95rem',
-                    fontWeight: 600
-                  }}
+                  className="bl-go-profile-btn"
                 >
                   Go to profile
                 </button>
@@ -701,42 +643,9 @@ const BookLesson = () => {
                 </button>
               ))}
             </div>
-            <div style={{
-              display: 'flex',
-              gap: '1rem',
-              justifyContent: 'flex-end',
-              marginTop: '1.5rem',
-              width: '100%'
-            }}>
-              <button
-                onClick={handleBack}
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  border: '1px solid #ddd',
-                  borderRadius: '6px',
-                  backgroundColor: 'white',
-                  color: '#333',
-                  cursor: 'pointer',
-                  fontSize: '1rem',
-                  fontWeight: '500'
-                }}
-              >
-                Back
-              </button>
-              <button
-                onClick={handleNext}
-                disabled={!selectedSubject}
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  border: 'none',
-                  borderRadius: '6px',
-                  backgroundColor: selectedSubject ? '#1A803D' : '#ccc',
-                  color: 'white',
-                  cursor: selectedSubject ? 'pointer' : 'not-allowed',
-                  fontSize: '1rem',
-                  fontWeight: '600'
-                }}
-              >
+            <div className="bl-nav-row">
+              <button onClick={handleBack} className="bl-back-btn">Back</button>
+              <button onClick={handleNext} disabled={!selectedSubject} className="bl-next-btn">
                 Continue
               </button>
             </div>
@@ -845,16 +754,14 @@ const BookLesson = () => {
               {selectedTutor && currentTutor && (
                 <div className="tutor-calendar">
                   <div className="calendar-header">
-                    <FontAwesomeIcon 
-                      icon={faChevronLeft} 
+                    <FontAwesomeIcon
+                      icon={faChevronLeft}
                       onClick={() => navigateCalendarWeek(-1)}
-                      style={{ cursor: 'pointer' }}
                     />
                     <span>{formatCalendarMonth()}</span>
-                    <FontAwesomeIcon 
-                      icon={faChevronRight} 
+                    <FontAwesomeIcon
+                      icon={faChevronRight}
                       onClick={() => navigateCalendarWeek(1)}
-                      style={{ cursor: 'pointer' }}
                     />
                   </div>
                   
@@ -949,28 +856,8 @@ const BookLesson = () => {
               )}
             </div>
             )}
-            <div style={{ 
-              display: 'flex', 
-              gap: '1rem', 
-              justifyContent: 'flex-end', 
-              marginTop: '1.5rem',
-              width: '100%'
-            }}>
-              <button 
-                onClick={handleBack}
-                style={{ 
-                  padding: '0.75rem 1.5rem', 
-                  border: '1px solid #ddd', 
-                  borderRadius: '6px', 
-                  backgroundColor: 'white', 
-                  color: '#333',
-                  cursor: 'pointer',
-                  fontSize: '1rem',
-                  fontWeight: '500'
-                }}
-              >
-                Back
-              </button>
+            <div className="bl-nav-row">
+              <button onClick={handleBack} className="bl-back-btn">Back</button>
             </div>
           </div>
         );
@@ -1042,11 +929,9 @@ const BookLesson = () => {
                 <>
                   {summaryLine}
                   {priceLabel && (
-                    <p style={{ fontWeight: 700, fontSize: '1.05rem', margin: '0 0 0.4rem' }}>
-                      Total: {priceLabel}
-                    </p>
+                    <p className="bl-popup-price">Total: {priceLabel}</p>
                   )}
-                  <p style={{ fontSize: '0.85rem', color: '#6b7280', margin: '0 0 0.75rem' }}>
+                  <p className="bl-popup-hint">
                     You'll save a card next. We only charge {priceLabel ? `${priceLabel} ` : 'it '}once your tutor confirms the booking.
                   </p>
                   <div className="booking-confirmation-buttons">
@@ -1107,9 +992,7 @@ const BookLesson = () => {
               )}
               <h2>{selectedTutorProfile.displayName || selectedTutorProfile.name || 'Tutor'}</h2>
               {selectedTutorProfile.user?.pronouns && (
-                <div style={{ color: '#6b7280', fontSize: '0.9rem', marginTop: '4px' }}>
-                  {selectedTutorProfile.user.pronouns}
-                </div>
+                <div className="bl-pronouns">{selectedTutorProfile.user.pronouns}</div>
               )}
               <div className="tutor-rating">
                 <FontAwesomeIcon icon={faStar} className="star-icon" />
