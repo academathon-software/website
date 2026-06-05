@@ -128,7 +128,7 @@ const Courses = () => {
   };
 
   const getSubjectColor = (index) => {
-    const colors = ['#ff6b6b', '#4ecdc4', '#9b59b6', '#e67e22', '#3498db', '#2ecc71', '#f39c12', '#1abc9c'];
+    const colors = ['#EF6B6B', '#26C6B0', '#9B6FCE', '#F5964A', '#4A9FE0', '#52B788', '#F4B942', '#E878A8'];
     return colors[index % colors.length];
   };
 
