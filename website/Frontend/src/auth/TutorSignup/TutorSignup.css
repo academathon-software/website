@@ -673,6 +673,9 @@
 
 /* ── Loading state ── */
 .tutor-signup-page .loading {
+  /* Span both grid columns so the spinner is centred on the full page,
+     not just the left 2fr column. */
+  grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
   align-items: center;

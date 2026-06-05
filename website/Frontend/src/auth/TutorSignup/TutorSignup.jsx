@@ -479,7 +479,7 @@ function TutorSignup() {
         const errorData = await response.json();
         setError(errorData.message || 'Signup failed');
       }
-    } catch (error) {
+    } catch (err) {
       setError('Network error. Please try again.');
     } finally {
       setIsLoading(false);
@@ -773,14 +773,24 @@ function TutorSignup() {
                   type="button"
                   className="select-all-btn"
                   onClick={() => {
-                    if (formData.subjects.length === ALL_SUBJECTS.length) {
-                      setFormData(prev => ({ ...prev, subjects: [] }));
-                    } else {
-                      setFormData(prev => ({ ...prev, subjects: [...ALL_SUBJECTS] }));
-                    }
+                    // Operate on filteredSubjects so the button reflects what the
+                    // user actually sees — toggling ALL_SUBJECTS when a search is
+                    // active would silently select hidden items and flip the label
+                    // to "Deselect All" with no visible explanation.
+                    const allFilteredSelected = filteredSubjects.every(s =>
+                      formData.subjects.includes(s)
+                    );
+                    setFormData(prev => ({
+                      ...prev,
+                      subjects: allFilteredSelected
+                        ? prev.subjects.filter(s => !filteredSubjects.includes(s))
+                        : [...new Set([...prev.subjects, ...filteredSubjects])],
+                    }));
                   }}
                 >
-                  {formData.subjects.length === ALL_SUBJECTS.length ? 'Deselect All' : 'Select All'}
+                  {filteredSubjects.every(s => formData.subjects.includes(s))
+                    ? 'Deselect All'
+                    : 'Select All'}
                 </button>
               </div>
 

@@ -25,32 +25,37 @@ const formatNumber = (value) =>
   new Intl.NumberFormat('en-CA').format(value || 0);
 
 /* ── Sparkline SVG component ── */
-const Sparkline = ({ path, color }) => (
-  <svg
-    viewBox="0 0 200 55"
-    className="admin-sparkline"
-    preserveAspectRatio="none"
-  >
-    <defs>
-      <linearGradient id={`sg-${color}`} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stopColor={color} stopOpacity="0.25" />
-        <stop offset="100%" stopColor={color} stopOpacity="0"    />
-      </linearGradient>
-    </defs>
-    <path
-      d={`${path} L200,55 L0,55 Z`}
-      fill={`url(#sg-${color})`}
-    />
-    <path
-      d={path}
-      stroke={color}
-      strokeWidth="2"
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
+const Sparkline = ({ path, color }) => {
+  // Strip '#' for use in SVG id — '#' is invalid in XML NCNames and breaks
+  // the url(#…) gradient reference in all browsers.
+  const gradientId = `sg-${color.replace('#', '')}`;
+  return (
+    <svg
+      viewBox="0 0 200 55"
+      className="admin-sparkline"
+      preserveAspectRatio="none"
+    >
+      <defs>
+        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor={color} stopOpacity="0.25" />
+          <stop offset="100%" stopColor={color} stopOpacity="0"    />
+        </linearGradient>
+      </defs>
+      <path
+        d={`${path} L200,55 L0,55 Z`}
+        fill={`url(#${gradientId})`}
+      />
+      <path
+        d={path}
+        stroke={color}
+        strokeWidth="2"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+};
 
 const CARD_META = [
   {
