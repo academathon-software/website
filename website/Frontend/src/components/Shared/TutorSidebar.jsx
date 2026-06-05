@@ -83,6 +83,7 @@ const TutorSidebar = () => {
           >
             at
           </div>
+          <span className="sidebar-wordmark">Academathon</span>
         </div>
         
         <nav className="sidebar-nav">

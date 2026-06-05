@@ -1,353 +1,492 @@
-/* Book Lesson Page Styles */
+/* ─────────────────────────────────────────
+   Book Lesson — design-system aligned
+   3-step booking flow: grade → subject → tutor + time
+───────────────────────────────────────── */
+
 .book-lesson-page {
   display: flex;
   min-height: 100vh;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: white;
+  font-family: var(--font-sans);
+  background: var(--color-bg);
 }
 
-.main-content {
+/* ── Main Content ── */
+.book-lesson-page .main-content {
   flex: 1;
   margin-left: 250px;
-  padding: 2rem;
-  background-color: white;
+  padding: 40px 40px 56px;
+  background: var(--color-bg);
   min-height: 100vh;
+  box-sizing: border-box;
 }
 
 @media screen and (max-width: 1199px) {
-  .main-content {
-    margin-left: 220px;
-  }
+  .book-lesson-page .main-content { margin-left: 220px; padding: 32px 28px 48px; }
 }
 
 @media screen and (max-width: 1024px) {
-  .main-content {
-    margin-left: 200px;
-  }
+  .book-lesson-page .main-content { margin-left: 200px; padding: 28px 24px 40px; }
 }
 
 @media screen and (max-width: 900px) {
-  .main-content {
-    margin-left: 70px;
-  }
+  .book-lesson-page .main-content { margin-left: 70px; padding: 24px 16px 32px; }
 }
 
+/* ── Page Header ── */
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  width: 100%;
+  margin-bottom: 40px;
 }
-
 
 .page-header h1 {
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: #333;
+  font-family: var(--font-sans);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--color-text-primary);
   margin: 0;
-  line-height: 1;
 }
 
+/* ── Progress Indicator ── */
 .progress-indicator {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 8px;
 }
 
 .progress-circle {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  border: 2px solid #1A803D;
-  background-color: transparent;
-  transition: all 0.3s ease;
+  border: 2px solid var(--color-accent);
+  background: transparent;
+  transition: background 0.2s ease;
 }
 
 .progress-circle.active {
-  background-color: #1A803D;
+  background: var(--color-accent);
 }
 
 .progress-line {
-  width: 40px;
+  width: 36px;
   height: 2px;
-  background-color: #1A803D;
+  background: var(--color-accent-border);
 }
 
-/* Booking Card */
+/* ── Booking Card (Step 1 & 2) ── */
 .booking-card {
-  background-color: #f8f9fa;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  max-width: 800px;
-  margin: 4rem auto 0;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  padding: 36px;
+  max-width: 580px;
+  margin: 0 auto;
 }
 
 .booking-card h3 {
-  font-size: 1.5rem;
+  font-family: var(--font-sans);
+  font-size: 1.25rem;
   font-weight: 600;
-  color: #333;
-  margin: 0 0 2rem 0;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  margin: 0 0 24px;
 }
 
-/* Step 1: Grade Selection */
-.grade-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.grade-button {
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: white;
-  color: #333;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.grade-button:hover {
-  background-color: #f8f9fa;
-  border-color: #1A803D;
-}
-
-.grade-button.selected {
-  background-color: #1A803D;
-  color: white;
-  border-color: #1A803D;
-}
-
-/* Step 2: Subject Selection */
-.subject-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.subject-button {
+/* ── Step 1: Grade Level ── */
+.bl-grade-box {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: 1.5rem;
-  border: none;
-  border-radius: 12px;
-  color: white;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.subject-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.subject-button.selected {
-  transform: scale(1.05);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-}
-
-.subject-button svg {
-  font-size: 2rem;
-}
-
-/* Step 3: Course Selection */
-.no-courses-message {
+  gap: 14px;
+  padding: 28px 24px;
+  border: 1px solid var(--color-accent-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-accent-subtle);
   text-align: center;
-  color: #666;
-  font-size: 1rem;
-  margin: 2rem 0;
-  padding: 1.5rem;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  border: 1px dashed #dee2e6;
 }
 
+.bl-grade-meta {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  margin: 0;
+}
+
+.bl-grade-name {
+  font-family: var(--font-sans);
+  font-size: 1.625rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--color-accent);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.bl-change-grade-btn {
+  padding: 6px 18px;
+  border: 1.5px solid var(--color-accent-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-raised);
+  color: var(--color-accent);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.bl-change-grade-btn:hover {
+  background: var(--color-accent-subtle);
+  color: var(--color-accent-hover);
+}
+
+.bl-grade-hint {
+  margin: 12px 0 0;
+  color: var(--color-text-tertiary);
+  font-size: 0.875rem;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* No grade set */
+.bl-no-grade-box {
+  padding: 24px;
+  border: 1px solid #FDE68A;
+  border-radius: var(--radius-lg);
+  background: #FFFBEB;
+}
+
+.bl-no-grade-title {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  color: #92400E;
+  margin: 0 0 8px;
+  font-size: 0.9375rem;
+}
+
+.bl-no-grade-body {
+  color: #78350F;
+  margin: 0 0 16px;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.bl-go-profile-btn {
+  padding: 9px 22px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.bl-go-profile-btn:hover { background: var(--color-accent-hover); }
+
+/* ── Navigation Rows ── */
+.bl-continue-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 28px;
+}
+
+.bl-nav-row {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 28px;
+}
+
+.bl-continue-btn,
+.bl-next-btn {
+  padding: 11px 32px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bl-continue-btn:hover,
+.bl-next-btn:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(45, 106, 79, 0.28);
+}
+
+.bl-next-btn:disabled {
+  background: var(--color-text-tertiary);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.55;
+}
+
+.bl-back-btn {
+  padding: 11px 24px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-raised);
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.bl-back-btn:hover {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border-color: var(--color-text-tertiary);
+}
+
+/* ── Subject Grid ── */
 .course-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 4px;
 }
 
 .course-button {
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: white;
-  color: #333;
-  font-size: 1rem;
+  padding: 11px 12px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
   font-weight: 500;
+  letter-spacing: -0.01em;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
   text-align: center;
 }
 
 .course-button:hover {
-  background-color: #f8f9fa;
-  border-color: #1A803D;
+  border-color: var(--color-accent);
+  background: var(--color-accent-subtle);
+  color: var(--color-accent);
 }
 
 .course-button.selected {
-  background-color: #9b59b6;
-  color: white;
-  border-color: #9b59b6;
-  box-shadow: 0 4px 8px rgba(155, 89, 182, 0.3);
+  background: var(--color-accent);
+  color: #fff;
+  border-color: var(--color-accent);
+  box-shadow: 0 2px 8px rgba(45, 106, 79, 0.25);
 }
 
-/* Step 4: Tutor Availability - New Design */
+/* ── Wide Card (Step 3 — Tutor + Calendar) ── */
 .booking-card-wide {
-  background-color: #f8f9fa;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  max-width: 1400px;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  padding: 32px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
 .booking-card-wide h3 {
-  font-size: 1.5rem;
+  font-family: var(--font-sans);
+  font-size: 1.125rem;
   font-weight: 600;
-  color: #333;
-  margin: 0 0 2rem 0;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  margin: 0 0 20px;
 }
 
+/* Inline error */
+.book-lesson-page .error-message {
+  color: #B91C1C;
+  font-size: 0.875rem;
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  background: #FEF2F2;
+  border-radius: var(--radius-md);
+  border: 1px solid #FECACA;
+}
+
+/* ── Tutor Availability Container ── */
 .tutor-availability-container {
   display: flex;
-  gap: 2rem;
+  gap: 20px;
+  margin-bottom: 20px;
   min-height: 0;
-  margin-bottom: 1.5rem;
   position: relative;
 }
 
-/* Left Side - Tutor List */
+/* ── Tutor List ── */
 .tutor-list {
-  flex: 0 0 250px;
+  flex: 0 0 200px;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  max-height: 400px;
+  gap: 8px;
+  max-height: 440px;
   overflow-y: auto;
-  padding-right: 0.5rem;
+  padding-right: 4px;
+}
+
+.tutor-list::-webkit-scrollbar { width: 3px; }
+.tutor-list::-webkit-scrollbar-track { background: transparent; }
+.tutor-list::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 9999px;
 }
 
 .tutor-card {
-  background-color: white;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  padding: 1rem;
+  background: var(--color-surface-raised);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 14px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .tutor-card:hover {
-  border-color: #2D6A4F;
-  transform: translateX(4px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  border-color: var(--color-accent);
+  background: var(--color-accent-subtle);
+  box-shadow: var(--shadow-sm);
 }
 
 .tutor-card.active {
-  background-color: #2D6A4F;
-  border-color: #2D6A4F;
-  color: white;
-  box-shadow: 0 4px 12px rgba(45, 106, 79, 0.3);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(45, 106, 79, 0.3);
 }
 
 .tutor-card-name {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   font-weight: 600;
-  font-size: 1rem;
-  text-align: center;
+  font-size: 0.875rem;
+  letter-spacing: -0.01em;
+  width: 100%;
 }
 
 .tutor-card-rating {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.3rem;
-  margin-top: 0.4rem;
-  font-size: 0.85rem;
-  color: #f9a825;
+  gap: 4px;
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: #F59E0B;
   font-weight: 600;
 }
 
-.tutor-card.active .tutor-card-rating {
-  color: #fff8e1;
-}
+.tutor-card.active .tutor-card-rating { color: rgba(255, 255, 255, 0.9); }
 
-.tutor-card-star {
-  color: #f9a825;
-}
-
-.tutor-card.active .tutor-card-star {
-  color: #fff8e1;
-}
+.tutor-card-star { color: #F59E0B; }
+.tutor-card.active .tutor-card-star { color: rgba(255, 255, 255, 0.9); }
 
 .tutor-card-review-count {
-  color: #6b7280;
+  color: var(--color-text-tertiary);
   font-weight: 500;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 
-.tutor-card.active .tutor-card-review-count {
-  color: rgba(255, 255, 255, 0.85);
-}
+.tutor-card.active .tutor-card-review-count { color: rgba(255, 255, 255, 0.7); }
 
 .tutor-card-no-rating {
-  color: #9ca3af;
-  font-weight: 500;
+  color: var(--color-text-tertiary);
+  font-weight: 400;
   font-style: italic;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 
-.tutor-card.active .tutor-card-no-rating {
-  color: rgba(255, 255, 255, 0.8);
+.tutor-card.active .tutor-card-no-rating { color: rgba(255, 255, 255, 0.65); }
+
+/* ── View Profile Button ── */
+.view-tutor-profile-btn {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-tertiary);
+  font-size: 0.6875rem;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  flex-shrink: 0;
 }
 
-/* Right Side - Calendar */
+.tutor-card:not(.active) .view-tutor-profile-btn:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.tutor-card.active .view-tutor-profile-btn {
+  border-color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.tutor-card.active .view-tutor-profile-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.8);
+  color: #fff;
+}
+
+/* ── Calendar ── */
 .tutor-calendar {
   flex: 1;
-  background-color: white;
-  border-radius: 8px;
-  border: 1px solid #ddd;
+  background: var(--color-surface-raised);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  position: relative;
+  min-width: 0;
 }
 
 .calendar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.875rem 1.5rem;
-  background-color: #2D6A4F;
-  color: white;
+  padding: 14px 20px;
+  background: var(--color-accent);
+  color: #fff;
+  font-family: var(--font-sans);
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 0.9375rem;
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
 }
 
 .calendar-header svg {
   cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
-  font-size: 1.2rem;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s ease;
 }
 
-.calendar-header svg:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
+.calendar-header svg:hover { background: rgba(255, 255, 255, 0.2); }
 
 .calendar-grid-container {
   display: flex;
@@ -355,36 +494,43 @@
   overflow: hidden;
 }
 
-/* Time Column (Left side of calendar) */
+/* Time Column */
 .time-column {
-  flex: 0 0 140px;
-  background-color: #f8f9fa;
-  border-right: 2px solid #ddd;
+  flex: 0 0 110px;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
 }
 
 .time-header {
-  padding: 1rem;
+  padding: 10px 8px;
   text-align: center;
+  font-family: var(--font-sans);
   font-weight: 600;
-  color: #333;
-  background-color: #e9ecef;
-  border-bottom: 2px solid #ddd;
-  height: 60px;
+  font-size: 0.75rem;
+  letter-spacing: -0.01em;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
+  overflow: hidden;
+  word-break: break-word;
+  line-height: 1.3;
 }
 
 .time-label {
-  padding: 0.75rem 1rem;
+  padding: 8px;
   text-align: center;
-  font-size: 0.95rem;
-  color: #666;
-  border-bottom: 1px solid #e0e0e0;
-  height: 70px;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border-subtle);
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -392,7 +538,7 @@
   box-sizing: border-box;
 }
 
-/* Days Grid (Right side of calendar) */
+/* Days Grid */
 .days-grid {
   flex: 1;
   display: flex;
@@ -403,38 +549,39 @@
 .day-headers {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  background-color: #e9ecef;
-  border-bottom: 2px solid #ddd;
-  height: 60px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  height: 52px;
 }
 
 .day-header {
-  padding: 0.75rem;
+  padding: 6px 4px;
   text-align: center;
-  font-weight: 600;
-  color: #333;
-  border-right: 1px solid #ddd;
+  border-right: 1px solid var(--color-border-subtle);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.25rem;
-  height: 60px;
+  gap: 2px;
+  height: 52px;
   box-sizing: border-box;
 }
 
-.day-header:last-child {
-  border-right: none;
-}
+.day-header:last-child { border-right: none; }
 
 .day-name {
-  font-size: 0.85rem;
-  letter-spacing: 0.5px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
 }
 
 .day-number {
-  font-size: 1.1rem;
+  font-size: 0.9375rem;
   font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
 }
 
 .availability-grid-new {
@@ -446,668 +593,310 @@
 .day-slots {
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #ddd;
+  border-right: 1px solid var(--color-border-subtle);
 }
 
-.day-slots:last-child {
-  border-right: none;
-}
+.day-slots:last-child { border-right: none; }
 
 .time-slot-cell {
-  height: 70px;
-  border-bottom: 1px solid #e0e0e0;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  height: 60px;
+  border-bottom: 1px solid var(--color-border-subtle);
   position: relative;
   box-sizing: border-box;
-  background-color: #f8f9fa; /* Default to unavailable color */
+  transition: background 0.15s ease;
 }
 
 .time-slot-cell.unavailable {
-  background-color: #f8f9fa !important;
+  background: var(--color-surface);
   cursor: not-allowed;
-  opacity: 1 !important;
 }
 
 .time-slot-cell.available {
-  background-color: #d4edda;
-  border: 1px solid #c3e6cb;
+  background: var(--color-accent-subtle);
+  cursor: pointer;
 }
 
 .time-slot-cell.available:hover {
-  background-color: #b8dcc4;
-  transform: scale(1.02);
-  box-shadow: inset 0 0 8px rgba(46, 204, 113, 0.3);
+  background: #D1FAE5;
 }
 
 .time-slot-cell.selected-slot {
-  background-color: #1A803D !important;
-  border: 2px solid #155d2e !important;
-  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.2);
+  background: var(--color-accent) !important;
+  box-shadow: inset 0 0 0 2px var(--color-accent-hover);
 }
 
-/* Booking Confirmation Popup */
-.booking-confirmation-popup {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: white;
-  border: 2px solid #1A803D;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  z-index: 100;
-  min-width: 400px;
-  max-width: 600px;
-}
-
-.booking-confirmation-popup p {
-  margin: 0 0 1rem 0;
-  font-size: 1rem;
-  color: #333;
-  line-height: 1.6;
-}
-
-.confirm-book-button {
-  background-color: #1A803D;
-  color: white;
-  border: none;
-  padding: 0.75rem 2rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 1rem;
-  transition: background-color 0.2s ease;
-  width: 100%;
-}
-
-.confirm-book-button:hover:not(:disabled) {
-  background-color: #2ecc71;
-}
-
-.confirm-book-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-.error-text {
-  color: #e74c3c;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-}
-
-/* Button Groups */
-.button-group {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-}
-
-.button-group .back-button {
-  padding: 0.75rem 1.5rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background-color: white;
-  color: #333;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.button-group .back-button:hover {
-  background-color: #f8f9fa;
-  border-color: #1A803D;
-}
-
-.button-group .continue-button {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 6px;
-  background-color: #1A803D;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.button-group .continue-button:hover:not(:disabled) {
-  background-color: #2ecc71;
-}
-
-.button-group .continue-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-/* Success Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.success-modal {
-  background-color: white;
-  border-radius: 12px;
-  padding: 2rem;
-  max-width: 500px;
+.no-availability-message {
+  padding: 40px 20px;
   text-align: center;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  color: var(--color-text-tertiary);
+  font-size: 0.9375rem;
+  line-height: 1.55;
 }
 
-.success-modal h2 {
-  color: #1A803D;
-  margin: 0 0 1rem 0;
-  font-size: 2rem;
-}
-
-.success-modal p {
-  color: #666;
-  margin: 0 0 2rem 0;
-  line-height: 1.6;
-}
-
-.book-new-button {
-  background-color: #1A803D;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.book-new-button:hover {
-  background-color: #2ecc71;
-}
-
-/* Booking Confirmation Overlay */
+/* ── Booking Confirmation Overlay ── */
 .booking-confirmation-overlay {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  background-color: rgba(0, 0, 0, 0.3);
-  z-index: 9999 !important;
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 25, 23, 0.3);
+  backdrop-filter: blur(2px);
+  z-index: 9999;
   cursor: pointer;
 }
 
 .booking-confirmation-popup {
-  position: fixed !important;
-  bottom: 2rem !important;
-  left: calc(50% + 125px) !important;
-  transform: translateX(-50%) !important;
-  background-color: white;
-  border: 3px solid #2D6A4F;
-  border-radius: 12px;
-  padding: 1.5rem 2rem;
+  position: fixed;
+  bottom: 2rem;
+  left: calc(50% + 125px);
+  transform: translateX(-50%);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: 24px 28px;
   width: 90%;
-  max-width: 600px;
-  /* Cap height to viewport so the SetupIntent step (Stripe card form) doesn't
-     grow off the top. Anything taller scrolls inside the popup. */
+  max-width: 560px;
   max-height: calc(100vh - 4rem);
   overflow-y: auto;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-lg);
   cursor: default;
-  z-index: 10000 !important;
-  animation: slideUp 0.2s ease;
+  z-index: 10000;
+  animation: bl-slideUp 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
+@keyframes bl-slideUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(14px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 .booking-confirmation-popup p {
-  margin: 0 0 1.5rem 0;
-  color: #333;
-  font-size: 1rem;
-  line-height: 1.6;
+  margin: 0 0 14px;
+  color: var(--color-text-primary);
+  font-size: 0.9375rem;
+  line-height: 1.55;
   text-align: center;
+}
+
+.bl-popup-price {
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+  text-align: center;
+  margin: 0 0 6px;
+}
+
+.bl-popup-hint {
+  font-size: 0.8125rem;
+  color: var(--color-text-tertiary);
+  text-align: center;
+  margin: 0 0 16px;
+  line-height: 1.5;
 }
 
 .booking-confirmation-buttons {
   display: flex;
-  gap: 1rem;
+  gap: 10px;
   justify-content: center;
 }
 
 .confirm-book-button {
-  padding: 0.75rem 2rem;
-  border: none;
-  border-radius: 8px;
-  background-color: #2ecc71;
-  color: white;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
   flex: 1;
+  padding: 11px 20px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .confirm-book-button:hover:not(:disabled) {
-  background-color: #27ae60;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+  background: var(--color-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(45, 106, 79, 0.28);
 }
 
 .confirm-book-button:disabled {
-  background-color: #95a5a6;
+  background: var(--color-text-tertiary);
+  opacity: 0.55;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
 .cancel-book-button {
-  padding: 0.75rem 2rem;
-  border: 2px solid #e74c3c;
-  border-radius: 8px;
-  background-color: white;
-  color: #e74c3c;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
   flex: 1;
+  padding: 11px 20px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-raised);
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .cancel-book-button:hover:not(:disabled) {
-  background-color: #e74c3c;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border-color: var(--color-text-tertiary);
 }
 
-.cancel-book-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
+.cancel-book-button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Save Card Form */
+.save-card-form { width: 100%; }
+
+.save-card-total {
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+  margin: 0 0 6px;
+}
+
+.save-card-subtitle {
+  font-size: 0.8125rem;
+  color: var(--color-text-tertiary);
+  margin: 0 0 16px;
+  line-height: 1.5;
 }
 
 .error-text {
-  color: #e74c3c;
-  font-size: 0.9rem;
-  margin-top: 1rem;
+  color: #B91C1C;
+  font-size: 0.875rem;
+  margin-top: 12px;
   text-align: center;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .book-lesson-page .main-content {
-    margin-left: 0;
-    padding: 1rem;
-    padding-top: 80px;
-  }
-  
-  .page-header {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: flex-start;
-  }
-  
-  .header-with-back {
-    width: 100%;
-  }
-  
-  .page-header h1 {
-    font-size: 1.75rem;
-  }
-  
-  .booking-card, .booking-card-wide {
-    padding: 1rem;
-  }
-
-  .booking-card h3, .booking-card-wide h3 {
-    font-size: 1.15rem;
-    margin-bottom: 1.25rem;
-  }
-  
-  .grade-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-  }
-  
-  .subject-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-  }
-
-  .subject-button {
-    padding: 1rem;
-    font-size: 0.85rem;
-  }
-
-  .subject-button svg {
-    font-size: 1.5rem;
-  }
-  
-  .course-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .tutor-availability-container {
-    flex-direction: column;
-    gap: 1rem;
-    min-height: auto;
-    margin-bottom: 80px;
-  }
-  
-  .tutor-list {
-    flex: none;
-    max-height: none;
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding-right: 0;
-    padding-bottom: 0.5rem;
-    gap: 0.5rem;
-  }
-  
-  .tutor-card {
-    min-width: 140px;
-    padding: 0.75rem;
-  }
-
-  .tutor-card-name {
-    font-size: 0.85rem;
-  }
-  
-  .tutor-calendar {
-    width: 100%;
-  }
-
-  .calendar-header {
-    padding: 0.85rem 1rem;
-    font-size: 0.95rem;
-  }
-  
-  .calendar-grid-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  .time-column {
-    flex: 0 0 70px;
-    position: sticky;
-    left: 0;
-    z-index: 2;
-  }
-  
-  .time-header {
-    font-size: 0.7rem;
-    padding: 0.4rem;
-    height: 70px;
-  }
-  
-  .time-label {
-    font-size: 0.7rem;
-    padding: 0.25rem;
-    height: 40px;
-    box-sizing: border-box;
-  }
-
-  .day-headers {
-    height: 70px;
-  }
-
-  .day-header {
-    height: 70px;
-    padding: 0.4rem 0.2rem;
-    min-width: 45px;
-  }
-
-  .day-name {
-    font-size: 0.65rem;
-  }
-
-  .day-number {
-    font-size: 0.9rem;
-  }
-  
-  .time-slot-cell {
-    height: 40px;
-    box-sizing: border-box;
-    min-width: 45px;
-  }
-
-  .day-slots {
-    min-width: 45px;
-  }
-
-  .no-availability-message {
-    padding: 1.5rem;
-    text-align: center;
-    color: #666;
-    font-size: 0.9rem;
-  }
-  
-  .booking-confirmation-popup {
-    min-width: auto;
-    max-width: 92%;
-    padding: 1rem;
-    bottom: 1rem !important;
-    left: 50% !important;
-    max-height: calc(100vh - 2rem);
-  }
-  
-  .booking-confirmation-popup p {
-    font-size: 0.85rem;
-    line-height: 1.5;
-  }
-
-  .booking-confirmation-buttons {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .book-lesson-page .main-content {
-    padding: 0.75rem;
-    padding-top: 70px;
-  }
-
-  .page-header h1 {
-    font-size: 1.5rem;
-  }
-
-  .grade-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem;
-  }
-
-  .grade-button {
-    padding: 0.75rem;
-    font-size: 0.9rem;
-  }
-
-  .subject-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
-  }
-
-  .subject-button {
-    padding: 0.75rem;
-    font-size: 0.8rem;
-  }
-
-  .subject-button svg {
-    font-size: 1.25rem;
-  }
-
-  .time-column {
-    flex: 0 0 55px;
-  }
-
-  .time-header {
-    font-size: 0.6rem;
-    padding: 0.25rem;
-    height: 45px;
-  }
-
-  .time-label {
-    font-size: 0.6rem;
-    height: 36px;
-  }
-
-  .day-headers {
-    height: 45px;
-  }
-
-  .day-header {
-    height: 45px;
-    min-width: 40px;
-    padding: 0.3rem 0.1rem;
-  }
-
-  .day-name {
-    font-size: 0.55rem;
-  }
-
-  .day-number {
-    font-size: 0.8rem;
-  }
-
-  .time-slot-cell {
-    height: 36px;
-    min-width: 40px;
-  }
-
-  .day-slots {
-    min-width: 40px;
-  }
-}
-
-/* View Tutor Profile Button */
-.tutor-card-name {
+/* ── Success Modal ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 25, 23, 0.4);
+  backdrop-filter: blur(3px);
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  width: 100%;
-}
-
-.view-tutor-profile-btn {
-  background: none;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  min-width: 28px;
-  display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: bl-fadeIn 0.2s ease;
+}
+
+@keyframes bl-fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.success-modal {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: 44px 40px;
+  max-width: 480px;
+  width: 90%;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  animation: bl-modalUp 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes bl-modalUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.success-modal h2 {
+  font-family: var(--font-sans);
+  font-size: 1.875rem;
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  color: var(--color-accent);
+  margin: 0 0 12px;
+}
+
+.success-modal p {
+  color: var(--color-text-secondary);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  margin: 0 0 28px;
+}
+
+.book-new-button {
+  padding: 12px 32px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.7);
-  transition: all 0.2s ease;
-  flex-shrink: 0;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.tutor-card:not(.active) .view-tutor-profile-btn {
-  border-color: #ddd;
-  color: #666;
+.book-new-button:hover {
+  background: var(--color-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(45, 106, 79, 0.28);
 }
 
-.view-tutor-profile-btn:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: white;
-  border-color: white;
-}
-
-.tutor-card:not(.active) .view-tutor-profile-btn:hover {
-  background-color: #2D6A4F;
-  border-color: #2D6A4F;
-  color: white;
-}
-
-/* Tutor Profile Modal */
+/* ── Tutor Profile Modal ── */
 .tutor-profile-modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(28, 25, 23, 0.4);
+  backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  animation: fadeIn 0.2s ease;
-  padding: 1rem;
+  animation: bl-fadeIn 0.2s ease;
+  padding: 16px;
   box-sizing: border-box;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 .tutor-profile-modal {
-  background: white;
-  border-radius: 16px;
-  padding: 2rem;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: 32px;
   width: 90%;
-  max-width: 450px;
-  max-height: none;
-  overflow-y: visible;
+  max-width: 440px;
   position: relative;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  animation: modalSlideUp 0.3s ease;
+  box-shadow: var(--shadow-lg);
+  animation: bl-modalUp 0.28s cubic-bezier(0.22, 1, 0.36, 1);
   margin: auto;
 }
 
-@keyframes modalSlideUp {
-  from { 
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to { 
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .tutor-profile-modal .modal-close-btn {
-  position: sticky;
-  top: 0;
-  float: right;
-  background: white;
-  border: 1px solid #eee;
-  font-size: 1.5rem;
-  color: #999;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  font-size: 1.25rem;
+  color: var(--color-text-tertiary);
   cursor: pointer;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: all 0.2s ease;
-  z-index: 10;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: -18px;
+  line-height: 1;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .tutor-profile-modal .modal-close-btn:hover {
-  background-color: #f0f0f0;
-  color: #333;
+  background: var(--color-border);
+  color: var(--color-text-primary);
 }
 
 .tutor-profile-modal .tutor-profile-header {
@@ -1115,180 +904,236 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin-bottom: 1.5rem;
-  clear: both;
+  margin-bottom: 24px;
+  padding-top: 8px;
 }
 
 .tutor-profile-modal .tutor-profile-avatar {
-  width: 90px;
-  height: 90px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #2D6A4F, #2E7D32);
-  color: white;
-  font-size: 2.2rem;
-  font-weight: 600;
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-light) 100%);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 2rem;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 1rem;
+  margin: 0 auto 12px;
 }
 
 .tutor-profile-modal .tutor-profile-avatar-img {
-  width: 90px;
-  height: 90px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   object-fit: cover;
-  margin: 0 auto 1rem;
+  margin: 0 auto 12px;
   display: block;
-  border: 3px solid #2D6A4F;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 2px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
 }
 
 .tutor-profile-modal .tutor-profile-header h2 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.5rem;
-  color: #333;
+  margin: 0 0 4px;
+  font-family: var(--font-sans);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+}
+
+.bl-pronouns {
+  color: var(--color-text-tertiary);
+  font-size: 0.875rem;
+  margin-top: 2px;
 }
 
 .tutor-rating {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.3rem;
-  color: #f9a825;
+  gap: 4px;
+  color: #F59E0B;
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1rem;
+  margin-top: 8px;
 }
 
-.tutor-rating .star-icon {
-  color: #f9a825;
-}
+.tutor-rating .star-icon { color: #F59E0B; }
 
 .tutor-rating-count {
-  color: #6b7280;
+  color: var(--color-text-tertiary);
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
 }
 
 .tutor-rating-empty {
-  color: #9ca3af;
-  font-weight: 500;
+  color: var(--color-text-tertiary);
+  font-weight: 400;
   font-style: italic;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
 }
 
 .tutor-profile-details {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: 14px;
+  margin-bottom: 24px;
 }
 
 .tutor-profile-item {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-}
-
-.tutor-profile-item.bio {
-  margin-bottom: 0.5rem;
+  gap: 4px;
 }
 
 .tutor-profile-label {
-  font-size: 0.75rem;
-  color: #999;
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  color: var(--color-text-tertiary);
   text-transform: uppercase;
   font-weight: 600;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.07em;
 }
 
 .tutor-profile-value {
-  font-size: 0.95rem;
-  color: #333;
-  line-height: 1.5;
+  font-size: 0.9375rem;
+  color: var(--color-text-primary);
+  line-height: 1.55;
 }
 
 .tutor-subjects-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.25rem;
+  gap: 6px;
+  margin-top: 4px;
 }
 
 .subject-tag {
-  background-color: #e8f5e9;
-  color: #2E7D32;
-  padding: 0.3rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
+  background: var(--color-accent-subtle);
+  color: var(--color-accent-hover);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
   font-weight: 500;
+  border: 1px solid var(--color-accent-border);
 }
 
 .tutor-profile-actions {
   display: flex;
   justify-content: center;
-  padding-top: 1rem;
-  border-top: 1px solid #eee;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
 }
 
 .select-tutor-btn {
-  background: linear-gradient(135deg, #2D6A4F, #2E7D32);
-  color: white;
+  padding: 12px 32px;
   border: none;
-  padding: 0.85rem 2.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .select-tutor-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  background: var(--color-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(45, 106, 79, 0.28);
 }
 
-/* Tutor Profile Modal - Mobile */
+/* ── Responsive ── */
 @media (max-width: 768px) {
-  .tutor-profile-modal-overlay {
-    padding: 0.5rem;
+  .book-lesson-page .main-content {
+    margin-left: 0;
+    padding: 80px 16px 28px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    gap: 12px;
     align-items: flex-start;
   }
 
-  .tutor-profile-modal {
-    width: 95%;
-    padding: 1.25rem;
-    border-radius: 12px;
-    margin: 0.5rem auto;
+  .page-header h1 { font-size: 1.625rem; }
+
+  .booking-card { padding: 24px 20px; border-radius: var(--radius-lg); }
+  .booking-card-wide { padding: 20px 16px; border-radius: var(--radius-lg); }
+
+  .course-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+
+  .tutor-availability-container { flex-direction: column; gap: 12px; }
+
+  .tutor-list {
+    flex: none;
+    max-height: none;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-right: 0;
+    padding-bottom: 4px;
+    gap: 8px;
   }
 
-  .tutor-profile-modal .modal-close-btn {
-    width: 32px;
-    height: 32px;
-    font-size: 1.3rem;
+  .tutor-card { min-width: 140px; padding: 12px; }
+  .tutor-card-name { font-size: 0.8125rem; }
+
+  .calendar-header { padding: 12px 14px; font-size: 0.875rem; }
+  .calendar-grid-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  .time-column { flex: 0 0 68px; position: sticky; left: 0; z-index: 2; }
+  .time-header { font-size: 0.625rem; padding: 4px; height: 52px; }
+  .time-label { font-size: 0.625rem; padding: 4px; height: 40px; }
+  .day-headers { height: 52px; }
+  .day-header { height: 52px; min-width: 40px; padding: 4px 2px; }
+  .day-name { font-size: 0.5rem; }
+  .day-number { font-size: 0.875rem; }
+  .time-slot-cell { height: 40px; min-width: 40px; }
+  .day-slots { min-width: 40px; }
+
+  .booking-confirmation-popup {
+    max-width: 94%;
+    padding: 20px 16px;
+    bottom: 1rem;
+    left: 50% !important;
+    max-height: calc(100vh - 2rem);
   }
 
-  .tutor-profile-avatar,
-  .tutor-profile-avatar-img {
-    width: 70px;
-    height: 70px;
+  .booking-confirmation-buttons { flex-direction: column; gap: 8px; }
+
+  .bl-nav-row { justify-content: stretch; }
+  .bl-back-btn, .bl-next-btn { flex: 1; text-align: center; }
+
+  .tutor-profile-modal { padding: 24px 20px; }
+  .tutor-profile-modal .modal-close-btn { top: 12px; right: 12px; }
+
+  .tutor-profile-modal .tutor-profile-avatar,
+  .tutor-profile-modal .tutor-profile-avatar-img {
+    width: 64px;
+    height: 64px;
   }
 
-  .tutor-profile-avatar {
-    font-size: 1.8rem;
-  }
+  .tutor-profile-modal .tutor-profile-header h2 { font-size: 1.125rem; }
+}
 
-  .tutor-profile-header h2 {
-    font-size: 1.25rem;
-  }
+@media (max-width: 480px) {
+  .book-lesson-page .main-content { padding: 72px 12px 20px; }
 
-  .subject-tag {
-    font-size: 0.8rem;
-    padding: 0.25rem 0.6rem;
-  }
+  .course-grid { gap: 6px; }
+  .course-button { padding: 10px 8px; font-size: 0.8125rem; }
 
-  .select-tutor-btn {
-    padding: 0.75rem 2rem;
-    font-size: 0.95rem;
-  }
+  .time-column { flex: 0 0 52px; }
+  .time-header { font-size: 0.55rem; height: 44px; }
+  .time-label { font-size: 0.55rem; height: 36px; }
+  .day-headers { height: 44px; }
+  .day-header { height: 44px; min-width: 36px; }
+  .day-number { font-size: 0.75rem; }
+  .time-slot-cell { height: 36px; min-width: 36px; }
+  .day-slots { min-width: 36px; }
 }

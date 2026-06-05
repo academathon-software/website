@@ -25,56 +25,61 @@ const formatNumber = (value) =>
   new Intl.NumberFormat('en-CA').format(value || 0);
 
 /* ── Sparkline SVG component ── */
-const Sparkline = ({ path, color }) => (
-  <svg
-    viewBox="0 0 200 55"
-    className="admin-sparkline"
-    preserveAspectRatio="none"
-  >
-    <defs>
-      <linearGradient id={`sg-${color}`} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"   stopColor={color} stopOpacity="0.25" />
-        <stop offset="100%" stopColor={color} stopOpacity="0"    />
-      </linearGradient>
-    </defs>
-    <path
-      d={`${path} L200,55 L0,55 Z`}
-      fill={`url(#sg-${color})`}
-    />
-    <path
-      d={path}
-      stroke={color}
-      strokeWidth="2"
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
+const Sparkline = ({ path, color }) => {
+  // Strip '#' for use in SVG id — '#' is invalid in XML NCNames and breaks
+  // the url(#…) gradient reference in all browsers.
+  const gradientId = `sg-${color.replace('#', '')}`;
+  return (
+    <svg
+      viewBox="0 0 200 55"
+      className="admin-sparkline"
+      preserveAspectRatio="none"
+    >
+      <defs>
+        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor={color} stopOpacity="0.25" />
+          <stop offset="100%" stopColor={color} stopOpacity="0"    />
+        </linearGradient>
+      </defs>
+      <path
+        d={`${path} L200,55 L0,55 Z`}
+        fill={`url(#${gradientId})`}
+      />
+      <path
+        d={path}
+        stroke={color}
+        strokeWidth="2"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+};
 
 const CARD_META = [
   {
-    iconBg:    '#dbeafe',
-    iconColor: '#3b82f6',
-    chartColor:'3b82f6',
+    iconBg:    '#DBEAFE',
+    iconColor: '#2563EB',
+    chartColor:'93C5FD',
     chartPath: 'M0,38 C25,40 45,42 70,32 C95,22 120,36 150,24 C170,16 188,12 200,8',
   },
   {
-    iconBg:    '#dcfce7',
-    iconColor: '#22c55e',
-    chartColor:'22c55e',
+    iconBg:    '#ECFDF5',
+    iconColor: '#2D6A4F',
+    chartColor:'52B788',
     chartPath: 'M0,42 C40,40 80,34 120,28 C160,22 180,18 200,14',
   },
   {
-    iconBg:    '#f3e8ff',
-    iconColor: '#a855f7',
-    chartColor:'a855f7',
+    iconBg:    '#EDE9FE',
+    iconColor: '#7C3AED',
+    chartColor:'C4B5FD',
     chartPath: 'M0,32 C40,34 80,32 120,33 C160,32 180,30 200,31',
   },
   {
-    iconBg:    '#fef3c7',
-    iconColor: '#f59e0b',
-    chartColor:'f59e0b',
+    iconBg:    '#FEF3C7',
+    iconColor: '#D97706',
+    chartColor:'FCD34D',
     chartPath: 'M0,30 C25,34 55,26 85,30 C115,34 145,26 170,28 C185,29 195,26 200,24',
   },
 ];
@@ -114,21 +119,21 @@ const StatisticsTab = ({ onNavigate }) => {
   const quickActions = [
     {
       icon: faUsers,
-      iconBg: '#dcfce7', iconColor: '#22c55e',
+      iconBg: '#DBEAFE', iconColor: '#2563EB',
       title: 'Manage Users',
       desc: 'View, edit and manage user accounts and permissions',
       tab: 'users',
     },
     {
       icon: faUserPlus,
-      iconBg: '#dcfce7', iconColor: '#22c55e',
+      iconBg: '#ECFDF5', iconColor: '#2D6A4F',
       title: 'Invite Tutors',
       desc: 'Send invitations and onboard new tutors',
       tab: 'tutors',
     },
     {
       icon: faCalendarDays,
-      iconBg: '#f3e8ff', iconColor: '#a855f7',
+      iconBg: '#EDE9FE', iconColor: '#7C3AED',
       title: 'View Bookings',
       desc: 'Browse and manage all bookings and appointments',
       tab: 'bookings',

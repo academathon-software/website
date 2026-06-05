@@ -92,7 +92,7 @@ const TutorDashboard = () => {
       setTutorProfile({
         name: userResponse.data.displayUsername || 'Tutor',
         email: userResponse.data.email,
-        profileImage: userResponse.data.profilePictureUrl || '👩‍🏫'
+        profileImage: userResponse.data.profilePictureUrl || null
       });
 
       setTutorData(tutorProfileData);
@@ -424,10 +424,12 @@ const TutorDashboard = () => {
         <div className="welcome-section">
           <div className="profile-pic">
             <div className="avatar">
-              {typeof tutorProfile.profileImage === 'string' && tutorProfile.profileImage.startsWith('http') ? (
+              {tutorProfile.profileImage ? (
                 <img src={tutorProfile.profileImage} alt="Profile" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
               ) : (
-                tutorProfile.profileImage
+                <span className="avatar-initial">
+                  {tutorProfile.name?.charAt(0)?.toUpperCase() || 'T'}
+                </span>
               )}
             </div>
           </div>
