@@ -19,7 +19,7 @@
   padding: 56px 44px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   box-sizing: border-box;
   position: sticky;
@@ -44,6 +44,7 @@
   letter-spacing: 0.1em;
   color: rgba(255, 255, 255, 0.55);
   margin: 0 0 10px;
+  text-align: center;
 }
 
 .tutor-signup-page .ts-panel-heading {
@@ -53,6 +54,7 @@
   line-height: 1.2;
   color: rgba(255, 255, 255, 0.95);
   margin: 0 0 8px;
+  text-align: center;
 }
 
 .tutor-signup-page .ts-panel-heading em {
@@ -66,6 +68,7 @@
   color: rgba(255, 255, 255, 0.6);
   margin: 0 0 36px;
   line-height: 1.55;
+  text-align: center;
 }
 
 /* ── Step indicator (4 steps with connector) ── */
@@ -160,7 +163,7 @@
   background: var(--color-bg);
   padding: 48px 64px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   box-sizing: border-box;
 }
@@ -210,6 +213,11 @@
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   margin-bottom: 12px;
+}
+
+/* Suppress the form-group bottom margin when inside form-row — form-row owns that spacing */
+.tutor-signup-page .form-row .form-group {
+  margin-bottom: 0;
 }
 
 .tutor-signup-page .form-group {
