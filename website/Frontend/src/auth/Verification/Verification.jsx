@@ -116,8 +116,8 @@ function VerificationPage() {
             <div className="success-icon">
               <FontAwesomeIcon icon={faCheck} />
             </div>
-            <h2>Account Verified!</h2>
-            <p>Your account has been successfully verified. Redirecting to login...</p>
+            <h2>Account <em>verified.</em></h2>
+            <p>Your account has been successfully verified. Redirecting to login…</p>
           </div>
         </div>
       </div>
@@ -129,7 +129,8 @@ function VerificationPage() {
       <div className="verification-container">
 
 
-        <h2 className="verification-title">Verify Your Email</h2>
+        <p className="vp-eyebrow">Account Verification</p>
+        <h2 className="verification-title">Verify your <em>email.</em></h2>
         <p className="verification-subtitle">We've sent a 6-digit verification code to:</p>
 
         <div className="email-display">
