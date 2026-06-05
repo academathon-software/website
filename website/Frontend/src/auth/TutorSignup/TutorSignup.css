@@ -161,9 +161,9 @@
 /* ── Right: form panel — natural scroll with page ── */
 .tutor-signup-page .form-panel {
   background: var(--color-bg);
-  padding: 48px 64px;
+  padding: 64px 64px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   box-sizing: border-box;
 }
@@ -372,7 +372,7 @@
 /* Already have an account */
 .tutor-signup-page .login-link {
   text-align: center;
-  margin-top: 14px;
+  margin-top: 20px;
   font-size: 0.875rem;
   color: var(--color-text-secondary);
 }
