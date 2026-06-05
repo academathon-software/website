@@ -159,9 +159,11 @@
 }
 
 /* ── Right: form panel — natural scroll with page ── */
+/* padding-top = 85px fixed navbar + 28px breathing room = 113px            */
+/* padding-bottom = same 113px so visual space is equal top and bottom       */
 .tutor-signup-page .form-panel {
   background: var(--color-bg);
-  padding: 64px 64px;
+  padding: 113px 64px;
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -901,7 +903,7 @@
   }
 
   .tutor-signup-page .form-panel {
-    padding: 40px 40px;
+    padding: 113px 40px;
   }
 }
 
