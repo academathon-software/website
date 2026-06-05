@@ -11,7 +11,6 @@ import {
   faEye,
   faEyeSlash
 } from '@fortawesome/free-solid-svg-icons';
-import logoImg from '../../assets/academathonLogo.png';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -517,9 +516,6 @@ function TutorSignup() {
       {/* ── Left: green visual panel ── */}
       <div className="green-panel">
         <div className="panel-content">
-
-          {/* Logo */}
-          <img src={logoImg} alt="Academathon" className="ts-logo-img" />
 
           {/* Panel copy */}
           <p className="ts-panel-eyebrow">Tutor Onboarding</p>
