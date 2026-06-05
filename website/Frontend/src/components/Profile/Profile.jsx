@@ -293,9 +293,9 @@ const Profile = () => {
                   />
                 ) : (
                   <div className="picture-placeholder">
-                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#ccc"/>
-                      <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#ccc"/>
+                    <svg className="profile-avatar-svg" width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="#52B788"/>
+                      <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#52B788"/>
                     </svg>
                   </div>
                 )}
@@ -409,15 +409,7 @@ const Profile = () => {
               {isTutor && (
                 <div className="form-group">
                   <label>Grade Levels You Teach</label>
-                  <div style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '8px',
-                    padding: '12px',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    backgroundColor: isEditing ? '#fff' : '#f9fafb'
-                  }}>
+                  <div className={`grade-pills-container ${!isEditing ? 'disabled' : ''}`}>
                     {TUTOR_GRADE_OPTIONS.map(option => {
                       const selected = tutorGradeLevels.includes(option);
                       return (
@@ -426,24 +418,14 @@ const Profile = () => {
                           key={option}
                           onClick={() => toggleTutorGradeLevel(option)}
                           disabled={!isEditing}
-                          style={{
-                            padding: '6px 14px',
-                            borderRadius: '999px',
-                            border: `1px solid ${selected ? '#1A803D' : '#d1d5db'}`,
-                            backgroundColor: selected ? '#1A803D' : 'white',
-                            color: selected ? 'white' : '#374151',
-                            cursor: isEditing ? 'pointer' : 'default',
-                            fontSize: '0.85rem',
-                            fontWeight: 500,
-                            opacity: isEditing ? 1 : 0.85
-                          }}
+                          className={`grade-pill${selected ? ' selected' : ''}${!isEditing ? ' pill-disabled' : ''}`}
                         >
                           {option}
                         </button>
                       );
                     })}
                   </div>
-                  <p style={{ marginTop: '6px', fontSize: '0.8rem', color: '#6b7280' }}>
+                  <p className="grade-pills-hint">
                     Students looking for help will only see you in the tutor list for these grade levels.
                   </p>
                 </div>
