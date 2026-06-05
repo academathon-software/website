@@ -344,9 +344,11 @@ public class BookingService {
         booking.setStatus(BookingStatus.CANCELLED);
         Booking updatedBooking = bookingRepository.save(booking);
 
+        boolean cancelledByStudent = booking.getStudent().getId().equals(userId);
+        boolean refunded = booking.getPaymentStatus() == Booking.PaymentStatus.REFUNDED;
+
         // Notify the other party
         try {
-            boolean cancelledByStudent = booking.getStudent().getId().equals(userId);
             String recipientEmail = cancelledByStudent
                     ? booking.getTutor().getUser().getEmail()
                     : booking.getStudent().getEmail();
@@ -356,7 +358,7 @@ public class BookingService {
             String otherPartyName = cancelledByStudent
                     ? booking.getStudent().getUsername()
                     : booking.getTutor().getDisplayName();
-            String refundLine = booking.getPaymentStatus() == Booking.PaymentStatus.REFUNDED
+            String refundLine = refunded
                     ? "The payment has been refunded to the student.\n"
                     : "No payment was captured for this booking.\n";
             String subject = "Booking Cancelled - Academathon";
@@ -372,7 +374,38 @@ public class BookingService {
             );
             emailService.sendEmail(recipientEmail, subject, body);
         } catch (Exception ignored) { /* best-effort */ }
-        
+
+        // Send the student a cancellation + refund confirmation when they initiated it.
+        if (cancelledByStudent) {
+            try {
+                String refundLine = refunded
+                        ? String.format(
+                            "A full refund of $%.2f has been issued to your original payment method.\n" +
+                            "Refunds typically take 5-10 business days to appear on your statement.\n",
+                            booking.getAmount() != null ? booking.getAmount() : 0.0)
+                        : "No payment had been captured for this booking, so there is nothing to refund.\n";
+                String subject = "Your Lesson Cancellation is Confirmed - Academathon";
+                String body = String.format(
+                    "Hello %s,\n\n" +
+                    "This confirms that you cancelled your lesson. Here are the details:\n\n" +
+                    "Lesson Details:\n" +
+                    "- Tutor: %s\n" +
+                    "- Subject: %s\n" +
+                    "- Date & Time: %s\n\n" +
+                    "%s\n" +
+                    "We hope to see you book again soon.\n\n" +
+                    "Best regards,\n" +
+                    "Academathon Team",
+                    booking.getStudent().getUsername(),
+                    booking.getTutor().getDisplayName(),
+                    booking.getSubject(),
+                    booking.getStartTime().format(EMAIL_DATE_FORMAT),
+                    refundLine
+                );
+                emailService.sendEmail(booking.getStudent().getEmail(), subject, body);
+            } catch (Exception ignored) { /* best-effort */ }
+        }
+
         return new BookingResponseDTO(updatedBooking);
     }
     
