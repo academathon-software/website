@@ -49,7 +49,7 @@ const Calendar = () => {
       // Transform bookings to lesson format
       const lessons = activeBookings.map((booking, index) => {
         const startTime = new Date(booking.startTime);
-        const colors = ['#9b59b6', '#3498db', '#8B4513', '#e74c3c', '#2ecc71'];
+        const colors = ['#2D6A4F', '#3B82F6', '#8B5CF6', '#F59E0B', '#EC4899'];
         
         return {
           id: booking.id,
@@ -178,27 +178,15 @@ const Calendar = () => {
         </div>
 
         {loading && (
-          <div style={{ textAlign: 'center', padding: '40px', fontSize: '18px' }}>
-            <p>Loading bookings...</p>
+          <div className="cal-loading">
+            <p>Loading your lessons…</p>
           </div>
         )}
 
         {error && !loading && (
-          <div style={{ textAlign: 'center', padding: '40px' }}>
-            <p style={{ color: 'red', marginBottom: '20px' }}>{error}</p>
-            <button 
-              onClick={fetchBookings}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: '#2D6A4F',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Retry
-            </button>
+          <div className="cal-error">
+            <p>{error}</p>
+            <button className="cal-retry-btn" onClick={fetchBookings}>Retry</button>
           </div>
         )}
 
