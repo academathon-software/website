@@ -11,8 +11,25 @@ import {
   faEye,
   faEyeSlash
 } from '@fortawesome/free-solid-svg-icons';
+import logoImg from '../../assets/academathonLogo.png';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
+/* ── Step metadata for the left panel ── */
+const STEPS = [
+  { num: 1, label: 'Your account',  desc: 'Name, pronouns & password' },
+  { num: 2, label: 'Academic info', desc: 'University & program'       },
+  { num: 3, label: 'Grade levels',  desc: 'Which grades you teach'     },
+  { num: 4, label: 'Subjects',      desc: 'What you teach'             },
+];
+
+/* ── Eyebrow / heading per step ── */
+const STEP_COPY = [
+  { eyebrow: 'Step 1 of 4', heading: <>Create your <em>account.</em></>,   sub: 'Set up your login to get started.' },
+  { eyebrow: 'Step 2 of 4', heading: <>Academic <em>background.</em></>,    sub: 'Tell us about your university and program.' },
+  { eyebrow: 'Step 3 of 4', heading: <>Grade <em>levels.</em></>,           sub: 'Which grade levels will you be teaching?' },
+  { eyebrow: 'Step 4 of 4', heading: <>Your <em>subjects.</em></>,          sub: 'Select the subjects you\'ll be teaching.' },
+];
 
 // --- Searchable Dropdown Component ---
 const SearchableDropdown = ({ label, value, onChange, options, placeholder, error, errorText }) => {
@@ -56,7 +73,10 @@ const SearchableDropdown = ({ label, value, onChange, options, placeholder, erro
     <div className="form-group searchable-dropdown-group" ref={dropdownRef}>
       <label>{label}</label>
       <div className={`searchable-dropdown ${isOpen ? 'open' : ''} ${error ? 'has-error' : ''}`}>
-        <div className="searchable-dropdown-input-wrapper" onClick={() => { setIsOpen(!isOpen); if (!isOpen && inputRef.current) inputRef.current.focus(); }}>
+        <div
+          className="searchable-dropdown-input-wrapper"
+          onClick={() => { setIsOpen(!isOpen); if (!isOpen && inputRef.current) inputRef.current.focus(); }}
+        >
           <input
             ref={inputRef}
             type="text"
@@ -294,14 +314,13 @@ function TutorSignup() {
     '7th Grade',
     '8th Grade',
     '9th Grade',
-    '10th Grade', 
+    '10th Grade',
     '11th Grade',
     '12th Grade',
     'College/University',
     'Adult Learner'
   ];
 
-  // Comprehensive subject list organized by category
   // Same subjects available to students — tutors pick which ones they teach
   const ALL_SUBJECTS = [
     'Math',
@@ -334,7 +353,7 @@ function TutorSignup() {
       try {
         const response = await fetch(`${API_BASE_URL}/api/tutor-invitations/validate/${token}`);
         const data = await response.json();
-        
+
         if (data.valid) {
           setTokenValid(true);
           setFormData(prev => ({ ...prev, email: data.email }));
@@ -353,7 +372,6 @@ function TutorSignup() {
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
@@ -379,7 +397,6 @@ function TutorSignup() {
 
   const validateStep1 = () => {
     const newErrors = {};
-    
     if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
     if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
     if (!formData.pronouns) newErrors.pronouns = 'Please select your pronouns';
@@ -388,83 +405,58 @@ function TutorSignup() {
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const validateStep2 = () => {
     const newErrors = {};
-    
     if (!formData.university.trim()) newErrors.university = 'University is required';
     if (!formData.program.trim()) newErrors.program = 'Program is required';
     if (!formData.academicYear.trim()) newErrors.academicYear = 'Academic year is required';
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const validateStep3 = () => {
     const newErrors = {};
-    
     if (formData.gradeLevels.length === 0) {
       newErrors.gradeLevels = 'Please select at least one grade level';
     }
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const validateStep4 = () => {
     const newErrors = {};
-    
     if (formData.subjects.length === 0) {
       newErrors.subjects = 'Please select at least one subject';
     }
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleNext = () => {
     let isValid = false;
-    
-    switch(currentStep) {
-      case 1:
-        isValid = validateStep1();
-        break;
-      case 2:
-        isValid = validateStep2();
-        break;
-      case 3:
-        isValid = validateStep3();
-        break;
-      default:
-        isValid = true;
+    switch (currentStep) {
+      case 1: isValid = validateStep1(); break;
+      case 2: isValid = validateStep2(); break;
+      case 3: isValid = validateStep3(); break;
+      default: isValid = true;
     }
-    
-    if (isValid) {
-      setCurrentStep(prev => prev + 1);
-    }
+    if (isValid) setCurrentStep(prev => prev + 1);
   };
 
-  const handleBack = () => {
-    setCurrentStep(prev => prev - 1);
-  };
+  const handleBack = () => setCurrentStep(prev => prev - 1);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!validateStep4()) return;
-    
     setIsLoading(true);
-    
     try {
       const response = await fetch(`${API_BASE_URL}/auth/signup/tutor`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           token: token,
           firstName: formData.firstName,
@@ -495,78 +487,117 @@ function TutorSignup() {
     }
   };
 
+  /* ── Loading state ── */
   if (isLoading && currentStep === 1) {
     return (
       <div className="tutor-signup-page">
-        <div className="loading">Validating invitation...</div>
+        <div className="loading">Validating your invitation…</div>
       </div>
     );
   }
 
+  /* ── Invalid / expired token ── */
   if (!tokenValid) {
     return (
-      <div className="tutor-signup-page">
+      <div className="tutor-signup-page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)' }}>
         <div className="error-container">
-          <h2>Invalid Invitation</h2>
-          <p>{error}</p>
-          <button onClick={() => navigate('/')}>Return to Home</button>
+          <h2>Invitation not found</h2>
+          <p>{error || 'This invite link is invalid or has expired. Please contact Academathon to receive a new one.'}</p>
+          <button onClick={() => navigate('/')}>Back to home</button>
         </div>
       </div>
     );
   }
+
+  const copy = STEP_COPY[currentStep - 1];
 
   return (
     <div className="tutor-signup-page">
+
+      {/* ── Left: green visual panel ── */}
       <div className="green-panel">
         <div className="panel-content">
-          <h1 className="brand">academathon</h1>
-          
-          <div className="step-indicator">
-            <div className={`step-item ${currentStep >= 1 ? 'active' : ''}`}>
-              <div className="step-number">1</div>
-              <span>Create an account</span>
-            </div>
-            <div className={`step-item ${currentStep >= 2 ? 'active' : ''}`}>
-              <div className="step-number">2</div>
-              <span>Set up your profile</span>
-            </div>
+
+          {/* Logo */}
+          <img src={logoImg} alt="Academathon" className="ts-logo-img" />
+
+          {/* Panel copy */}
+          <p className="ts-panel-eyebrow">Tutor Onboarding</p>
+          <h2 className="ts-panel-heading">
+            Join our <em>teaching community.</em>
+          </h2>
+          <p className="ts-panel-sub">
+            Set up your tutor profile and start connecting with students across Canada.
+          </p>
+
+          {/* 4-step indicator */}
+          <div className="step-indicator" aria-label="Setup progress">
+            {STEPS.map((step) => (
+              <div
+                key={step.num}
+                className={`step-item ${currentStep >= step.num ? 'active' : ''}`}
+                aria-current={currentStep === step.num ? 'step' : undefined}
+              >
+                <div className="step-number">
+                  {currentStep > step.num
+                    ? <FontAwesomeIcon icon={faCheck} />
+                    : step.num}
+                </div>
+                <div className="step-text">
+                  <span className="step-label">{step.label}</span>
+                  <span className="step-desc">{step.desc}</span>
+                </div>
+              </div>
+            ))}
           </div>
+
         </div>
       </div>
 
+      {/* ── Right: form panel ── */}
       <div className="form-panel">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
+
+          {/* ── Step 1: Account ── */}
           {currentStep === 1 && (
             <div className="form-step">
-              <h2>Let's get started</h2>
-              <p>Welcome! Begin setting up your account</p>
-              
+              <p className="form-step-eyebrow">{copy.eyebrow}</p>
+              <h2>{copy.heading}</h2>
+              <p>{copy.sub}</p>
+
               <div className="form-row">
                 <div className="form-group">
-                  <label>First name</label>
+                  <label htmlFor="ts-firstName">First name</label>
                   <input
+                    id="ts-firstName"
                     type="text"
                     value={formData.firstName}
                     onChange={(e) => handleInputChange('firstName', e.target.value)}
                     className={errors.firstName ? 'error' : ''}
+                    placeholder="First name"
+                    autoComplete="given-name"
                   />
                   {errors.firstName && <span className="error-text">{errors.firstName}</span>}
                 </div>
                 <div className="form-group">
-                  <label>Last name</label>
+                  <label htmlFor="ts-lastName">Last name</label>
                   <input
+                    id="ts-lastName"
                     type="text"
                     value={formData.lastName}
                     onChange={(e) => handleInputChange('lastName', e.target.value)}
                     className={errors.lastName ? 'error' : ''}
+                    placeholder="Last name"
+                    autoComplete="family-name"
                   />
                   {errors.lastName && <span className="error-text">{errors.lastName}</span>}
                 </div>
               </div>
 
               <div className="form-group">
-                <label>Email</label>
+                <label htmlFor="ts-email">Email</label>
                 <input
+                  id="ts-email"
                   type="email"
                   value={formData.email}
                   disabled
@@ -575,8 +606,9 @@ function TutorSignup() {
               </div>
 
               <div className="form-group">
-                <label>Pronouns</label>
+                <label htmlFor="ts-pronouns">Pronouns</label>
                 <select
+                  id="ts-pronouns"
                   value={formData.pronouns}
                   onChange={(e) => handleInputChange('pronouns', e.target.value)}
                   className={errors.pronouns ? 'error' : ''}
@@ -590,15 +622,18 @@ function TutorSignup() {
               </div>
 
               <div className="form-group">
-                <label>Password</label>
+                <label htmlFor="ts-password">Password</label>
                 <div className="password-input-wrapper">
                   <input
+                    id="ts-password"
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => handleInputChange('password', e.target.value)}
                     className={errors.password ? 'error' : ''}
+                    placeholder="Create a strong password"
+                    autoComplete="new-password"
                   />
-                  <button type="button" className="password-toggle" onClick={() => setShowPassword(p => !p)}>
+                  <button type="button" className="password-toggle" onClick={() => setShowPassword(p => !p)} aria-label={showPassword ? 'Hide password' : 'Show password'}>
                     <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                   </button>
                 </div>
@@ -606,15 +641,18 @@ function TutorSignup() {
               </div>
 
               <div className="form-group">
-                <label>Confirm Password</label>
+                <label htmlFor="ts-confirmPassword">Confirm Password</label>
                 <div className="password-input-wrapper">
                   <input
+                    id="ts-confirmPassword"
                     type={showConfirmPassword ? 'text' : 'password'}
                     value={formData.confirmPassword}
                     onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                     className={errors.confirmPassword ? 'error' : ''}
+                    placeholder="Confirm your password"
+                    autoComplete="new-password"
                   />
-                  <button type="button" className="password-toggle" onClick={() => setShowConfirmPassword(p => !p)}>
+                  <button type="button" className="password-toggle" onClick={() => setShowConfirmPassword(p => !p)} aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}>
                     <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
                   </button>
                 </div>
@@ -622,36 +660,38 @@ function TutorSignup() {
               </div>
 
               <button type="button" className="btn-primary" onClick={handleNext}>
-                Sign up
+                Continue <FontAwesomeIcon icon={faArrowRight} />
               </button>
 
               <p className="login-link">
-                Already have an account? <a href="/login">Login</a>
+                Already have an account? <a href="/login">Sign in</a>
               </p>
             </div>
           )}
 
+          {/* ── Step 2: Academic Info ── */}
           {currentStep === 2 && (
             <div className="form-step">
-              <h2>Academic Information</h2>
-              <p>Tell us about your university and program</p>
-              
+              <p className="form-step-eyebrow">{copy.eyebrow}</p>
+              <h2>{copy.heading}</h2>
+              <p>{copy.sub}</p>
+
               <SearchableDropdown
                 label="University"
                 value={formData.university}
                 onChange={(val) => handleInputChange('university', val)}
                 options={CANADIAN_UNIVERSITIES}
-                placeholder="Search for your university..."
+                placeholder="Search for your university…"
                 error={!!errors.university}
                 errorText={errors.university}
               />
 
               <SearchableDropdown
-                label="Program"
+                label="Program of Study"
                 value={formData.program}
                 onChange={(val) => handleInputChange('program', val)}
                 options={PROGRAMS_OF_STUDY}
-                placeholder="Search for your program..."
+                placeholder="Search for your program…"
                 error={!!errors.program}
                 errorText={errors.program}
               />
@@ -671,17 +711,19 @@ function TutorSignup() {
                   'Post-Graduate',
                   'Alumni'
                 ]}
-                placeholder="Select your academic year..."
+                placeholder="Select your academic year…"
                 error={!!errors.academicYear}
                 errorText={errors.academicYear}
               />
             </div>
           )}
 
+          {/* ── Step 3: Grade Levels ── */}
           {currentStep === 3 && (
             <div className="form-step">
-              <h2>Grade Levels</h2>
-              <p>Which grade levels will you be teaching?</p>
+              <p className="form-step-eyebrow">{copy.eyebrow}</p>
+              <h2>{copy.heading}</h2>
+              <p>{copy.sub}</p>
 
               <button
                 type="button"
@@ -696,7 +738,7 @@ function TutorSignup() {
               >
                 {formData.gradeLevels.length === availableGradeLevels.length ? 'Deselect All' : 'Select All'}
               </button>
-              
+
               <div className="selection-grid">
                 {availableGradeLevels.map(grade => (
                   <button
@@ -709,22 +751,24 @@ function TutorSignup() {
                   </button>
                 ))}
               </div>
-              {errors.gradeLevels && <span className="error-text">{errors.gradeLevels}</span>}
+              {errors.gradeLevels && <span className="error-text" style={{ display: 'block', marginTop: 12 }}>{errors.gradeLevels}</span>}
             </div>
           )}
 
+          {/* ── Step 4: Subjects ── */}
           {currentStep === 4 && (
             <div className="form-step">
-              <h2>Subjects</h2>
-              <p>Select the subjects you'll be teaching</p>
-              <p className="hint-text">Don't worry — you can always update your subjects later from your profile.</p>
-              
+              <p className="form-step-eyebrow">{copy.eyebrow}</p>
+              <h2>{copy.heading}</h2>
+              <p>{copy.sub}</p>
+              <p className="hint-text">You can always update your subjects later from your profile.</p>
+
               <div className="search-and-actions">
                 <div className="search-box">
                   <FontAwesomeIcon icon={faSearch} className="search-icon" />
                   <input
                     type="text"
-                    placeholder="Can't find your course? Search here"
+                    placeholder="Search subjects…"
                     value={subjectSearch}
                     onChange={(e) => setSubjectSearch(e.target.value)}
                   />
@@ -757,50 +801,48 @@ function TutorSignup() {
                   </button>
                 ))}
               </div>
-              {errors.subjects && <span className="error-text">{errors.subjects}</span>}
+              {errors.subjects && <span className="error-text" style={{ display: 'block', marginTop: 12 }}>{errors.subjects}</span>}
             </div>
           )}
 
+          {/* General error */}
           {error && <div className="error-message">{error}</div>}
 
-          <div className="form-navigation">
-            <div className="progress-dots">
-              <span className={`dot ${currentStep === 1 ? 'active' : ''}`}></span>
-              <span className={`dot ${currentStep === 2 ? 'active' : ''}`}></span>
-              <span className={`dot ${currentStep === 3 ? 'active' : ''}`}></span>
-            </div>
+          {/* ── Navigation: dots + back / next ── */}
+          {currentStep > 1 && (
+            <div className="form-navigation">
+              <div className="progress-dots" aria-label="Step progress">
+                {STEPS.map(s => (
+                  <span key={s.num} className={`dot ${currentStep === s.num ? 'active' : ''}`} />
+                ))}
+              </div>
 
-            <div className="nav-buttons">
-              {currentStep > 1 && currentStep < 4 && (
-                <button type="button" className="btn-back" onClick={handleBack}>
-                  <FontAwesomeIcon icon={faArrowLeft} />
-                </button>
-              )}
-              
-              {currentStep === 2 && (
-                <button type="button" className="btn-next" onClick={handleNext}>
-                  <FontAwesomeIcon icon={faArrowRight} />
-                </button>
-              )}
-              
-              {currentStep === 3 && (
-                <button type="button" className="btn-next" onClick={handleNext}>
-                  <FontAwesomeIcon icon={faArrowRight} />
-                </button>
-              )}
+              <div className="nav-buttons">
+                {currentStep < 4 && (
+                  <>
+                    <button type="button" className="btn-back" onClick={handleBack}>
+                      <FontAwesomeIcon icon={faArrowLeft} /> Back
+                    </button>
+                    <button type="button" className="btn-next" onClick={handleNext}>
+                      Next <FontAwesomeIcon icon={faArrowRight} />
+                    </button>
+                  </>
+                )}
 
-              {currentStep === 4 && (
-                <>
-                  <button type="button" className="btn-back" onClick={handleBack}>
-                    <FontAwesomeIcon icon={faArrowLeft} />
-                  </button>
-                  <button type="submit" className="btn-next" disabled={isLoading}>
-                    <FontAwesomeIcon icon={faArrowRight} />
-                  </button>
-                </>
-              )}
+                {currentStep === 4 && (
+                  <>
+                    <button type="button" className="btn-back" onClick={handleBack}>
+                      <FontAwesomeIcon icon={faArrowLeft} /> Back
+                    </button>
+                    <button type="submit" className="btn-next" disabled={isLoading}>
+                      {isLoading ? 'Creating…' : <>Finish <FontAwesomeIcon icon={faArrowRight} /></>}
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
+          )}
+
         </form>
       </div>
     </div>
@@ -808,4 +850,3 @@ function TutorSignup() {
 }
 
 export default TutorSignup;
-

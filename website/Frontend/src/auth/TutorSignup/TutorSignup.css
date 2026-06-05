@@ -1,187 +1,313 @@
-/* Tutor Signup - Independent Styling */
-/* Note: box-sizing: border-box is now applied globally via src/index.css,
-   so the form-panel/green-panel inputs no longer overflow on mobile. */
+/* ─────────────────────────────────────────
+   Tutor Signup — design-system aligned
+   Split-panel: visual left / form right
+   4-step invite flow
+───────────────────────────────────────── */
+
 .tutor-signup-page {
-  display: flex;
+  display: grid;
+  grid-template-columns: 2fr 3fr;
   height: 100vh;
   overflow: hidden;
-  background: white;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+  font-family: var(--font-sans);
+  background: var(--color-bg);
 }
 
-/* Green Left Panel */
+/* ── Left: green visual panel ── */
 .tutor-signup-page .green-panel {
-  width: 40%;
-  background: linear-gradient(135deg, #1a7f37 0%, #0d5928 100%);
-  color: white;
-  padding: 60px 50px;
+  background: linear-gradient(160deg, #2D6A4F 0%, #1B4332 55%, #122B22 100%);
+  color: #fff;
+  padding: 48px 44px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .tutor-signup-page .panel-content {
-  max-width: 400px;
-  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
-.tutor-signup-page .brand {
-  font-size: 32px;
+/* Logo */
+.tutor-signup-page .ts-logo-img {
+  height: 36px;
+  width: auto;
+  display: block;
+  margin-bottom: 40px;
+  flex-shrink: 0;
+}
+
+/* Panel copy */
+.tutor-signup-page .ts-panel-eyebrow {
+  font-size: 0.75rem;
   font-weight: 600;
-  margin-bottom: 80px;
-  letter-spacing: -0.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0 0 10px;
 }
 
+.tutor-signup-page .ts-panel-heading {
+  font-size: clamp(1.375rem, 2vw, 1.875rem);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0 0 8px;
+}
+
+.tutor-signup-page .ts-panel-heading em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.tutor-signup-page .ts-panel-sub {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 44px;
+  line-height: 1.55;
+}
+
+/* ── Step indicator (4 steps with connector) ── */
 .tutor-signup-page .step-indicator {
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  flex: 1;
+  justify-content: center;
+  gap: 0;
 }
 
 .tutor-signup-page .step-item {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  opacity: 0.5;
+  align-items: flex-start;
+  gap: 14px;
+  opacity: 0.38;
   transition: opacity 0.3s ease;
+  position: relative;
+  padding-bottom: 24px;
+}
+
+.tutor-signup-page .step-item:last-child {
+  padding-bottom: 0;
+}
+
+/* Vertical connector line */
+.tutor-signup-page .step-item::after {
+  content: '';
+  position: absolute;
+  left: 17px;
+  top: 36px;
+  bottom: 0;
+  width: 1.5px;
+  background: rgba(255, 255, 255, 0.18);
+  transition: background 0.3s ease;
+}
+
+.tutor-signup-page .step-item:last-child::after {
+  display: none;
 }
 
 .tutor-signup-page .step-item.active {
   opacity: 1;
 }
 
-.tutor-signup-page .step-number {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-
-.tutor-signup-page .step-item.active .step-number {
+.tutor-signup-page .step-item.active::after {
   background: rgba(255, 255, 255, 0.3);
 }
 
-.tutor-signup-page .step-item span {
-  font-size: 16px;
-  font-weight: 500;
+.tutor-signup-page .step-number {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
-/* White Right Panel */
+.tutor-signup-page .step-item.active .step-number {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+/* Step text block */
+.tutor-signup-page .step-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 7px;
+}
+
+.tutor-signup-page .step-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.tutor-signup-page .step-desc {
+  font-size: 0.775rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.4;
+}
+
+/* ── Right: form panel ── */
 .tutor-signup-page .form-panel {
-  width: 60%;
-  padding: 100px 60px 60px;
+  background: var(--color-bg);
+  padding: 56px 64px;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  /* overflow-y: auto so a tall form (e.g. the subject-picker step) can
-     scroll on a shorter desktop window instead of getting clipped by the
-     parent's height:100vh. Mobile overrides this to overflow:visible so
-     the whole page scrolls naturally. */
   overflow-y: auto;
   overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .tutor-signup-page form {
   width: 100%;
-  max-width: 500px;
+  max-width: 480px;
+}
+
+/* ── Form step headings ── */
+.tutor-signup-page .form-step-eyebrow {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-accent);
+  margin: 0 0 10px;
 }
 
 .tutor-signup-page .form-step h2 {
-  font-size: 32px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 4px;
+  font-family: var(--font-sans);
+  font-size: clamp(1.875rem, 3vw, 2.5rem);
+  font-weight: 300;
+  color: var(--color-text-primary);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin: 0 0 6px;
+}
+
+.tutor-signup-page .form-step h2 em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-accent);
 }
 
 .tutor-signup-page .form-step > p {
-  color: #666;
-  font-size: 15px;
-  margin-bottom: 18px;
+  color: var(--color-text-secondary);
+  font-size: 0.9375rem;
+  margin: 0 0 28px;
+  line-height: 1.5;
 }
 
-/* Form Groups */
+/* ── Form groups ── */
 .tutor-signup-page .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .tutor-signup-page .form-group {
-  margin-bottom: 6px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
 }
 
 .tutor-signup-page .form-group label {
   display: block;
-  font-size: 13px;
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 5px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
   text-align: left;
 }
 
+/* ── Inputs & selects ── */
 .tutor-signup-page .form-group input,
 .tutor-signup-page .form-group select {
   width: 100%;
-  padding: 10px 14px;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: all 0.2s ease;
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  color: var(--color-text-primary);
+  background: var(--color-surface-raised);
   box-sizing: border-box;
-  background: white;
-  color: #333;
-  -webkit-text-fill-color: #333;
-  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  -webkit-text-fill-color: var(--color-text-primary);
 }
 
-/* Safari autofill fix */
-.tutor-signup-page .form-group input:-webkit-autofill,
-.tutor-signup-page .form-group input:-webkit-autofill:hover,
-.tutor-signup-page .form-group input:-webkit-autofill:focus {
-  -webkit-text-fill-color: #333;
-  -webkit-box-shadow: 0 0 0px 1000px white inset;
-  transition: background-color 5000s ease-in-out 0s;
+.tutor-signup-page .form-group input::placeholder {
+  color: var(--color-text-tertiary);
+  -webkit-text-fill-color: var(--color-text-tertiary);
 }
 
 .tutor-signup-page .form-group input:focus,
 .tutor-signup-page .form-group select:focus {
   outline: none;
-  border-color: #1a7f37;
-  box-shadow: 0 0 0 3px rgba(26, 127, 55, 0.1);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.12);
 }
 
-.tutor-signup-page .form-group input.error {
-  border-color: #dc3545;
+.tutor-signup-page .form-group input.error,
+.tutor-signup-page .form-group select.error {
+  border-color: #F87171;
 }
 
+.tutor-signup-page .form-group input.error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Disabled email input */
+.tutor-signup-page .form-group input:disabled,
 .tutor-signup-page .form-group input.disabled-input {
-  background: #f5f5f5;
-  color: #999;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  -webkit-text-fill-color: var(--color-text-secondary);
   cursor: not-allowed;
+  border-color: var(--color-border-subtle);
 }
 
+/* Safari autofill */
+.tutor-signup-page .form-group input:-webkit-autofill,
+.tutor-signup-page .form-group input:-webkit-autofill:hover,
+.tutor-signup-page .form-group input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-text-primary);
+  -webkit-box-shadow: 0 0 0 1000px var(--color-surface-raised) inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Error text */
 .tutor-signup-page .error-text {
-  display: block;
-  color: #dc3545;
-  font-size: 13px;
-  margin-top: 6px;
+  font-size: 0.8125rem;
+  color: #B91C1C;
+  font-weight: 500;
+  line-height: 1.4;
 }
 
-/* Password visibility toggle */
+/* ── Password wrapper ── */
 .tutor-signup-page .password-input-wrapper {
   position: relative;
 }
 
 .tutor-signup-page .password-input-wrapper input {
-  width: 100%;
-  padding-right: 44px;
+  padding-right: 44px !important;
 }
 
 .tutor-signup-page .password-toggle {
@@ -191,87 +317,96 @@
   transform: translateY(-50%);
   background: none;
   border: none;
+  padding: 4px;
   cursor: pointer;
-  color: #999;
-  font-size: 14px;
-  padding: 0;
+  color: var(--color-text-tertiary);
+  font-size: 0.9rem;
   display: flex;
   align-items: center;
+  transition: color 0.2s ease;
 }
 
 .tutor-signup-page .password-toggle:hover {
-  color: #333;
+  color: var(--color-accent);
 }
 
-/* Primary Button */
+/* ── Primary CTA button (step 1 Sign up) ── */
 .tutor-signup-page .btn-primary {
   width: 100%;
-  padding: 12px;
-  background: #1a7f37;
-  color: white;
+  height: 50px;
+  background: var(--color-accent);
+  color: #fff;
   border: none;
-  border-radius: 8px;
-  font-size: 15px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
   cursor: pointer;
-  transition: all 0.2s ease;
-  margin-top: 6px;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  margin-top: 4px;
 }
 
 .tutor-signup-page .btn-primary:hover {
-  background: #0d5928;
+  background: var(--color-accent-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(26, 127, 55, 0.3);
+  box-shadow: 0 4px 16px rgba(45, 106, 79, 0.3);
 }
 
 .tutor-signup-page .btn-primary:active {
   transform: translateY(0);
+  box-shadow: none;
 }
 
 .tutor-signup-page .btn-primary:disabled {
-  background: #ccc;
+  background: var(--color-text-tertiary);
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
-/* Login Link */
+/* Already have an account */
 .tutor-signup-page .login-link {
   text-align: center;
-  margin-top: 12px;
-  font-size: 13px;
-  color: #666;
+  margin-top: 16px;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
 }
 
 .tutor-signup-page .login-link a {
-  color: #1a7f37;
-  text-decoration: none;
+  color: var(--color-accent);
   font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 .tutor-signup-page .login-link a:hover {
+  color: var(--color-accent-hover);
   text-decoration: underline;
 }
 
-/* Select All Button */
+/* ── Select all toggle ── */
 .tutor-signup-page .select-all-btn {
-  padding: 6px 16px;
-  border: 1.5px solid #1a7f37;
-  border-radius: 6px;
-  background: white;
-  color: #1a7f37;
-  font-size: 13px;
+  padding: 7px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-raised);
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  margin-bottom: 0;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+  white-space: nowrap;
 }
 
 .tutor-signup-page .select-all-btn:hover {
-  background: #1a7f37;
-  color: white;
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: var(--color-accent-subtle);
 }
 
-/* Selection Cards (for steps 2, 3, 4) */
+/* ── Selection cards (grades & subjects) ── */
 .tutor-signup-page .selection-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -280,84 +415,94 @@
 }
 
 .tutor-signup-page .selection-card {
-  padding: 13px 12px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  background: white;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 14px;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-raised);
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
   font-weight: 500;
-  color: #333;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
   text-align: center;
+  white-space: nowrap;
 }
 
 .tutor-signup-page .selection-card:hover {
-  border-color: #1a7f37;
-  background: #f8fcf9;
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: var(--color-accent-subtle);
 }
 
 .tutor-signup-page .selection-card.selected {
-  border-color: #1a7f37;
-  background: #e8f5ea;
-  color: #1a7f37;
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: #fff;
 }
 
-/* Subject Cards */
+.tutor-signup-page .selection-card.selected:hover {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+/* Subjects grid */
 .tutor-signup-page .subjects-grid {
   grid-template-columns: repeat(3, 1fr);
-  max-height: 380px;
+  max-height: 360px;
   overflow-y: auto;
-  padding-right: 6px;
+  padding-right: 4px;
 }
 
 .tutor-signup-page .subject-card {
   position: relative;
-  padding-left: 36px;
+  padding-left: 32px;
   text-align: left;
 }
 
 .tutor-signup-page .subject-indicator {
   position: absolute;
-  left: 12px;
+  left: 10px;
   top: 50%;
   transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
-  border: 2px solid #ccc;
-  border-radius: 3px;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
   transition: all 0.2s ease;
+  background: transparent;
 }
 
 .tutor-signup-page .subject-card.selected .subject-indicator {
-  background: #1a7f37;
-  border-color: #1a7f37;
+  background: #fff;
+  border-color: transparent;
 }
 
 .tutor-signup-page .subject-card.selected .subject-indicator::after {
   content: '✓';
   position: absolute;
-  color: white;
-  font-size: 11px;
+  color: var(--color-accent);
+  font-size: 10px;
+  font-weight: 700;
   top: -1px;
   left: 2px;
 }
 
-/* Hint Text */
+/* Hint text */
 .tutor-signup-page .hint-text {
-  color: #888 !important;
-  font-size: 12px !important;
+  font-size: 0.8125rem !important;
+  color: var(--color-text-tertiary) !important;
   font-style: italic;
-  margin-top: -12px !important;
-  margin-bottom: 12px !important;
+  margin-top: -16px !important;
+  margin-bottom: 16px !important;
 }
 
-/* Search + Actions Row */
+/* ── Subject search row ── */
 .tutor-signup-page .search-and-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 10px;
+  gap: 10px;
+  margin-bottom: 8px;
 }
 
 .tutor-signup-page .search-and-actions .search-box {
@@ -366,176 +511,244 @@
 }
 
 .tutor-signup-page .search-and-actions .select-all-btn {
-  white-space: nowrap;
   margin-bottom: 0;
 }
 
-/* Search Box */
+/* Search box */
 .tutor-signup-page .search-box {
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .tutor-signup-page .search-box input {
   width: 100%;
-  padding: 14px 16px 14px 44px;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 15px;
+  height: 44px;
+  padding: 0 16px 0 42px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  background: var(--color-surface-raised);
+  color: var(--color-text-primary);
   box-sizing: border-box;
-  background: white;
-  color: #333;
-  -webkit-text-fill-color: #333;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  -webkit-text-fill-color: var(--color-text-primary);
 }
 
-/* Safari autofill fix for search */
-.tutor-signup-page .search-box input:-webkit-autofill,
-.tutor-signup-page .search-box input:-webkit-autofill:hover,
-.tutor-signup-page .search-box input:-webkit-autofill:focus {
-  -webkit-text-fill-color: #333;
-  -webkit-box-shadow: 0 0 0px 1000px white inset;
-  transition: background-color 5000s ease-in-out 0s;
+.tutor-signup-page .search-box input::placeholder {
+  color: var(--color-text-tertiary);
+  -webkit-text-fill-color: var(--color-text-tertiary);
 }
 
 .tutor-signup-page .search-box input:focus {
   outline: none;
-  border-color: #1a7f37;
-  box-shadow: 0 0 0 3px rgba(26, 127, 55, 0.1);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.12);
 }
 
 .tutor-signup-page .search-icon {
   position: absolute;
-  left: 16px;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
-  color: #999;
+  color: var(--color-text-tertiary);
+  font-size: 0.8rem;
+  pointer-events: none;
 }
 
-/* Form Navigation */
+/* ── Form navigation (dots + back/next) ── */
 .tutor-signup-page .form-navigation {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid #e0e0e0;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
 }
 
 .tutor-signup-page .progress-dots {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  gap: 6px;
 }
 
 .tutor-signup-page .dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #ddd;
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: var(--color-border);
   transition: all 0.3s ease;
 }
 
 .tutor-signup-page .dot.active {
-  background: #1a7f37;
-  width: 24px;
-  border-radius: 4px;
+  background: var(--color-accent);
+  width: 22px;
 }
 
 .tutor-signup-page .nav-buttons {
   display: flex;
-  gap: 12px;
+  gap: 10px;
+  align-items: center;
 }
 
-.tutor-signup-page .btn-back,
-.tutor-signup-page .btn-next {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
-  border: none;
+/* Back button — ghost pill */
+.tutor-signup-page .btn-back {
+  height: 44px;
+  padding: 0 20px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-}
-
-.tutor-signup-page .btn-back {
-  background: #f5f5f5;
-  color: #666;
+  gap: 6px;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
 }
 
 .tutor-signup-page .btn-back:hover {
-  background: #e0e0e0;
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: var(--color-accent-subtle);
 }
 
+/* Next / submit button — accent pill */
 .tutor-signup-page .btn-next {
-  background: #1a7f37;
-  color: white;
+  height: 44px;
+  padding: 0 24px;
+  background: var(--color-accent);
+  border: none;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .tutor-signup-page .btn-next:hover {
-  background: #0d5928;
+  background: var(--color-accent-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(26, 127, 55, 0.3);
+  box-shadow: 0 4px 12px rgba(45, 106, 79, 0.3);
+}
+
+.tutor-signup-page .btn-next:active {
+  transform: translateY(0);
+  box-shadow: none;
 }
 
 .tutor-signup-page .btn-next:disabled {
-  background: #ccc;
+  background: var(--color-text-tertiary);
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
-/* Loading & Error States */
+/* ── Error banner ── */
+.tutor-signup-page .error-message {
+  padding: 12px 16px;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: var(--radius-md);
+  color: #B91C1C;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-top: 16px;
+  line-height: 1.5;
+}
+
+/* ── Loading state ── */
 .tutor-signup-page .loading {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100vh;
-  font-size: 18px;
-  color: #666;
+  gap: 16px;
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
 }
 
+.tutor-signup-page .loading::before {
+  content: '';
+  width: 32px;
+  height: 32px;
+  border: 2.5px solid var(--color-border);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: ts-spin 0.75s linear infinite;
+}
+
+@keyframes ts-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Invalid token / error container ── */
 .tutor-signup-page .error-container {
-  max-width: 500px;
+  max-width: 420px;
   margin: 0 auto;
-  padding: 60px 30px;
+  padding: 80px 24px;
   text-align: center;
+  font-family: var(--font-sans);
 }
 
 .tutor-signup-page .error-container h2 {
-  color: #dc3545;
-  margin-bottom: 16px;
+  font-size: 1.5rem;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  margin: 0 0 12px;
 }
 
 .tutor-signup-page .error-container p {
-  color: #666;
-  margin-bottom: 30px;
+  color: var(--color-text-secondary);
+  font-size: 0.9375rem;
+  margin: 0 0 32px;
+  line-height: 1.55;
 }
 
 .tutor-signup-page .error-container button {
-  padding: 12px 30px;
-  background: #1a7f37;
-  color: white;
+  height: 48px;
+  padding: 0 28px;
+  background: var(--color-accent);
+  color: #fff;
   border: none;
-  border-radius: 8px;
-  font-size: 15px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
-.tutor-signup-page .error-message {
-  padding: 14px;
-  background: #fee;
-  border: 1px solid #fcc;
-  border-radius: 8px;
-  color: #c33;
-  font-size: 14px;
-  margin-top: 20px;
+.tutor-signup-page .error-container button:hover {
+  background: var(--color-accent-hover);
+  transform: translateY(-1px);
 }
 
-/* Searchable Dropdown */
+/* ── Searchable dropdown ── */
 .tutor-signup-page .searchable-dropdown-group {
   position: relative;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.tutor-signup-page .searchable-dropdown-group label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
 }
 
 .tutor-signup-page .searchable-dropdown {
@@ -549,38 +762,40 @@
 
 .tutor-signup-page .searchable-dropdown-input {
   width: 100%;
-  padding: 10px 40px 10px 14px;
-  border: 1.5px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: all 0.2s ease;
+  height: 48px;
+  padding: 0 40px 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  color: var(--color-text-primary);
+  background: var(--color-surface-raised);
   box-sizing: border-box;
-  background: white;
-  color: #333;
-  -webkit-text-fill-color: #333;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  -webkit-text-fill-color: var(--color-text-primary);
   cursor: pointer;
 }
 
 .tutor-signup-page .searchable-dropdown.open .searchable-dropdown-input {
-  border-color: #1a7f37;
-  box-shadow: 0 0 0 3px rgba(26, 127, 55, 0.1);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.12);
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   cursor: text;
 }
 
 .tutor-signup-page .searchable-dropdown-input.error {
-  border-color: #dc3545;
+  border-color: #F87171;
 }
 
 .tutor-signup-page .searchable-dropdown-input::placeholder {
-  color: #333;
-  -webkit-text-fill-color: #333;
+  color: var(--color-text-primary);
+  -webkit-text-fill-color: var(--color-text-primary);
 }
 
 .tutor-signup-page .searchable-dropdown.open .searchable-dropdown-input::placeholder {
-  color: #999;
-  -webkit-text-fill-color: #999;
+  color: var(--color-text-tertiary);
+  -webkit-text-fill-color: var(--color-text-tertiary);
 }
 
 .tutor-signup-page .dropdown-chevron {
@@ -588,8 +803,8 @@
   right: 14px;
   top: 50%;
   transform: translateY(-50%);
-  color: #999;
-  font-size: 13px;
+  color: var(--color-text-tertiary);
+  font-size: 0.75rem;
   transition: transform 0.2s ease;
   pointer-events: none;
 }
@@ -603,27 +818,28 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
-  border: 1.5px solid #1a7f37;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-accent);
   border-top: none;
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
   max-height: 220px;
   overflow-y: auto;
   z-index: 100;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-lg);
 }
 
 .tutor-signup-page .searchable-dropdown-item {
   padding: 11px 16px;
-  font-size: 14px;
-  color: #333;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--color-text-primary);
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  transition: background 0.15s ease;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .tutor-signup-page .searchable-dropdown-item:last-child {
@@ -631,65 +847,64 @@
 }
 
 .tutor-signup-page .searchable-dropdown-item:hover {
-  background-color: #f0faf2;
+  background: var(--color-accent-subtle);
 }
 
 .tutor-signup-page .searchable-dropdown-item.selected {
-  background-color: #e8f5ea;
-  color: #1a7f37;
+  background: var(--color-accent-subtle);
+  color: var(--color-accent-hover);
   font-weight: 600;
 }
 
 .tutor-signup-page .searchable-dropdown-item .check-icon {
-  color: #1a7f37;
-  font-size: 12px;
+  color: var(--color-accent);
+  font-size: 0.75rem;
 }
 
 .tutor-signup-page .searchable-dropdown-empty {
-  padding: 16px;
+  padding: 20px 16px;
   text-align: center;
-  color: #999;
-  font-size: 14px;
+  color: var(--color-text-tertiary);
+  font-size: 0.875rem;
+  font-family: var(--font-sans);
 }
 
-/* Scrollbar for dropdown */
-.tutor-signup-page .searchable-dropdown-list::-webkit-scrollbar {
-  width: 6px;
+/* Scrollbar */
+.tutor-signup-page .searchable-dropdown-list::-webkit-scrollbar,
+.tutor-signup-page .subjects-grid::-webkit-scrollbar {
+  width: 5px;
 }
 
-.tutor-signup-page .searchable-dropdown-list::-webkit-scrollbar-track {
+.tutor-signup-page .searchable-dropdown-list::-webkit-scrollbar-track,
+.tutor-signup-page .subjects-grid::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.tutor-signup-page .searchable-dropdown-list::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 3px;
+.tutor-signup-page .searchable-dropdown-list::-webkit-scrollbar-thumb,
+.tutor-signup-page .subjects-grid::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 9999px;
 }
 
-.tutor-signup-page .searchable-dropdown-list::-webkit-scrollbar-thumb:hover {
-  background: #aaa;
+.tutor-signup-page .searchable-dropdown-list::-webkit-scrollbar-thumb:hover,
+.tutor-signup-page .subjects-grid::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
 }
 
-/* Responsive Design */
+/* ── Responsive ── */
 @media (max-width: 1024px) {
   .tutor-signup-page .green-panel {
-    width: 35%;
-    padding: 40px 30px;
+    padding: 36px 32px;
   }
 
   .tutor-signup-page .form-panel {
-    width: 65%;
-    padding: 60px 50px;
+    padding: 48px 48px;
   }
 }
 
 @media (max-width: 768px) {
-  /* Critical fix: the desktop layout locks the page to height:100vh with
-     overflow:hidden so the green sidebar can stay full-height. On mobile
-     the panels stack vertically and exceed the viewport, so we need to
-     let the page grow and scroll naturally. */
   .tutor-signup-page {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     height: auto;
     min-height: 100vh;
     overflow-x: hidden;
@@ -697,38 +912,62 @@
   }
 
   .tutor-signup-page .green-panel {
-    width: 100%;
-    min-height: auto;
-    padding: 24px 20px;
+    padding: 28px 24px;
     justify-content: flex-start;
+    min-height: auto;
   }
 
   .tutor-signup-page .panel-content {
-    max-width: none;
-    width: 100%;
+    height: auto;
   }
 
-  .tutor-signup-page .brand {
-    margin-bottom: 24px;
-    font-size: 26px;
+  .tutor-signup-page .ts-logo-img {
+    height: 30px;
+    margin-bottom: 20px;
+  }
+
+  .tutor-signup-page .ts-panel-heading,
+  .tutor-signup-page .ts-panel-sub {
+    display: none;
   }
 
   .tutor-signup-page .step-indicator {
     flex-direction: row;
-    gap: 20px;
     justify-content: center;
+    gap: 8px;
+    flex: none;
+    margin-top: 0;
   }
 
-  .tutor-signup-page .step-item span {
+  .tutor-signup-page .step-item {
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding-bottom: 0;
+    opacity: 0.4;
+    flex: none;
+  }
+
+  .tutor-signup-page .step-item.active {
+    opacity: 1;
+  }
+
+  .tutor-signup-page .step-item::after {
     display: none;
   }
 
-  /* Match the page change: let the form panel grow with its content
-     instead of clipping anything past the viewport. Also stretch (not
-     center) so the form gets full available width. */
+  .tutor-signup-page .step-text {
+    display: none;
+  }
+
+  .tutor-signup-page .step-number {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8125rem;
+  }
+
   .tutor-signup-page .form-panel {
-    width: 100%;
-    padding: 28px 18px 56px;
+    padding: 32px 20px 64px;
     overflow: visible;
     align-items: stretch;
   }
@@ -739,11 +978,9 @@
   }
 
   .tutor-signup-page .form-step h2 {
-    font-size: 26px;
+    font-size: clamp(1.625rem, 5vw, 2rem);
   }
 
-  /* Defensive: ensure every input/select/dropdown obeys the parent width
-     even if a stray inline-style or browser default tries to push past. */
   .tutor-signup-page .form-group input,
   .tutor-signup-page .form-group select,
   .tutor-signup-page .searchable-dropdown-input,
@@ -757,7 +994,7 @@
   }
 
   .tutor-signup-page .selection-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 
   .tutor-signup-page .subjects-grid {
@@ -765,13 +1002,25 @@
     max-height: none;
   }
 
-  /* Search + actions row was wrapping awkwardly when the "Select All"
-     pill couldn't fit alongside the search input. */
   .tutor-signup-page .search-and-actions {
     flex-wrap: wrap;
   }
 
   .tutor-signup-page .search-and-actions .search-box {
     flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .tutor-signup-page .selection-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tutor-signup-page .subjects-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tutor-signup-page .form-panel {
+    padding: 24px 16px 64px;
   }
 }
