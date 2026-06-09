@@ -82,6 +82,9 @@ public class SecurityConfig {
                 // Allow public access to tutor invitation validation
                 .requestMatchers("/api/tutor-invitations/validate/**").permitAll()
                 .requestMatchers("/api/voice/token").permitAll()
+                // Stripe webhooks authenticate via Stripe-Signature header (HMAC),
+                // not JWT. The PaymentController verifies the signature itself.
+                .requestMatchers(HttpMethod.POST, "/api/payments/webhook").permitAll()
                 // Protect admin endpoints - require ADMIN role
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 // Allow authenticated users to access API endpoints
