@@ -193,25 +193,45 @@ public class PaymentController {
                         // Check metadata to decide which handler to call.
                         // Wallet top-ups set type=wallet_topup; booking payments don't set type at all.
                         String intentType = paymentIntent.getMetadata().get("type");
+                        System.out.println("[Webhook] payment_intent.succeeded — type=" + intentType + " id=" + paymentIntent.getId());
+
                         if ("wallet_topup".equals(intentType)) {
-                            // Credit the student's wallet balance.
-                            // Use getAmountReceived() (Stripe's confirmed charge in cents) rather than
-                            // metadata so the credited amount always matches what was actually charged.
                             String userIdStr = paymentIntent.getMetadata().get("userId");
-                            if (userIdStr != null && paymentIntent.getAmountReceived() != null) {
-                                double actualAmount = paymentIntent.getAmountReceived() / 100.0;
+                            String metaAmount = paymentIntent.getMetadata().get("amount");
+                            System.out.println("[Webhook] wallet_topup — userId=" + userIdStr
+                                + " amountReceived=" + paymentIntent.getAmountReceived()
+                                + " metaAmount=" + metaAmount);
+
+                            if (userIdStr != null) {
+                                // Prefer the actual confirmed amount from Stripe (in cents → dollars).
+                                // Fall back to the metadata amount if getAmountReceived() is null
+                                // (can happen with certain Stripe SDK / API version combinations).
+                                double actualAmount;
+                                if (paymentIntent.getAmountReceived() != null && paymentIntent.getAmountReceived() > 0) {
+                                    actualAmount = paymentIntent.getAmountReceived() / 100.0;
+                                } else if (metaAmount != null) {
+                                    actualAmount = Double.parseDouble(metaAmount);
+                                } else {
+                                    System.err.println("[Webhook] wallet_topup — no amount available, skipping credit");
+                                    break;
+                                }
+                                System.out.println("[Webhook] crediting $" + actualAmount + " to userId=" + userIdStr);
                                 walletService.creditWallet(
                                     Long.parseLong(userIdStr),
                                     actualAmount,
                                     paymentIntent.getId()
                                 );
+                                System.out.println("[Webhook] wallet credit complete for userId=" + userIdStr);
+                            } else {
+                                System.err.println("[Webhook] wallet_topup — missing userId in metadata");
                             }
                         } else {
                             // Standard booking payment
                             paymentService.handlePaymentSuccess(paymentIntent.getId());
                         }
                     } catch (Exception e) {
-                        System.err.println("Error handling payment_intent.succeeded: " + e.getMessage());
+                        System.err.println("[Webhook] ERROR handling payment_intent.succeeded: " + e.getMessage());
+                        e.printStackTrace();
                     }
                 }
                 break;
