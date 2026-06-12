@@ -87,8 +87,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/payments/webhook").permitAll()
                 // Protect admin endpoints - require ADMIN role
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                // Wallet endpoints are for students only — tutors and admins are blocked at the filter level
-                .requestMatchers("/api/wallet/**").hasRole("STUDENT")
+                // Wallet role enforcement is handled inside WalletController (student-only check)
                 // Allow authenticated users to access API endpoints
                 .requestMatchers("/users/**", "/api/**").authenticated()
                 .anyRequest().authenticated()
