@@ -347,6 +347,9 @@ public class BookingService {
         boolean cancelledByStudent = booking.getStudent().getId().equals(userId);
         boolean refunded = booking.getPaymentStatus() == Booking.PaymentStatus.REFUNDED;
 
+        // Detect whether the lesson was paid by wallet or card, so the emails say the right thing
+        boolean paidByWallet = paymentService.wasBookingPaidByWallet(bookingId);
+
         // Notify the other party
         try {
             String recipientEmail = cancelledByStudent
@@ -359,7 +362,9 @@ public class BookingService {
                     ? booking.getStudent().getUsername()
                     : booking.getTutor().getDisplayName();
             String refundLine = refunded
-                    ? "The payment has been refunded to the student.\n"
+                    ? (paidByWallet
+                        ? "The payment has been refunded to the student's wallet.\n"
+                        : "The payment has been refunded to the student.\n")
                     : "No payment was captured for this booking.\n";
             String subject = "Booking Cancelled - Academathon";
             String body = String.format(
@@ -378,12 +383,22 @@ public class BookingService {
         // Send the student a cancellation + refund confirmation when they initiated it.
         if (cancelledByStudent) {
             try {
-                String refundLine = refunded
-                        ? String.format(
+                String refundLine;
+                if (refunded) {
+                    if (paidByWallet) {
+                        refundLine = String.format(
+                            "A full refund of $%.2f CAD has been returned to your Academathon wallet. " +
+                            "It is available immediately.\n",
+                            booking.getAmount() != null ? booking.getAmount() : 0.0);
+                    } else {
+                        refundLine = String.format(
                             "A full refund of $%.2f has been issued to your original payment method.\n" +
                             "Refunds typically take 5-10 business days to appear on your statement.\n",
-                            booking.getAmount() != null ? booking.getAmount() : 0.0)
-                        : "No payment had been captured for this booking, so there is nothing to refund.\n";
+                            booking.getAmount() != null ? booking.getAmount() : 0.0);
+                    }
+                } else {
+                    refundLine = "No payment had been captured for this booking, so there is nothing to refund.\n";
+                }
                 String subject = "Your Lesson Cancellation is Confirmed - Academathon";
                 String body = String.format(
                     "Hello %s,\n\n" +

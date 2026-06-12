@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
+import {
   faHome,
-  faCalendarAlt, 
+  faCalendarAlt,
   faBookOpen,
   faClock,
   faEnvelope,
   faUser,
+  faWallet,
   faSignOutAlt,
   faBars,
   faTimes
@@ -106,12 +107,19 @@ const StudentSidebar = () => {
             <FontAwesomeIcon icon={faBookOpen} />
             <span>Book Lesson</span>
           </div>
-          <div 
+          <div
             className={`sidebar-nav-item ${isActive('/lesson-history') ? 'active' : ''}`}
             onClick={() => handleNavigation('/lesson-history')}
           >
             <FontAwesomeIcon icon={faClock} />
             <span>Lesson History</span>
+          </div>
+          <div
+            className={`sidebar-nav-item ${isActive('/wallet') ? 'active' : ''}`}
+            onClick={() => handleNavigation('/wallet')}
+          >
+            <FontAwesomeIcon icon={faWallet} />
+            <span>Wallet</span>
           </div>
           <div 
             className={`sidebar-nav-item ${isActive('/messages') ? 'active' : ''}`}

@@ -57,6 +57,11 @@ public class User implements UserDetails{
     @Column(name = "stripe_customer_id")
     private String stripeCustomerId;
 
+    // Prepaid wallet balance in CAD. Parents top this up once; bookings deduct from it
+    // automatically when the tutor confirms, saving a Stripe transaction fee per lesson.
+    @Column(name = "wallet_balance", nullable = false)
+    private Double walletBalance = 0.00;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
@@ -240,6 +245,14 @@ public class User implements UserDetails{
 
     public void setStripeCustomerId(String stripeCustomerId) {
         this.stripeCustomerId = stripeCustomerId;
+    }
+
+    public Double getWalletBalance() {
+        return walletBalance != null ? walletBalance : 0.00;
+    }
+
+    public void setWalletBalance(Double walletBalance) {
+        this.walletBalance = walletBalance;
     }
 }
 

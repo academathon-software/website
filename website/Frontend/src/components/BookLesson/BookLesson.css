@@ -1137,3 +1137,39 @@
   .time-slot-cell { height: 36px; min-width: 36px; }
   .day-slots { min-width: 36px; }
 }
+
+/* ─── Wallet notice in booking popup ─────────────────────────────────────── */
+
+.bl-wallet-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 0.25rem;
+}
+
+.bl-wallet-notice--ok {
+  background: #ECFDF5;
+  color: #1B4332;
+  border: 1px solid #A7F3D0;
+}
+
+.bl-wallet-notice--warn {
+  background: #FFFBEB;
+  color: #78350F;
+  border: 1px solid #FDE68A;
+}
+
+.bl-wallet-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.bl-wallet-dot--green { background: #2D6A4F; }
+.bl-wallet-dot--amber { background: #D97706; }
