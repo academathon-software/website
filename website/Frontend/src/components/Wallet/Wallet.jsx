@@ -153,8 +153,18 @@ const Wallet = () => {
     setSuccessMsg(`$${resolvedAmount.toFixed(2)} CAD added to your wallet!`);
 
     // Wait 4 seconds for the webhook to hit the backend, then fetch the real balance.
+    // Only apply the server value if it's >= the optimistic value — this prevents
+    // reverting the UI on local dev where no webhook listener is running.
     setTimeout(async () => {
-      await fetchWalletData();
+      try {
+        const [balanceRes, txRes] = await Promise.all([
+          walletAPI.getBalance(),
+          walletAPI.getTransactions(),
+        ]);
+        const serverBalance = balanceRes.data.balance;
+        setBalance(prev => serverBalance >= prev ? serverBalance : prev);
+        setTransactions(txRes.data);
+      } catch (_) { /* best-effort — optimistic value stays */ }
     }, 4000);
 
     setTimeout(() => setSuccessMsg(null), 6000);
