@@ -13,6 +13,7 @@ import StudentDashboard from './components/Dashboard/StudentDashboard';
 import TutorDashboard from './components/Dashboard/TutorDashboard';
 import Calendar from './components/Calendar/Calendar';
 import BookLesson from './components/BookLesson/BookLesson';
+import Wallet from './components/Wallet/Wallet';
 import LessonHistory from './components/LessonHistory/LessonHistory';
 import Profile from './components/Profile/Profile';
 import Courses from './components/Courses/Courses';
@@ -56,6 +57,11 @@ function App() {
           <Route path="book-lesson" element={
             <ProtectedRoute allowedRoles={['STUDENT']}>
               <BookLesson />
+            </ProtectedRoute>
+          } />
+          <Route path="wallet" element={
+            <ProtectedRoute allowedRoles={['STUDENT']}>
+              <Wallet />
             </ProtectedRoute>
           } />
           

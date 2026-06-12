@@ -3,7 +3,9 @@ package com.academathon.controller;
 import com.academathon.model.Booking;
 import com.academathon.model.User;
 import com.academathon.repository.BookingRepository;
+import com.academathon.service.BookingService;
 import com.academathon.service.PaymentService;
+import com.academathon.service.WalletService;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
@@ -27,10 +29,17 @@ public class PaymentController {
 
     private final PaymentService paymentService;
     private final BookingRepository bookingRepository;
+    private final WalletService walletService;
+    private final BookingService bookingService;
 
-    public PaymentController(PaymentService paymentService, BookingRepository bookingRepository) {
+    public PaymentController(PaymentService paymentService,
+                            BookingRepository bookingRepository,
+                            WalletService walletService,
+                            BookingService bookingService) {
         this.paymentService = paymentService;
         this.bookingRepository = bookingRepository;
+        this.walletService = walletService;
+        this.bookingService = bookingService;
     }
 
     /**
@@ -185,7 +194,14 @@ public class PaymentController {
                         .getObject().orElse(null);
                 if (paymentIntent != null) {
                     try {
-                        paymentService.handlePaymentSuccess(paymentIntent.getId());
+                        String type = paymentIntent.getMetadata() != null
+                                ? paymentIntent.getMetadata().get("type") : null;
+                        if ("wallet_topup".equals(type) || "wallet_auto_reload".equals(type)) {
+                            // Wallet credit (idempotent via intent-id dedupe).
+                            walletService.creditFromStripeIntent(paymentIntent);
+                        } else {
+                            paymentService.handlePaymentSuccess(paymentIntent.getId());
+                        }
                     } catch (Exception e) {
                         System.err.println("Error handling payment success: " + e.getMessage());
                     }
@@ -231,10 +247,8 @@ public class PaymentController {
                 return ResponseEntity.status(403).body(Map.of("error", "Admin access required for refunds"));
             }
 
-            paymentService.refundPayment(bookingId);
+            bookingService.refundBookingPayment(bookingId);
             return ResponseEntity.ok(Map.of("message", "Payment refunded successfully"));
-        } catch (StripeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Stripe error: " + e.getMessage()));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }

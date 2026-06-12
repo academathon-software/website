@@ -35,6 +35,7 @@ public class BookingService {
     private final EmailService emailService;
     private final BookingTimingProperties timing;
     private final PaymentService paymentService;
+    private final WalletService walletService;
 
     @Value("${app.frontend.url:http://localhost:5173}")
     private String frontendUrl;
@@ -45,7 +46,8 @@ public class BookingService {
                          AvailabilityService availabilityService,
                          EmailService emailService,
                          BookingTimingProperties timing,
-                         PaymentService paymentService) {
+                         PaymentService paymentService,
+                         WalletService walletService) {
         this.bookingRepository = bookingRepository;
         this.tutorProfileRepository = tutorProfileRepository;
         this.userRepository = userRepository;
@@ -53,6 +55,7 @@ public class BookingService {
         this.emailService = emailService;
         this.timing = timing;
         this.paymentService = paymentService;
+        this.walletService = walletService;
     }
     
     /**
@@ -87,8 +90,17 @@ public class BookingService {
             throw new RuntimeException("End time must be after start time");
         }
 
-        // Require a saved payment method - we auto-charge when the tutor confirms.
-        if (request.getPaymentMethodId() == null || request.getPaymentMethodId().isBlank()) {
+        // Resolve how this lesson will be paid for. WALLET bookings deduct from the
+        // student's balance at confirm time and don't require a saved card up front.
+        Booking.PaymentSource paymentSource = Booking.PaymentSource.CARD;
+        if (request.getPaymentSource() != null && request.getPaymentSource().equalsIgnoreCase("WALLET")) {
+            paymentSource = Booking.PaymentSource.WALLET;
+        }
+
+        // CARD bookings require a saved payment method - we auto-charge when the tutor confirms.
+        // WALLET bookings skip this; no money moves until the tutor confirms.
+        if (paymentSource == Booking.PaymentSource.CARD
+                && (request.getPaymentMethodId() == null || request.getPaymentMethodId().isBlank())) {
             throw new RuntimeException("A saved payment method is required to book a lesson");
         }
         
@@ -135,6 +147,7 @@ public class BookingService {
         booking.setSubject(request.getNotes()); // Store the subject from notes field
         booking.setGradeLevel(request.getGradeLevel());
         booking.setPaymentMethodId(request.getPaymentMethodId());
+        booking.setPaymentSource(paymentSource);
         
         // Tutor must respond at least N hours before the lesson; if that deadline
         // is already in the past (shouldn't happen given the 5h advance rule) we
@@ -332,9 +345,13 @@ public class BookingService {
                 );
             }
 
-            // Refund the captured payment.
+            // Refund the captured payment back to its original source.
             try {
-                paymentService.refundPayment(bookingId);
+                if (booking.getPaymentSource() == Booking.PaymentSource.WALLET) {
+                    walletService.refundToWallet(booking);
+                } else {
+                    paymentService.refundPayment(bookingId);
+                }
             } catch (Exception e) {
                 System.err.println("Failed to refund payment for booking " + bookingId + ": " + e.getMessage());
                 throw new RuntimeException("Could not process refund: " + e.getMessage(), e);
@@ -410,6 +427,28 @@ public class BookingService {
     }
     
     /**
+     * Refund a booking's captured payment to its original source (wallet or card).
+     * Used by the admin refund endpoint; does not change the booking status.
+     */
+    @Transactional
+    public void refundBookingPayment(Long bookingId) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+        try {
+            if (booking.getPaymentSource() == Booking.PaymentSource.WALLET) {
+                walletService.refundToWallet(booking);
+                bookingRepository.save(booking);
+            } else {
+                paymentService.refundPayment(bookingId);
+            }
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Could not process refund: " + e.getMessage(), e);
+        }
+    }
+
+    /**
      * Confirm a booking (tutor confirms a pending booking).
      *
      * New workflow: confirmation auto-charges the student's saved card. On success the
@@ -440,10 +479,16 @@ public class BookingService {
             );
         }
         
-        // Auto-charge the student's saved card before transitioning. On failure the
-        // booking stays PENDING (no status change) and the exception bubbles up.
+        // Collect payment before transitioning. WALLET bookings deduct from the
+        // student's balance (with auto-reload-then-card fallback); CARD bookings charge
+        // the saved card off-session. On failure the booking stays PENDING (no status
+        // change) and the exception bubbles up.
         try {
-            paymentService.chargeBookingOffSession(booking);
+            if (booking.getPaymentSource() == Booking.PaymentSource.WALLET) {
+                walletService.deductForBooking(booking);
+            } else {
+                paymentService.chargeBookingOffSession(booking);
+            }
         } catch (RuntimeException chargeError) {
             // Send the student a note asking them to update their payment method.
             try {

@@ -176,6 +176,34 @@ export const paymentAPI = {
     api.post(`/api/payments/refund/${bookingId}`),
 };
 
+// Wallet API
+export const walletAPI = {
+  // Get wallet balance + auto-reload settings
+  getWallet: () => api.get('/api/wallet'),
+
+  // Get wallet transaction history
+  getTransactions: () => api.get('/api/wallet/transactions'),
+
+  // Start a top-up; returns a Stripe clientSecret to confirm on the frontend
+  createTopUp: (amount) => api.post('/api/wallet/topup', { amount }),
+
+  // Confirm a top-up succeeded (fallback to webhook)
+  confirmTopUp: (paymentIntentId) =>
+    api.post('/api/wallet/topup/confirm', { paymentIntentId }),
+
+  // Update auto-reload settings
+  updateAutoReload: (enabled, threshold, amount) =>
+    api.put('/api/wallet/auto-reload', { enabled, threshold, amount }),
+
+  // Create a SetupIntent to save a card for top-ups/auto-reload
+  createPaymentMethodSetupIntent: () =>
+    api.post('/api/wallet/payment-method/setup-intent'),
+
+  // Save the default card for top-ups/auto-reload
+  setPaymentMethod: (paymentMethodId) =>
+    api.put('/api/wallet/payment-method', { paymentMethodId }),
+};
+
 // Availability API
 export const availabilityAPI = {
   // Get tutor's recurring schedule

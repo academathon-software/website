@@ -14,6 +14,12 @@ public class BookingRequestDTO {
      */
     private String paymentMethodId;
 
+    /**
+     * How the lesson will be paid for: "CARD" (default, save-a-card flow) or
+     * "WALLET" (deduct from the student's wallet balance when the tutor confirms).
+     */
+    private String paymentSource;
+
     public BookingRequestDTO() {
     }
 
@@ -71,6 +77,14 @@ public class BookingRequestDTO {
 
     public void setPaymentMethodId(String paymentMethodId) {
         this.paymentMethodId = paymentMethodId;
+    }
+
+    public String getPaymentSource() {
+        return paymentSource;
+    }
+
+    public void setPaymentSource(String paymentSource) {
+        this.paymentSource = paymentSource;
     }
 }
 

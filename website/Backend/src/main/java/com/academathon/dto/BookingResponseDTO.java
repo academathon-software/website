@@ -19,6 +19,7 @@ public class BookingResponseDTO {
     private LocalDateTime endTime;
     private String status;
     private String paymentStatus;
+    private String paymentSource;
     private String subject;
     private BigDecimal hourlyRate;
     private LocalDateTime createdAt;
@@ -49,6 +50,7 @@ public class BookingResponseDTO {
         this.endTime = booking.getEndTime();
         this.status = booking.getStatus().toString();
         this.paymentStatus = booking.getPaymentStatus() != null ? booking.getPaymentStatus().toString() : "PENDING";
+        this.paymentSource = booking.getPaymentSource() != null ? booking.getPaymentSource().toString() : "CARD";
         this.subject = booking.getSubject();
         this.hourlyRate = booking.getTutor().getHourlyRate();
         this.createdAt = booking.getCreatedAt();
@@ -166,6 +168,14 @@ public class BookingResponseDTO {
 
     public void setPaymentStatus(String paymentStatus) {
         this.paymentStatus = paymentStatus;
+    }
+
+    public String getPaymentSource() {
+        return paymentSource;
+    }
+
+    public void setPaymentSource(String paymentSource) {
+        this.paymentSource = paymentSource;
     }
 
     public String getSubject() {

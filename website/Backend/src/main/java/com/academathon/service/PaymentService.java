@@ -78,6 +78,14 @@ public class PaymentService {
     }
 
     /**
+     * Public accessor for the per-lesson price so the wallet flow can compute how much
+     * to deduct/charge using the exact same pricing rules as the card flow.
+     */
+    public double getLessonAmount(String gradeLevel) {
+        return calculateAmount(gradeLevel);
+    }
+
+    /**
      * Public price quote for a given grade level. Returned by GET /api/payments/quote
      * and consumed by the frontend so the SetupIntent step can disclose the amount
      * before the student saves their card.

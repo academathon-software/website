@@ -43,6 +43,10 @@ public class Booking {
     @Column(name = "payment_status")
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_source", nullable = false)
+    private PaymentSource paymentSource = PaymentSource.CARD;
+
     @Column(name = "amount")
     private Double amount;
 
@@ -82,6 +86,9 @@ public class Booking {
     public enum BookingStatus { PENDING, CONFIRMED, PAID, SCHEDULED, REJECTED, CANCELLED, COMPLETED }
     
     public enum PaymentStatus { PENDING, PROCESSING, SUCCEEDED, FAILED, REFUNDED }
+
+    /** How the lesson will be paid for when the tutor confirms. */
+    public enum PaymentSource { CARD, WALLET }
 
     public Booking() {
         // JPA requires a public no-args constructor
@@ -185,6 +192,14 @@ public class Booking {
 
     public void setPaymentStatus(PaymentStatus paymentStatus) {
         this.paymentStatus = paymentStatus;
+    }
+
+    public PaymentSource getPaymentSource() {
+        return paymentSource;
+    }
+
+    public void setPaymentSource(PaymentSource paymentSource) {
+        this.paymentSource = paymentSource;
     }
 
     public Double getAmount() {

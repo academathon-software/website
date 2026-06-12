@@ -8,6 +8,7 @@ import {
   faClock,
   faEnvelope,
   faUser,
+  faWallet,
   faSignOutAlt,
   faBars,
   faTimes
@@ -112,6 +113,13 @@ const StudentSidebar = () => {
           >
             <FontAwesomeIcon icon={faClock} />
             <span>Lesson History</span>
+          </div>
+          <div 
+            className={`sidebar-nav-item ${isActive('/wallet') ? 'active' : ''}`}
+            onClick={() => handleNavigation('/wallet')}
+          >
+            <FontAwesomeIcon icon={faWallet} />
+            <span>Wallet</span>
           </div>
           <div 
             className={`sidebar-nav-item ${isActive('/messages') ? 'active' : ''}`}

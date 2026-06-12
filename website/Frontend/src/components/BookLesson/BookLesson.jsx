@@ -23,7 +23,7 @@ import {
 } from '@stripe/react-stripe-js';
 import StudentSidebar from '../Shared/StudentSidebar';
 import { useUser } from '../../context/UserContext';
-import { tutorAPI, bookingAPI, availabilityAPI, userAPI, paymentAPI } from '../../services/api';
+import { tutorAPI, bookingAPI, availabilityAPI, userAPI, paymentAPI, walletAPI } from '../../services/api';
 import { stripePromise } from '../../services/stripe';
 
 /**
@@ -205,6 +205,11 @@ const BookLesson = () => {
   const [setupClientSecret, setSetupClientSecret] = useState(null);
   const [setupLoading, setSetupLoading] = useState(false);
 
+  // Wallet vs card payment choice. Defaults to card so nothing changes for users
+  // who don't use the wallet; the wallet balance is shown when available.
+  const [paymentChoice, setPaymentChoice] = useState('card');
+  const [wallet, setWallet] = useState(null);
+
   // Backend-driven price quote so the SetupIntent step can disclose the amount
   // before the student saves their card. Refetched any time the grade changes
   // (today it's locked to the profile but keeping the dep is cheap insurance).
@@ -219,6 +224,17 @@ const BookLesson = () => {
         }
       })
       .catch(() => { /* fall back to defaults */ });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Load the student's wallet so the booking popup can offer "pay with balance".
+  useEffect(() => {
+    let cancelled = false;
+    walletAPI.getWallet()
+      .then(response => {
+        if (!cancelled && response?.data) setWallet(response.data);
+      })
+      .catch(() => { /* wallet optional; fall back to card */ });
     return () => { cancelled = true; };
   }, []);
 
@@ -467,8 +483,8 @@ const BookLesson = () => {
     setSelectedTimeSlot({ timeSlot, day, date, slotData });
   };
 
-  // Step 1: validate the slot and request a Stripe SetupIntent so the student can save
-  // a card. This transitions the confirmation popup into the "save card" sub-step.
+  // Step 1: validate the slot, then either submit a wallet booking directly or request
+  // a Stripe SetupIntent so the student can save a card (the "save card" sub-step).
   const handleBookLesson = async () => {
     try {
       setBookingLoading(true);
@@ -498,6 +514,13 @@ const BookLesson = () => {
         return;
       }
 
+      // Wallet path: no card to save - book directly. No money moves until the tutor confirms.
+      if (paymentChoice === 'wallet') {
+        await submitBooking({ paymentSource: 'WALLET' });
+        return;
+      }
+
+      // Card path: collect a card via SetupIntent first.
       setSetupLoading(true);
       const setupResponse = await paymentAPI.createSetupIntent();
       const clientSecret = setupResponse?.data?.clientSecret;
@@ -514,9 +537,9 @@ const BookLesson = () => {
     }
   };
 
-  // Step 2: after Stripe confirms the SetupIntent and gives us a payment method id,
-  // submit the actual booking. The backend auto-charges this method when the tutor confirms.
-  const submitBookingWithPaymentMethod = async (paymentMethodId) => {
+  // Submit the actual booking. For card bookings the backend auto-charges the saved
+  // method when the tutor confirms; for wallet bookings it deducts from the balance.
+  const submitBooking = async ({ paymentMethodId = null, paymentSource = 'CARD' }) => {
     try {
       setBookingLoading(true);
       setError(null);
@@ -534,6 +557,7 @@ const BookLesson = () => {
         notes: `${studentGradeLabel || selectedGrade?.name || ''} ${selectedSubject}`.trim(),
         gradeLevel: studentGradeLabel || selectedGrade?.name || '',
         paymentMethodId,
+        paymentSource,
       };
 
       await bookingAPI.createBooking(bookingData);
@@ -548,6 +572,11 @@ const BookLesson = () => {
       setBookingLoading(false);
     }
   };
+
+  // Step 2 (card only): after Stripe confirms the SetupIntent and gives us a payment
+  // method id, submit the actual booking.
+  const submitBookingWithPaymentMethod = (paymentMethodId) =>
+    submitBooking({ paymentMethodId, paymentSource: 'CARD' });
 
   const cancelBookingFlow = () => {
     setSetupClientSecret(null);
@@ -925,22 +954,71 @@ const BookLesson = () => {
                 );
               }
 
+              const price = pricing?.amount;
+              const balance = wallet ? Number(wallet.balance) : 0;
+              const reloadCovers = wallet?.autoReloadEnabled
+                && wallet?.autoReloadAmount != null
+                && (balance + Number(wallet.autoReloadAmount)) >= (price || 0);
+              const walletCovers = price == null || balance >= price || reloadCovers;
+              const balanceLabel = wallet ? formatPrice(wallet.balance, wallet.currency) : null;
+
               return (
                 <>
                   {summaryLine}
                   {priceLabel && (
                     <p className="bl-popup-price">Total: {priceLabel}</p>
                   )}
-                  <p className="bl-popup-hint">
-                    You'll save a card next. We only charge {priceLabel ? `${priceLabel} ` : 'it '}once your tutor confirms the booking.
-                  </p>
+
+                  <div className="bl-pay-choice">
+                    <label className={`bl-pay-option ${paymentChoice === 'wallet' ? 'selected' : ''}`}>
+                      <input
+                        type="radio"
+                        name="payChoice"
+                        checked={paymentChoice === 'wallet'}
+                        onChange={() => setPaymentChoice('wallet')}
+                      />
+                      <span className="bl-pay-option-main">Pay with wallet</span>
+                      {balanceLabel && (
+                        <span className="bl-pay-option-meta">Balance: {balanceLabel}</span>
+                      )}
+                    </label>
+                    <label className={`bl-pay-option ${paymentChoice === 'card' ? 'selected' : ''}`}>
+                      <input
+                        type="radio"
+                        name="payChoice"
+                        checked={paymentChoice === 'card'}
+                        onChange={() => setPaymentChoice('card')}
+                      />
+                      <span className="bl-pay-option-main">Pay with card</span>
+                      <span className="bl-pay-option-meta">Save a card next</span>
+                    </label>
+                  </div>
+
+                  {paymentChoice === 'wallet' ? (
+                    <p className="bl-popup-hint">
+                      We'll deduct {priceLabel ? `${priceLabel} ` : ''}from your wallet only once your tutor confirms the booking.
+                    </p>
+                  ) : (
+                    <p className="bl-popup-hint">
+                      You'll save a card next. We only charge {priceLabel ? `${priceLabel} ` : 'it '}once your tutor confirms the booking.
+                    </p>
+                  )}
+
+                  {paymentChoice === 'wallet' && !walletCovers && (
+                    <p className="bl-popup-warning">
+                      Your wallet balance may not cover this lesson. Top up in your Wallet to avoid a failed confirmation.
+                    </p>
+                  )}
+
                   <div className="booking-confirmation-buttons">
                     <button
                       className="confirm-book-button"
                       onClick={handleBookLesson}
                       disabled={bookingLoading || setupLoading}
                     >
-                      {bookingLoading || setupLoading ? 'Preparing…' : 'Continue to payment'}
+                      {bookingLoading || setupLoading
+                        ? 'Preparing…'
+                        : paymentChoice === 'wallet' ? 'Book lesson' : 'Continue to payment'}
                     </button>
                     <button
                       className="cancel-book-button"
