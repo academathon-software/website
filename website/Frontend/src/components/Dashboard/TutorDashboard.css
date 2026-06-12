@@ -321,7 +321,7 @@
 
 .lesson-row {
   display: grid;
-  grid-template-columns: 1.5fr 1.5fr 1.2fr 1.2fr auto;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.5fr) minmax(0, 1.2fr) minmax(0, 1.2fr) auto;
   gap: 12px;
   align-items: center;
   padding: 14px 8px;
@@ -395,7 +395,6 @@
   gap: 6px;
   justify-content: flex-end;
   flex-wrap: nowrap;
-  min-width: 160px;
 }
 
 .lesson-actions .action-btn,

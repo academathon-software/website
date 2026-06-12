@@ -88,7 +88,13 @@ public class BookingService {
         }
 
         // Require a saved payment method - we auto-charge when the tutor confirms.
-        if (request.getPaymentMethodId() == null || request.getPaymentMethodId().isBlank()) {
+        // Exception: if the student's wallet balance covers the lesson price, the
+        // tutor-confirm charge will be deducted from the wallet instead, so no
+        // saved card is needed.
+        double lessonPrice = (double) paymentService.getQuote(request.getGradeLevel()).get("amount");
+        boolean walletCoversLesson = student.getWalletBalance() >= lessonPrice;
+        if (!walletCoversLesson
+                && (request.getPaymentMethodId() == null || request.getPaymentMethodId().isBlank())) {
             throw new RuntimeException("A saved payment method is required to book a lesson");
         }
         
