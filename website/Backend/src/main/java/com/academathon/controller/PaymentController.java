@@ -5,6 +5,8 @@ import com.academathon.model.User;
 import com.academathon.repository.BookingRepository;
 import com.academathon.service.PaymentService;
 import com.academathon.service.WalletService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
@@ -186,48 +188,82 @@ public class PaymentController {
         // Handle the event
         switch (event.getType()) {
             case "payment_intent.succeeded":
-                PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer()
-                        .getObject().orElse(null);
+                {
+                    PaymentIntent paymentIntent = null;
+                    try {
+                        paymentIntent = resolvePaymentIntent(event);
+                    } catch (Exception e) {
+                        System.err.println("[Webhook] failed to resolve PaymentIntent for payment_intent.succeeded: " + e.getMessage());
+                        e.printStackTrace();
+                    }
                 if (paymentIntent != null) {
                     try {
                         // Check metadata to decide which handler to call.
                         // Wallet top-ups set type=wallet_topup; booking payments don't set type at all.
                         String intentType = paymentIntent.getMetadata().get("type");
+                        System.out.println("[Webhook] payment_intent.succeeded — type=" + intentType + " id=" + paymentIntent.getId());
+
                         if ("wallet_topup".equals(intentType)) {
-                            // Credit the student's wallet balance.
-                            // Use getAmountReceived() (Stripe's confirmed charge in cents) rather than
-                            // metadata so the credited amount always matches what was actually charged.
                             String userIdStr = paymentIntent.getMetadata().get("userId");
-                            if (userIdStr != null && paymentIntent.getAmountReceived() != null) {
-                                double actualAmount = paymentIntent.getAmountReceived() / 100.0;
+                            String metaAmount = paymentIntent.getMetadata().get("amount");
+                            System.out.println("[Webhook] wallet_topup — userId=" + userIdStr
+                                + " amountReceived=" + paymentIntent.getAmountReceived()
+                                + " metaAmount=" + metaAmount);
+
+                            if (userIdStr != null) {
+                                // Prefer the actual confirmed amount from Stripe (in cents → dollars).
+                                // Fall back to the metadata amount if getAmountReceived() is null
+                                // (can happen with certain Stripe SDK / API version combinations).
+                                double actualAmount;
+                                if (paymentIntent.getAmountReceived() != null && paymentIntent.getAmountReceived() > 0) {
+                                    actualAmount = paymentIntent.getAmountReceived() / 100.0;
+                                } else if (metaAmount != null) {
+                                    actualAmount = Double.parseDouble(metaAmount);
+                                } else {
+                                    System.err.println("[Webhook] wallet_topup — no amount available, skipping credit");
+                                    break;
+                                }
+                                System.out.println("[Webhook] crediting $" + actualAmount + " to userId=" + userIdStr);
                                 walletService.creditWallet(
                                     Long.parseLong(userIdStr),
                                     actualAmount,
                                     paymentIntent.getId()
                                 );
+                                System.out.println("[Webhook] wallet credit complete for userId=" + userIdStr);
+                            } else {
+                                System.err.println("[Webhook] wallet_topup — missing userId in metadata");
                             }
                         } else {
                             // Standard booking payment
                             paymentService.handlePaymentSuccess(paymentIntent.getId());
                         }
                     } catch (Exception e) {
-                        System.err.println("Error handling payment_intent.succeeded: " + e.getMessage());
+                        System.err.println("[Webhook] ERROR handling payment_intent.succeeded: " + e.getMessage());
+                        e.printStackTrace();
                     }
+                }
                 }
                 break;
 
             case "payment_intent.payment_failed":
-                PaymentIntent failedIntent = (PaymentIntent) event.getDataObjectDeserializer()
-                        .getObject().orElse(null);
+                {
+                    PaymentIntent failedIntent = null;
+                    try {
+                        failedIntent = resolvePaymentIntent(event);
+                    } catch (Exception e) {
+                        System.err.println("[Webhook] failed to resolve PaymentIntent for payment_intent.payment_failed: " + e.getMessage());
+                        e.printStackTrace();
+                    }
                 if (failedIntent != null) {
                     try {
-                        String reason = failedIntent.getLastPaymentError() != null 
-                            ? failedIntent.getLastPaymentError().getMessage() 
+                        String reason = failedIntent.getLastPaymentError() != null
+                            ? failedIntent.getLastPaymentError().getMessage()
                             : "Unknown error";
                         paymentService.handlePaymentFailure(failedIntent.getId(), reason);
                     } catch (Exception e) {
                         System.err.println("Error handling payment failure: " + e.getMessage());
                     }
+                }
                 }
                 break;
 
@@ -236,6 +272,25 @@ public class PaymentController {
         }
 
         return ResponseEntity.ok("Success");
+    }
+
+    /**
+     * Resolve the PaymentIntent attached to a webhook event. Stripe's typed
+     * deserialization can silently come back empty when the account's API
+     * version is newer than what this SDK understands, so fall back to
+     * retrieving the object directly by ID from the raw event JSON.
+     */
+    private PaymentIntent resolvePaymentIntent(Event event) throws Exception {
+        PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer()
+                .getObject().orElse(null);
+        if (paymentIntent != null) {
+            return paymentIntent;
+        }
+        String rawJson = event.getDataObjectDeserializer().getRawJson();
+        JsonNode obj = new ObjectMapper().readTree(rawJson);
+        String id = obj.get("id").asText();
+        System.out.println("[Webhook] typed deserialization returned empty, retrieving PaymentIntent " + id + " via API");
+        return PaymentIntent.retrieve(id);
     }
 
     /**
