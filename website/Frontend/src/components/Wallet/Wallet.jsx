@@ -145,9 +145,19 @@ const Wallet = () => {
     setClientSecret(null);
     setCustomAmount('');
     setSelectedPreset(null);
+
+    // Optimistically show the new balance immediately while we wait for the
+    // webhook to arrive. Stripe fires the webhook asynchronously so there's
+    // a short delay before the DB is actually updated.
+    setBalance(prev => (prev ?? 0) + resolvedAmount);
     setSuccessMsg(`$${resolvedAmount.toFixed(2)} CAD added to your wallet!`);
-    await fetchWalletData();
-    setTimeout(() => setSuccessMsg(null), 4000);
+
+    // Wait 4 seconds for the webhook to hit the backend, then fetch the real balance.
+    setTimeout(async () => {
+      await fetchWalletData();
+    }, 4000);
+
+    setTimeout(() => setSuccessMsg(null), 6000);
   };
 
   const handleCancelStripe = () => {
