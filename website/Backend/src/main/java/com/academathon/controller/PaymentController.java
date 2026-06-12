@@ -4,6 +4,7 @@ import com.academathon.model.Booking;
 import com.academathon.model.User;
 import com.academathon.repository.BookingRepository;
 import com.academathon.service.PaymentService;
+import com.academathon.service.WalletService;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
@@ -27,10 +28,14 @@ public class PaymentController {
 
     private final PaymentService paymentService;
     private final BookingRepository bookingRepository;
+    private final WalletService walletService;
 
-    public PaymentController(PaymentService paymentService, BookingRepository bookingRepository) {
+    public PaymentController(PaymentService paymentService,
+                             BookingRepository bookingRepository,
+                             WalletService walletService) {
         this.paymentService = paymentService;
         this.bookingRepository = bookingRepository;
+        this.walletService = walletService;
     }
 
     /**
@@ -185,9 +190,28 @@ public class PaymentController {
                         .getObject().orElse(null);
                 if (paymentIntent != null) {
                     try {
-                        paymentService.handlePaymentSuccess(paymentIntent.getId());
+                        // Check metadata to decide which handler to call.
+                        // Wallet top-ups set type=wallet_topup; booking payments don't set type at all.
+                        String intentType = paymentIntent.getMetadata().get("type");
+                        if ("wallet_topup".equals(intentType)) {
+                            // Credit the student's wallet balance.
+                            // Use getAmountReceived() (Stripe's confirmed charge in cents) rather than
+                            // metadata so the credited amount always matches what was actually charged.
+                            String userIdStr = paymentIntent.getMetadata().get("userId");
+                            if (userIdStr != null && paymentIntent.getAmountReceived() != null) {
+                                double actualAmount = paymentIntent.getAmountReceived() / 100.0;
+                                walletService.creditWallet(
+                                    Long.parseLong(userIdStr),
+                                    actualAmount,
+                                    paymentIntent.getId()
+                                );
+                            }
+                        } else {
+                            // Standard booking payment
+                            paymentService.handlePaymentSuccess(paymentIntent.getId());
+                        }
                     } catch (Exception e) {
-                        System.err.println("Error handling payment success: " + e.getMessage());
+                        System.err.println("Error handling payment_intent.succeeded: " + e.getMessage());
                     }
                 }
                 break;

@@ -15,12 +15,14 @@ import {
   faUser,
   faBookOpen,
   faClock,
-  faCalendarAlt
+  faCalendarAlt,
+  faWallet,
+  faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import StudentSidebar from '../Shared/StudentSidebar';
 import BookingStatusBadge from '../Shared/BookingStatusBadge';
 import { useUser } from '../../context/UserContext';
-import { bookingAPI, userAPI, availabilityAPI, tutorAPI } from '../../services/api';
+import { bookingAPI, userAPI, availabilityAPI, tutorAPI, walletAPI } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 
 const StudentDashboard = () => {
@@ -47,6 +49,7 @@ const StudentDashboard = () => {
   const [showTutorProfile, setShowTutorProfile] = useState(false);
   const [selectedTutorProfile, setSelectedTutorProfile] = useState(null);
   const [loadingTutorProfile, setLoadingTutorProfile] = useState(false);
+  const [walletBalance, setWalletBalance] = useState(null);
   // Booking timing config (loaded from backend; defaults match application.properties)
   const [bookingTiming, setBookingTiming] = useState({
     minimumAdvanceHours: 5,
@@ -68,13 +71,18 @@ const StudentDashboard = () => {
       setLoading(true);
       setError(null);
 
-      // Fetch user profile, bookings, and timing config in parallel
-      const [profileResponse, upcomingResponse, allBookingsResponse, timingResponse] = await Promise.all([
+      // Fetch user profile, bookings, timing config, and wallet balance in parallel
+      const [profileResponse, upcomingResponse, allBookingsResponse, timingResponse, walletResponse] = await Promise.all([
         userAPI.getCurrentUser(),
         bookingAPI.getUpcomingBookings(),
         bookingAPI.getUserBookings(),
-        bookingAPI.getTimingConfig().catch(() => null)
+        bookingAPI.getTimingConfig().catch(() => null),
+        walletAPI.getBalance().catch(() => null),
       ]);
+
+      if (walletResponse?.data?.balance != null) {
+        setWalletBalance(walletResponse.data.balance);
+      }
 
       if (timingResponse?.data) {
         setBookingTiming(timingResponse.data);
@@ -763,6 +771,30 @@ const StudentDashboard = () => {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* Wallet Balance Card */}
+        <div className="wallet-sidebar-card">
+          <div className="wallet-sidebar-top">
+            <div className="wallet-sidebar-icon">
+              <FontAwesomeIcon icon={faWallet} />
+            </div>
+            <div>
+              <p className="wallet-sidebar-label">Wallet</p>
+              <p className="wallet-sidebar-balance">
+                {walletBalance != null
+                  ? `$${walletBalance.toFixed(2)} CAD`
+                  : '—'}
+              </p>
+            </div>
+          </div>
+          <button
+            className="wallet-sidebar-btn"
+            onClick={() => navigate('/wallet')}
+          >
+            <FontAwesomeIcon icon={faPlus} />
+            &nbsp;Add Funds
+          </button>
         </div>
 
         {/* Upcoming Section */}

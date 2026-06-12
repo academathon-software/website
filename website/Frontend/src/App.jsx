@@ -25,6 +25,7 @@ import Team from './Team/Team';
 import Contact from './Contact/Contact';
 import { UserProvider } from './context/UserContext';
 import AdminDashboard from './components/Admin/AdminDashboard';
+import Wallet from './components/Wallet/Wallet';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import SessionExpiryWatcher from './components/Auth/SessionExpiryWatcher';
 
@@ -56,6 +57,11 @@ function App() {
           <Route path="book-lesson" element={
             <ProtectedRoute allowedRoles={['STUDENT']}>
               <BookLesson />
+            </ProtectedRoute>
+          } />
+          <Route path="wallet" element={
+            <ProtectedRoute allowedRoles={['STUDENT']}>
+              <Wallet />
             </ProtectedRoute>
           } />
           

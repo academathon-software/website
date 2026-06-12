@@ -273,6 +273,19 @@ export const messageAPI = {
     api.delete(`/api/messages/${messageId}`),
 };
 
+// Wallet API
+export const walletAPI = {
+  // Get current wallet balance
+  getBalance: () => api.get('/api/wallet/balance'),
+
+  // Get full transaction history
+  getTransactions: () => api.get('/api/wallet/transactions'),
+
+  // Create a Stripe PaymentIntent for a top-up
+  // amount is a number in CAD e.g. 50 for $50.00
+  createTopupIntent: (amount) => api.post('/api/wallet/topup/intent', { amount }),
+};
+
 // Review/Feedback API
 export const reviewAPI = {
   leaveReview: (bookingId, rating, comment) =>

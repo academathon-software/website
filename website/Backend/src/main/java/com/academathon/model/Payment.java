@@ -35,6 +35,12 @@ public class Payment {
 
     public enum PaymentStatus { PENDING, PROCESSING, SUCCEEDED, FAILED, REFUNDED }
 
+    public enum PaymentSource { CARD, WALLET }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_source", nullable = false, length = 10)
+    private PaymentSource paymentSource = PaymentSource.CARD;
+
     public Payment() {
         // JPA requires a public no-args constructor
     }
@@ -89,6 +95,14 @@ public class Payment {
 
     public void setStatus(PaymentStatus status) {
         this.status = status;
+    }
+
+    public PaymentSource getPaymentSource() {
+        return paymentSource;
+    }
+
+    public void setPaymentSource(PaymentSource paymentSource) {
+        this.paymentSource = paymentSource;
     }
 
     public LocalDateTime getCreatedAt() {

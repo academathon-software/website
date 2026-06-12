@@ -23,7 +23,7 @@ import {
 } from '@stripe/react-stripe-js';
 import StudentSidebar from '../Shared/StudentSidebar';
 import { useUser } from '../../context/UserContext';
-import { tutorAPI, bookingAPI, availabilityAPI, userAPI, paymentAPI } from '../../services/api';
+import { tutorAPI, bookingAPI, availabilityAPI, userAPI, paymentAPI, walletAPI } from '../../services/api';
 import { stripePromise } from '../../services/stripe';
 
 /**
@@ -156,24 +156,29 @@ const BookLesson = () => {
     setUserType('student');
   }, [setUserType]);
 
-  // Load the student's grade from their profile — they can no longer choose
-  // a grade per booking; it's locked to whatever they have set on their profile.
+  // Load the student's grade and wallet balance on mount.
   useEffect(() => {
     let cancelled = false;
-    const loadProfileGrade = async () => {
+    const loadProfileData = async () => {
       try {
-        const response = await userAPI.getCurrentUser();
+        const [profileResponse, walletResponse] = await Promise.all([
+          userAPI.getCurrentUser(),
+          walletAPI.getBalance().catch(() => null),
+        ]);
         if (cancelled) return;
-        const grade = response.data?.studentGrade || '';
+        const grade = profileResponse.data?.studentGrade || '';
         setStudentGradeLabel(grade);
         setSelectedGrade(resolveGradeFromLabel(grade));
+        if (walletResponse?.data?.balance != null) {
+          setWalletBalance(walletResponse.data.balance);
+        }
       } catch (err) {
-        console.error('Failed to load profile grade:', err);
+        console.error('Failed to load profile data:', err);
       } finally {
         if (!cancelled) setProfileLoading(false);
       }
     };
-    loadProfileGrade();
+    loadProfileData();
     return () => { cancelled = true; };
   }, []);
 
@@ -209,6 +214,10 @@ const BookLesson = () => {
   // before the student saves their card. Refetched any time the grade changes
   // (today it's locked to the profile but keeping the dep is cheap insurance).
   const [pricing, setPricing] = useState(null);
+
+  // Wallet balance — loaded once on mount so the booking popup can show
+  // whether the lesson will be paid from the wallet or needs a card.
+  const [walletBalance, setWalletBalance] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -467,17 +476,16 @@ const BookLesson = () => {
     setSelectedTimeSlot({ timeSlot, day, date, slotData });
   };
 
-  // Step 1: validate the slot and request a Stripe SetupIntent so the student can save
-  // a card. This transitions the confirmation popup into the "save card" sub-step.
+  // Step 1: validate the slot, then decide the payment path.
+  // - Wallet covers the lesson → submit the booking directly (no card step needed)
+  // - Wallet insufficient or empty → request a Stripe SetupIntent to save a card
   const handleBookLesson = async () => {
     try {
       setBookingLoading(true);
       setError(null);
 
       const tutor = tutors.find(t => t.id === selectedTutor);
-      if (!tutor) {
-        throw new Error('Selected tutor not found');
-      }
+      if (!tutor) throw new Error('Selected tutor not found');
 
       const slotData = selectedTimeSlot.slotData;
       if (!slotData || !slotData.startTime) {
@@ -498,6 +506,17 @@ const BookLesson = () => {
         return;
       }
 
+      // ── Wallet path ──────────────────────────────────────────────────────
+      // If the wallet has enough balance, submit the booking immediately.
+      // No Stripe SetupIntent, no card form — the backend deducts from the wallet
+      // when the tutor confirms.
+      const lessonPrice = pricing?.amount ?? 0;
+      if (walletBalance != null && walletBalance >= lessonPrice && lessonPrice > 0) {
+        await submitBookingWithPaymentMethod(null); // null = use wallet
+        return;
+      }
+
+      // ── Card path ────────────────────────────────────────────────────────
       setSetupLoading(true);
       const setupResponse = await paymentAPI.createSetupIntent();
       const clientSecret = setupResponse?.data?.clientSecret;
@@ -925,22 +944,52 @@ const BookLesson = () => {
                 );
               }
 
+              // Determine wallet coverage for this lesson
+              const lessonPrice = pricing?.amount ?? 0;
+              const walletCovers = walletBalance != null && walletBalance >= lessonPrice && lessonPrice > 0;
+              const walletPartial = walletBalance != null && walletBalance > 0 && walletBalance < lessonPrice;
+
               return (
                 <>
                   {summaryLine}
                   {priceLabel && (
                     <p className="bl-popup-price">Total: {priceLabel}</p>
                   )}
-                  <p className="bl-popup-hint">
-                    You'll save a card next. We only charge {priceLabel ? `${priceLabel} ` : 'it '}once your tutor confirms the booking.
-                  </p>
+
+                  {/* Wallet covers the full lesson */}
+                  {walletCovers && (
+                    <div className="bl-wallet-notice bl-wallet-notice--ok">
+                      <span className="bl-wallet-dot bl-wallet-dot--green" />
+                      Wallet balance <strong>${walletBalance.toFixed(2)} CAD</strong> — this lesson will be paid from your wallet. No card needed.
+                    </div>
+                  )}
+
+                  {/* Wallet exists but not enough */}
+                  {walletPartial && (
+                    <div className="bl-wallet-notice bl-wallet-notice--warn">
+                      <span className="bl-wallet-dot bl-wallet-dot--amber" />
+                      Your wallet has <strong>${walletBalance.toFixed(2)} CAD</strong> — not enough for this lesson. You can top up your wallet or pay by card below.
+                    </div>
+                  )}
+
+                  {/* No wallet balance — show standard hint */}
+                  {!walletCovers && !walletPartial && (
+                    <p className="bl-popup-hint">
+                      You'll save a card next. We only charge {priceLabel ? `${priceLabel} ` : 'it '}once your tutor confirms the booking.
+                    </p>
+                  )}
+
                   <div className="booking-confirmation-buttons">
                     <button
                       className="confirm-book-button"
                       onClick={handleBookLesson}
                       disabled={bookingLoading || setupLoading}
                     >
-                      {bookingLoading || setupLoading ? 'Preparing…' : 'Continue to payment'}
+                      {bookingLoading || setupLoading
+                        ? 'Preparing…'
+                        : walletCovers
+                          ? 'Book Lesson'
+                          : 'Continue to payment'}
                     </button>
                     <button
                       className="cancel-book-button"
