@@ -9,6 +9,7 @@ import com.academathon.repository.PaymentRepository;
 import com.academathon.repository.UserRepository;
 import com.academathon.service.WalletService;
 import com.stripe.Stripe;
+import com.stripe.exception.InvalidRequestException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.model.PaymentIntent;
@@ -101,7 +102,15 @@ public class PaymentService {
     @Transactional
     public String ensureStripeCustomer(User user) throws StripeException {
         if (user.getStripeCustomerId() != null && !user.getStripeCustomerId().isBlank()) {
-            return user.getStripeCustomerId();
+            try {
+                Customer.retrieve(user.getStripeCustomerId());
+                return user.getStripeCustomerId();
+            } catch (InvalidRequestException e) {
+                // Stored customer ID belongs to a different Stripe account/mode
+                // (e.g. after switching from test to live API keys) — create a fresh one.
+                System.out.println("[Stripe] stored customer " + user.getStripeCustomerId()
+                        + " not found, creating a new one for userId=" + user.getId());
+            }
         }
         CustomerCreateParams params = CustomerCreateParams.builder()
                 .setEmail(user.getEmail())
