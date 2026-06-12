@@ -145,29 +145,37 @@ const Wallet = () => {
     setClientSecret(null);
     setCustomAmount('');
     setSelectedPreset(null);
+    setSuccessMsg(`Payment confirmed! Updating your balance…`);
 
-    // Optimistically show the new balance immediately while we wait for the
-    // webhook to arrive. Stripe fires the webhook asynchronously so there's
-    // a short delay before the DB is actually updated.
-    setBalance(prev => (prev ?? 0) + resolvedAmount);
-    setSuccessMsg(`$${resolvedAmount.toFixed(2)} CAD added to your wallet!`);
+    // Poll the balance every 2 seconds until the webhook has fired and the
+    // DB reflects the new amount. Give up after 30 seconds (15 attempts).
+    const expectedAmount = resolvedAmount;
+    const balanceBefore = balance ?? 0;
+    let attempts = 0;
+    const maxAttempts = 15;
 
-    // Wait 4 seconds for the webhook to hit the backend, then fetch the real balance.
-    // Only apply the server value if it's >= the optimistic value — this prevents
-    // reverting the UI on local dev where no webhook listener is running.
-    setTimeout(async () => {
+    const poll = async () => {
+      attempts++;
       try {
         const [balanceRes, txRes] = await Promise.all([
           walletAPI.getBalance(),
           walletAPI.getTransactions(),
         ]);
-        const serverBalance = balanceRes.data.balance;
-        setBalance(prev => serverBalance >= prev ? serverBalance : prev);
-        setTransactions(txRes.data);
-      } catch (_) { /* best-effort — optimistic value stays */ }
-    }, 4000);
+        const newBalance = balanceRes.data.balance;
+        if (newBalance > balanceBefore || attempts >= maxAttempts) {
+          setBalance(newBalance);
+          setTransactions(txRes.data);
+          setSuccessMsg(`$${expectedAmount.toFixed(2)} CAD added to your wallet!`);
+          setTimeout(() => setSuccessMsg(null), 4000);
+        } else {
+          setTimeout(poll, 2000);
+        }
+      } catch (_) {
+        if (attempts < maxAttempts) setTimeout(poll, 2000);
+      }
+    };
 
-    setTimeout(() => setSuccessMsg(null), 6000);
+    setTimeout(poll, 2000);
   };
 
   const handleCancelStripe = () => {
