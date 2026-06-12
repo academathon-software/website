@@ -347,6 +347,8 @@
 
 .form-group input,
 .form-group select {
+  width: 100%;
+  box-sizing: border-box;
   padding: 9px 12px;
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -355,6 +357,14 @@
   color: var(--color-text-primary);
   background: var(--color-surface-raised);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* iOS gives date/time inputs an intrinsic width that overflows the card —
+   strip the native styling so width:100% is respected */
+.form-group input[type="date"],
+.form-group input[type="time"] {
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .form-group input:focus,
