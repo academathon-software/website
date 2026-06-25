@@ -14,6 +14,7 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.model.PaymentIntent;
 import com.stripe.model.SetupIntent;
+import com.stripe.net.RequestOptions;
 import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.PaymentIntentCreateParams;
 import com.stripe.param.SetupIntentCreateParams;
@@ -161,7 +162,15 @@ public class PaymentService {
      */
     @Transactional
     public void chargeBookingOffSession(Booking booking) {
-        // Avoid double-charging if a successful payment already exists
+        // Lock the student row FIRST so two concurrent tutor confirmations for this
+        // booking serialize here instead of racing. The second caller blocks until the
+        // first commits, then the duplicate-payment guard below sees the committed
+        // SUCCEEDED payment and returns without charging again.
+        User student = userRepository.findByIdWithLock(booking.getStudent().getId())
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+
+        // Avoid double-charging if a successful payment already exists. Reliable now
+        // that the lock above serializes concurrent confirms for this booking.
         boolean hasSuccessfulPayment = paymentRepository.findByBookingId(booking.getId()).stream()
                 .anyMatch(p -> p.getStatus() == Payment.PaymentStatus.SUCCEEDED);
         if (hasSuccessfulPayment) {
@@ -171,10 +180,6 @@ public class PaymentService {
         double amount = calculateAmount(booking.getGradeLevel());
 
         // --- WALLET PATH ---
-        // Re-fetch the student with a write lock so balance reads are safe under concurrency
-        User student = userRepository.findById(booking.getStudent().getId())
-                .orElseThrow(() -> new RuntimeException("Student not found"));
-
         if (student.getWalletBalance() >= amount) {
             // Sufficient wallet balance — deduct and skip Stripe entirely
             walletService.deductForBooking(student, booking, amount);
@@ -202,7 +207,7 @@ public class PaymentService {
         long amountInCents = Math.round(amount * 100);
         String customerId;
         try {
-            customerId = ensureStripeCustomer(booking.getStudent());
+            customerId = ensureStripeCustomer(student);
         } catch (StripeException e) {
             throw new RuntimeException("Could not resolve Stripe customer: " + e.getMessage(), e);
         }
@@ -220,9 +225,16 @@ public class PaymentService {
                 .setDescription("Academathon Tutoring Session - " + booking.getSubject())
                 .build();
 
+        // Idempotency key keyed on the booking: if this charge is ever invoked twice
+        // (double-click, retry, two tabs), Stripe returns the SAME PaymentIntent instead
+        // of creating a second charge. This is the hard backstop against double-charging.
+        RequestOptions requestOptions = RequestOptions.builder()
+                .setIdempotencyKey("booking-charge-" + booking.getId())
+                .build();
+
         PaymentIntent paymentIntent;
         try {
-            paymentIntent = PaymentIntent.create(params);
+            paymentIntent = PaymentIntent.create(params, requestOptions);
         } catch (StripeException e) {
             throw new RuntimeException("Card was declined: " + e.getMessage(), e);
         }
@@ -438,47 +450,44 @@ public class PaymentService {
                 .anyMatch(p -> p.getPaymentSource() == Payment.PaymentSource.WALLET);
     }
 
+    @Transactional
     public void refundPayment(Long bookingId) throws StripeException {
         // Find all payments for this booking
         var payments = paymentRepository.findByBookingId(bookingId);
 
-        // Find the successful payment
-        Payment payment = payments.stream()
+        // Refund EVERY successful payment, not just the first. If a duplicate charge ever
+        // slipped through, refunding only one would leave the customer out of pocket while
+        // the booking misleadingly shows REFUNDED.
+        var successfulPayments = payments.stream()
                 .filter(p -> p.getStatus() == Payment.PaymentStatus.SUCCEEDED)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No successful payment found for this booking"));
+                .toList();
+        if (successfulPayments.isEmpty()) {
+            throw new RuntimeException("No successful payment found for this booking");
+        }
 
-        Booking booking = payment.getBooking();
+        Booking booking = successfulPayments.get(0).getBooking();
 
-        // ── Wallet-paid booking: return funds to wallet, no Stripe call ────────
-        // Wallet payments use a synthetic ID (e.g. "wallet_123_456") rather than
-        // a real Stripe PaymentIntent, so we must never call PaymentIntent.retrieve()
-        // on them. Instead we credit the student's wallet balance directly.
-        if (payment.getPaymentSource() == Payment.PaymentSource.WALLET) {
-            User student = booking.getStudent();
-            double amount = payment.getAmount() != null ? payment.getAmount() : booking.getAmount();
-            walletService.refundToWallet(student, booking, amount);
+        for (Payment payment : successfulPayments) {
+            if (payment.getPaymentSource() == Payment.PaymentSource.WALLET) {
+                // ── Wallet-paid: return funds to wallet, no Stripe call ──────────
+                // Wallet payments use a synthetic ID (e.g. "wallet_123_456") rather than
+                // a real Stripe PaymentIntent, so we must never call PaymentIntent.retrieve()
+                // on them. Instead we credit the student's wallet balance directly.
+                User student = booking.getStudent();
+                double amount = payment.getAmount() != null ? payment.getAmount() : booking.getAmount();
+                walletService.refundToWallet(student, booking, amount);
+            } else {
+                // ── Card-paid: issue a real Stripe refund ────────────────────────
+                PaymentIntent paymentIntent = PaymentIntent.retrieve(payment.getStripePaymentIntentId());
+                Map<String, Object> refundParams = new HashMap<>();
+                refundParams.put("payment_intent", paymentIntent.getId());
+                com.stripe.model.Refund.create(refundParams);
+            }
 
             payment.setStatus(Payment.PaymentStatus.REFUNDED);
             paymentRepository.save(payment);
-
-            booking.setPaymentStatus(Booking.PaymentStatus.REFUNDED);
-            bookingRepository.save(booking);
-            return;
         }
 
-        // ── Card-paid booking: issue a real Stripe refund ─────────────────────
-        PaymentIntent paymentIntent = PaymentIntent.retrieve(payment.getStripePaymentIntentId());
-
-        Map<String, Object> refundParams = new HashMap<>();
-        refundParams.put("payment_intent", paymentIntent.getId());
-        com.stripe.model.Refund.create(refundParams);
-
-        // Update payment status
-        payment.setStatus(Payment.PaymentStatus.REFUNDED);
-        paymentRepository.save(payment);
-
-        // Update booking
         booking.setPaymentStatus(Booking.PaymentStatus.REFUNDED);
         bookingRepository.save(booking);
     }
